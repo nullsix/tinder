@@ -9,8 +9,7 @@
 <body>
   <div class="container">
     <header>
-        <h1>tinder</h1>
-        <p>Fuel your creativity</p>
+      <h1>tinder <small>- fuel your creativity</small></h1>
     </header>
 
     <% if flash[:notice] %>
@@ -23,13 +22,15 @@
           <%= link_to "Sign Out", signout_path %>
         </div>
       <% else %>
-        <div class="hero-unit">
-          <h1><%= link_to "Sign in with Google", "/auth/google_oauth2" %></h1>
+        <div class="hero-unit pagination-centered">
+          <h1><%= link_to raw("<i class=\"icon-user\"></i> ")+"Sign in with Google", "/auth/google_oauth2" %></h1>
         </div>
       <% end %>
     </div>
 
   <%= yield %>
+
+  <footer><p class="muted">&copy; 2012 | a <%= link_to "nullsix", "http://nullsix.com" %> passion</p></footer>
 </div>
 
 </body>

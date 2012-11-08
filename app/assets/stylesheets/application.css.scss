@@ -11,12 +11,30 @@
  *= require_self
  *= require_tree .
  */
+@import 'bootstrap';
+/* Font Awesome - http://fortawesome.github.com/Font-Awesome */
+@import 'font-awesome';
+@import url(http://fonts.googleapis.com/css?family=Strait);
+
 header {
   padding-bottom: 20px;
+
+  h1 {
+    font-family: 'Strait', sans-serif;
+  }
+  
+}
+
+.hero-unit {
+  a:hover { text-decoration: none; }
 }
 
 #flash {
   width: 100%;
   border: solid 1px #3D7220;
   background: #66BF35;
+}
+
+footer {
+  text-align: center;
 }
