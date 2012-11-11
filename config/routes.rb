@@ -1,5 +1,5 @@
 Tinder::Application.routes.draw do
-  root to: "users#index"
+  root to: "pages#index"
 
   match "/auth/:provider/callback" => "sessions#create"
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>tinder</title>
   <%= stylesheet_link_tag    "application", :media => "all" %>
@@ -7,20 +7,42 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <% if flash[:notice] %>
-    <div id="flash"><%= flash[:notice] %></div>
-  <% end %>
+  <div class="container">
+    <header class="row">
+      <h1 class="pull-left"><span>tinder</span> <small>- fuel your creativity</small></h1>
+      <% if current_user %>
+        <div class="navbar pull-right">
+          <div class="navbar-inner">
+            <ul class="nav">
+              <li><%= link_to current_user.name, "/profile", class: :brand %></li>
+              <li class="divider-vertical"></li>
+              <li><%= link_to "Sign Out", signout_path %></li>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+    </header>
 
-  <div id="user_nav">
-    <% if current_user %>
-      Welcome, <%= current_user.name %>!
-      <%= link_to "Sign Out", signout_path %>
-    <% else %>
-      <%= link_to "Sign in with Google", "/auth/google_oauth2" %>
+    <% if flash[:notice] %>
+      <div class="row">
+        <div class="alert alert-info"><strong><%= flash[:notice] %></strong></div>
+      </div>
     <% end %>
-  </div>
 
-<%= yield %>
+    <% if !current_user %>
+      <div class="row">
+        <div class="hero-unit pagination-centered">
+          <h1><%= link_to raw("<i class=\"icon-user\"></i> ")+"Sign in with Google", "/auth/google_oauth2" %></h1>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="row">
+      <%= yield %>
+    </div>
+
+    <footer class="row"><p class="muted">&copy; 2012 | a <%= link_to "nullsix", "http://nullsix.com" %> passion</p></footer>
+  </div>
 
 </body>
 </html>
