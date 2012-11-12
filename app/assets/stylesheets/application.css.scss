@@ -44,5 +44,5 @@ header {
 }
 
 footer {
-  text-align: center;
+  @extend .centered;
 }
