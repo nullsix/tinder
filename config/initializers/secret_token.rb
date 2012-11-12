@@ -4,4 +4,4 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-Tinder::Application.config.secret_token = 'd8af94d0e261a1014b6c5ad3229a92547ad982359654858b0f0912ff269d89ae5256d1768a63857bdf0559650a399e2815eef5679d582a5aebf47200ea020765'
+Tinder::Application.config.secret_token = '2b74d289615bf6413fc56c73d26e8b8a185e00190c28d330c93d6f416536493352ab5b88825f6e8cbb219483251b3359659e83c8ce5e813a119fa0b694c7151e'
