@@ -14,6 +14,9 @@ group :development, :test do
   gem 'rspec-rails', '2.11.0'
   gem 'taps', '0.3.24'
   gem 'guard-rspec', '2.1.1'
+  gem 'guard-livereload', '1.1.0'
+  gem 'yajl-ruby', '1.1.0'
+  gem 'rack-livereload'
 end
 
 # Gems used only for assets and not required
