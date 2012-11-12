@@ -8,20 +8,7 @@
 </head>
 <body>
   <div class="container">
-    <header class="row">
-      <h1 class="pull-left"><span>tinder</span> <small>- fuel your creativity</small></h1>
-      <% if current_user %>
-        <div class="navbar pull-right">
-          <div class="navbar-inner">
-            <ul class="nav">
-              <li><%= link_to current_user.name, "/profile", class: :brand %></li>
-              <li class="divider-vertical"></li>
-              <li><%= link_to "Sign Out", signout_path %></li>
-            </ul>
-          </div>
-        </div>
-      <% end %>
-    </header>
+    <%= render 'layouts/header' %>
 
     <% if flash[:notice] %>
       <div class="row">

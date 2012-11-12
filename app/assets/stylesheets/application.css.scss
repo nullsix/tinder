@@ -21,7 +21,10 @@ header {
   div {  padding:10px 0px; }
 
   h1 {
-    span { font-family: 'Strait', sans-serif; }
+    a {
+      font-family: 'Strait', sans-serif;
+      &:hover { text-decoration: none; }
+    }
   }
   
 }
