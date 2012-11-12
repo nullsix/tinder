@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Layouts" do
   subject { page }
   before :each do
-    visit '/'
+    visit root_path
   end
 
   describe "Home page" do
