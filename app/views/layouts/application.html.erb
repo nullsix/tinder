@@ -17,14 +17,6 @@
       </div>
     <% end %>
 
-    <% if !current_user %>
-      <div class="row">
-        <div class="centered hero-unit">
-          <h1><%= link_to raw("<i class=\"icon-user\"></i> ")+"Sign in with Google", "/auth/google_oauth2" %></h1>
-        </div>
-      </div>
-    <% end %>
-
     <div class="row">
       <%= yield %>
     </div>
