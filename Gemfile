@@ -39,6 +39,7 @@ group :test do
   gem 'growl', '1.0.3'
   gem 'guard-spork', '1.2.3'
   gem 'spork', '0.9.2'
+  gem 'fakefs', '0.4.0', require: 'fakefs/safe'
 end
 
 # To use ActiveModel has_secure_password
