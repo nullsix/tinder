@@ -42,8 +42,13 @@ describe User do
         end
 
         it "should create a user directory" do
-          data_path = Rails.root.join("data")
-          assert File.directory?(File.join(data_path, auth["uid"].to_s))
+          def user_dir
+            data_path = Rails.root.join("data")
+            user_path = File.join(data_path, auth["uid"].to_s)
+            File.directory?(user_path)
+          end
+
+          user_dir.should be_true
         end
       end
     end
