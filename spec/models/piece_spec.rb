@@ -1,5 +1,15 @@
 require 'spec_helper'
 
 describe Piece do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "instance methods" do
+    let(:piece) { Piece.new }
+
+    it "should respond to .content" do
+      piece.should respond_to(:content)
+    end
+
+    it "should respond to .title" do
+      piece.should respond_to(:title)
+    end
+  end
 end
