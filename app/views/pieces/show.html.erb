@@ -1,3 +1,4 @@
 <% provide :title, @piece.current_version.title %>
 <h2><%= @piece.current_version.title %></h2>
 <p><%= @piece.current_version.content %></p>
+<p><%= link_to "delete", piece_path(@piece.id), method: :delete %></p>

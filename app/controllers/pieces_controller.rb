@@ -25,4 +25,14 @@ class PiecesController < ApplicationController
   def show
     @piece = Piece.find_by_id params[:id]
   end
+
+  def destroy
+    @piece = Piece.find_by_id params[:id]
+
+    redirect_to root_url unless @piece && @piece.user = current_user
+
+    @piece.destroy
+
+    redirect_to pieces_path
+  end
 end
