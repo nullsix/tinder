@@ -1,8 +1,11 @@
+<% provide :title, "pieces" %>
 <% if @pieces.empty? %>
   <p>You have no pieces.</p>
 <% else %>
   <% @pieces.each do |piece| %>
-    <p><%= link_to piece.title, piece_path(piece.id) %>
+    <p>
+      <%= link_to piece.current_version.title, piece_path(piece.id) %>
+    </p>
   <% end %>
 <% end %>
 <p><%= link_to "Create one!", new_piece_path %></p>

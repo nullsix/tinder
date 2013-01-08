@@ -4,13 +4,13 @@
 
 <%= form_for @piece do |f| %>
   <div>
-    <%= f.label :title %>
-    <%= f.text_field :title %>
+    <%= label :version, :title %>
+    <%= text_field :version, :title %>
   </div>
 
   <div>
-    <%= f.label :content %>
-    <%= f.text_area :content %>
+    <%= label :version, :content %>
+    <%= text_area :version, :content %>
   </div>
 
   <div><%= f.submit %></div>

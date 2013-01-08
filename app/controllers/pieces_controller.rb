@@ -12,7 +12,9 @@ class PiecesController < ApplicationController
   end
 
   def create
+    version = Version.new title: params[:version][:title], content: params[:version][:content]
     @piece = current_user.pieces.build(params[:piece])
+    @piece.versions << version
     if @piece.save
       redirect_to piece_path(@piece)
     else

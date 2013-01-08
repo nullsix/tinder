@@ -1,2 +1,3 @@
-<h2><%= @piece.title %></h2>
-<p><%= @piece.content %></p>
+<% provide :title, @piece.current_version.title %>
+<h2><%= @piece.current_version.title %></h2>
+<p><%= @piece.current_version.content %></p>
