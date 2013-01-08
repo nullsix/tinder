@@ -1,0 +1,17 @@
+<% title = 'new piece' %>
+<% provide :title, title %>
+<h1><%= title %></h1>
+
+<%= form_for @piece do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+
+  <div>
+    <%= f.label :content %>
+    <%= f.text_area :content %>
+  </div>
+
+  <div><%= f.submit %></div>
+<% end %>

@@ -1,0 +1,8 @@
+<% if @pieces.empty? %>
+  <p>You have no pieces.</p>
+<% else %>
+  <% @pieces.each do |piece| %>
+    <p><%= link_to piece.title, piece_path(piece.id) %>
+  <% end %>
+<% end %>
+<p><%= link_to "Create one!", new_piece_path %></p>

@@ -6,6 +6,8 @@
         <ul class="nav">
           <li><%= link_to current_user.name, "/profile", class: :brand %></li>
           <li class="divider-vertical"></li>
+          <li><%= link_to "Pieces", pieces_path %></li>
+          <li class="divider-vertical"></li>
           <li><%= link_to "Sign Out", signout_path %></li>
         </ul>
       </div>

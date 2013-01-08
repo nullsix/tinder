@@ -5,7 +5,7 @@ Tinder::Application.routes.draw do
 
   match "/signout" => "sessions#destroy", :as => :signout
 
-  resources :users
+  resources :users, :pieces
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
