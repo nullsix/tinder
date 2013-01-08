@@ -10,13 +10,6 @@ class User < ActiveRecord::Base
       end
     end
 
-    def self.create_user_folders(id)
-      data_path = Rails.root.join("data")
-      FileUtils.mkdir_p(File.join(data_path, id.to_s))
-    end
-
-    user = create_the_user(auth)
-    create_user_folders(auth["uid"])
-    user
+    create_the_user(auth)
   end
 end

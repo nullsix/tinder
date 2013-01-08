@@ -16,7 +16,6 @@ describe User do
   describe "self" do
     describe ".create_with_omniauth" do
       describe "creating a user" do
-        include FakeFS::SpecHelpers 
 
         let(:auth) { {"provider" => :test, "uid" => :test, "info" => { "name" => "test" }} }
         before {
@@ -39,16 +38,6 @@ describe User do
 
         it "should have the right name" do
           @user.name.should eq(auth["info"]["name"])
-        end
-
-        it "should create a user directory" do
-          def user_dir
-            data_path = Rails.root.join("data")
-            user_path = File.join(data_path, auth["uid"].to_s)
-            File.directory?(user_path)
-          end
-
-          user_dir.should be_true
         end
       end
     end
