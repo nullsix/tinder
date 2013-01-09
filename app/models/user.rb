@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
-  attr_accessible :name, :provider, :uid
   has_many :pieces
+  accepts_nested_attributes_for :pieces
 
   def self.create_with_omniauth(auth)
     def self.create_the_user(auth)

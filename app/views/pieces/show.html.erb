@@ -1,4 +1,3 @@
 <% provide :title, @piece.current_version.title %>
-<h2><%= @piece.current_version.title %></h2>
-<p><%= @piece.current_version.content %></p>
+<%= render template: 'versions/show', locals: { version: @piece.current_version } %>
 <p><%= link_to "delete", piece_path(@piece.id), method: :delete %></p>

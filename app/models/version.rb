@@ -1,3 +1,5 @@
 class Version < ActiveRecord::Base
-  attr_accessible :content, :title
+  belongs_to :piece
+
+  attr_accessible :title, :content, :piece
 end
