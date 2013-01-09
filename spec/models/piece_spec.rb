@@ -4,12 +4,12 @@ describe Piece do
   describe "instance methods" do
     let(:piece) { Piece.new }
 
-    it "should respond to .content" do
-      piece.should respond_to(:content)
+    it "should respond to #versions" do
+      piece.should respond_to(:versions)
     end
 
-    it "should respond to .title" do
-      piece.should respond_to(:title)
+    it "should respond to #current_version" do
+      piece.should respond_to(:current_version)
     end
   end
 end
