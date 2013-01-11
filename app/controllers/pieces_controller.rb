@@ -3,7 +3,8 @@ class PiecesController < ApplicationController
   before_filter :signed_in_user
 
   def index
-    @pieces = current_user.pieces
+    #TODO: Need this to get past the fact that you can now create a piece without a version... Is this the way we really want to go?!
+    @pieces = current_user.pieces.select { |p| !p.versions.empty? }
   end
 
   def new
