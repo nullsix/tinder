@@ -4,9 +4,9 @@
 <% else %>
   <% @pieces.each do |piece| %>
     <p>
-      <%= link_to piece.current_version.title, piece_path(piece.id) %>
-      | <%= link_to "edit", edit_piece_path(piece.id) %>
-      | <%= link_to "delete", piece_path(piece.id), method: :delete %>
+      <%= link_to piece.current_version.title, piece %>
+      | <%= link_to "edit", edit_piece_path(piece) %>
+      | <%= link_to "delete", piece, method: :delete %>
     </p>
   <% end %>
 <% end %>
