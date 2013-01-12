@@ -13,5 +13,5 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
-config/initializers/google.rb
+config/initializers/env.sh
 .DS_Store
