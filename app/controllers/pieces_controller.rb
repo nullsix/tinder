@@ -3,22 +3,17 @@ class PiecesController < ApplicationController
   before_filter :signed_in_user
 
   def index
-    #TODO: Need this to get past the fact that you can now create a piece without a version... Is this the way we really want to go?!
-    @pieces = current_user.pieces.select { |p| !p.versions.empty? }
+    @pieces = current_user.pieces
   end
 
   def new
-    redirect_to root_url if !current_user
-
-    @piece = Piece.new(user: current_user)
-    @piece.save
-    
+    @piece = current_user.pieces.build
     @version = @piece.versions.build
   end
 
   def create
-    @piece = current_user.pieces.build(params[:piece])
-    @version = @piece.versions.build params[:version]
+    @piece = current_user.pieces.build params[:piece]
+    @version = @piece.current_version
     if @piece.save
       redirect_to piece_path(@piece)
     else
@@ -27,27 +22,42 @@ class PiecesController < ApplicationController
   end
 
   def edit
-    @piece = current_user.pieces.find(params[:id])
+    get_piece
     @version = @piece.current_version
   end
 
   def update
-    @piece = current_user.pieces.find(params[:id])
-    @version = @piece.current_version
-    #TODO: Have to do some more stuff here...
+    get_piece
+    # The form actually contains the version information we want, but
+    # it's formatted as if we are going to update the version. Since
+    # we're creating a new version instead of modifying an existing
+    # one, we have to dig into the params hash to get the version
+    # data to use to build a new version object.
+    @version = @piece.versions.build params[:piece][:versions_attributes]["0"]
+
+    if @piece.save
+      redirect_to piece_path(@piece)
+    else
+      render 'piece/edit', notice: "Sorry, this was not a valid piece."
+    end
   end
 
   def show
-    @piece = Piece.find params[:id]
+    get_piece
   end
 
   def destroy
-    @piece = Piece.find params[:id]
+    get_piece
 
     redirect_to root_url unless @piece && @piece.user = current_user
 
     @piece.destroy
 
     redirect_to pieces_path
+  end
+
+  private
+  def get_piece
+    @piece = current_user.pieces.find params[:id]
   end
 end

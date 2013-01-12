@@ -1,15 +1,22 @@
-<%= form_for ([@piece, @version]) do |f| %>
-  <%= f.fields_for @version do |version_fields| %>
+<%= form_for @piece do |piece_form| %>
+  <% if @piece.errors.any? %>
+    <h3><%= pluralize(@piece.errors.count, "error") %> kept us from saving your piece.</h3>
+    <% @piece.errors.full_message.each do |msg| %>
+      <p><%= msg %></p>
+    <% end %>
+  <% end %>
+
+  <%= piece_form.fields_for :versions, @version do |version_fields| %>
     <div>
-      <%= f.label :title %>
-      <%= f.text_field :title %>
+      <%= version_fields.label :title %>
+      <%= version_fields.text_field :title %>
     </div>
 
     <div>
-      <%= f.label :content %>
-      <%= f.text_area :content %>
+      <%= version_fields.label :content %>
+      <%= version_fields.text_area :content %>
     </div>
   <% end %>
 
-  <div><%= f.submit "Update Piece" %></div>
+  <div><%= piece_form.submit %></div>
 <% end %>
