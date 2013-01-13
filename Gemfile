@@ -35,11 +35,19 @@ gem 'jquery-rails', '2.0.2'
 
 group :test do
   gem 'capybara', '1.1.2'
-  gem 'rb-fsevent', '0.9.2', require: false
-  gem 'growl', '1.0.3'
   gem 'guard-spork', '1.2.3'
   gem 'spork', '0.9.2'
-  gem 'fakefs', '0.4.0', require: 'fakefs/safe'
+
+  # For watching the file system and notifications on...
+  #   linux
+  gem 'rb-inotify', require: false
+  gem 'libnotify', require: false
+  #   os x
+  gem 'rb-fsevent', require: false
+  gem 'growl', require: false
+  #   windows
+  gem 'wdm', :platforms => [:mswin, :mingw], :require => false
+  gem 'rb-notifu', require: false
 end
 
 # To use ActiveModel has_secure_password
