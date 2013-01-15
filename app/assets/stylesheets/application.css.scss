@@ -15,10 +15,21 @@
 @import 'bootstrap-responsive';
 /* Font Awesome - http://fortawesome.github.com/Font-Awesome */
 @import 'font-awesome';
-@import url(http://fonts.googleapis.com/css?family=Strait);
+@import url(http://fonts.googleapis.com/css?family=Dosis:400,700|Open+Sans:400,700,400italic,700italic|Exo:700);
+$baseFontFamily: "Open Sans", $sansFontFamily;
+$logoFontFamily: "Exo", $sansFontFamily;
+$headerFontFamily: "Dosis", $sansFontFamily;
 
 html {
   overflow-y: scroll;
+}
+
+html, a { font-weight: 400; }
+
+h1,h2,h3,h4,h5,h6 {
+  color: $linkColor;
+  font-family: $headerFontFamily;
+  font-weight: 400;
 }
 
 section {
@@ -37,8 +48,11 @@ header {
   div {  padding:10px 0px; }
 
   h1 {
+    font-weight: 400;
+
     a {
-      font-family: 'Strait', sans-serif;
+      font-family: $logoFontFamily;
+      font-weight: 700;
 
       &:hover {
         text-decoration: none;
@@ -49,6 +63,11 @@ header {
 }
 
 .hero-unit {
+  a {
+    font-family: $baseFontFamily;
+    font-weight: 700;
+  }
+
   a:hover { text-decoration: none; }
 }
 
@@ -60,4 +79,5 @@ header {
 
 footer {
   @extend .centered;
+  margin-top: 30px;
 }
