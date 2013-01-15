@@ -11,12 +11,15 @@
  *= require_self
  *= require_tree .
  */
+$baseFontFamily: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif !default;
+$sansFontFamily: $baseFontFamily;
+
 @import 'bootstrap';
 @import 'bootstrap-responsive';
 /* Font Awesome - http://fortawesome.github.com/Font-Awesome */
 @import 'font-awesome';
 @import url(http://fonts.googleapis.com/css?family=Dosis:400,700|Open+Sans:400,700,400italic,700italic|Exo:700);
-$baseFontFamily: "Open Sans", $sansFontFamily;
+
 $logoFontFamily: "Exo", $sansFontFamily;
 $headerFontFamily: "Dosis", $sansFontFamily;
 
