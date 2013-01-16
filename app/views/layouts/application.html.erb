@@ -11,11 +11,7 @@
   <div class="container">
     <%= render 'layouts/header' %>
 
-    <% if flash[:notice] %>
-      <div class="row">
-        <div class="alert alert-info"><strong><%= flash[:notice] %></strong></div>
-      </div>
-    <% end %>
+    <%= render 'layouts/flashes' %>
 
     <div class="row">
       <%= yield %>
