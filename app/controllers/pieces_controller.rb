@@ -13,11 +13,12 @@ class PiecesController < ApplicationController
 
   def create
     @piece = current_user.pieces.build params[:piece]
-    @version = @piece.current_version
+    @version = @piece.versions.build params[:version]
+
     if @piece.save
-      redirect_to piece_path(@piece)
+      redirect_to @piece, notice: "Piece was successfully created."
     else
-      render 'piece/new', notice: 'Sorry, this was not a valid piece.'
+      render action: 'new'
     end
   end
 
@@ -28,17 +29,13 @@ class PiecesController < ApplicationController
 
   def update
     get_piece
-    # The form actually contains the version information we want, but
-    # it's formatted as if we are going to update the version. Since
-    # we're creating a new version instead of modifying an existing
-    # one, we have to dig into the params hash to get the version
-    # data to use to build a new version object.
-    @version = @piece.versions.build params[:piece][:versions_attributes]["0"]
+    @version = @piece.versions.build params[:version]
+    #TODO: We don't want to create a new version if it's the exact same as before. Can we enfore a uniqueness of title and content?
 
     if @piece.save
-      redirect_to piece_path(@piece)
+      redirect_to @piece, notice: "Piece was successfully updated."
     else
-      render 'piece/edit', notice: "Sorry, this was not a valid piece."
+      render action: 'edit'
     end
   end
 
@@ -53,7 +50,7 @@ class PiecesController < ApplicationController
 
     @piece.destroy
 
-    redirect_to pieces_path
+    redirect_to pieces_path, notice: "Piece was successfully deleted."
   end
 
   private

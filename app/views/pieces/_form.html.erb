@@ -1,22 +1,25 @@
-<%= form_for @piece do |piece_form| %>
-  <% if @piece.errors.any? %>
-    <h3><%= pluralize(@piece.errors.count, "error") %> kept us from saving your piece.</h3>
-    <% @piece.errors.full_message.each do |msg| %>
-      <p><%= msg %></p>
-    <% end %>
-  <% end %>
-
-  <%= piece_form.fields_for :versions, @version do |version_fields| %>
-    <div>
-      <%= version_fields.label :title %>
-      <%= version_fields.text_field :title %>
-    </div>
-
-    <div>
-      <%= version_fields.label :content %>
-      <%= version_fields.text_area :content %>
+<%= form_for @piece, class: "span12" do |piece_form| %>
+  <% if @version.errors.any? %>
+    <div class="row">
+      <div id="error_explanation" class="text-error span12">
+        <h3 class="text-error"><%= pluralize(@version.errors.count, "error") %> kept us from saving your piece.</h3>
+        <ul>
+        <% @version.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
     </div>
   <% end %>
 
-  <div><%= piece_form.submit %></div>
+  <%= fields_for :version, @version do |version_fields| %>
+    <div class="row">
+      <div class="span12">
+        <%= version_fields.text_field :title, placeholder: :title %>
+        <%= version_fields.text_area :content, placeholder: :content %>
+      </div>
+    </div>
+  <% end %>
+
+  <div><%= piece_form.submit class: "btn btn-primary" %></div>
 <% end %>
