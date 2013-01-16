@@ -1,13 +1,21 @@
-<% provide :title, "pieces" %>
-<% if @pieces.empty? %>
-  <p>You have no pieces.</p>
-<% else %>
-  <% @pieces.each do |piece| %>
-    <p>
-      <%= link_to piece.current_version.title, piece %>
-      | <%= link_to "edit", edit_piece_path(piece) %>
-      | <%= link_to "delete", piece, method: :delete %>
-    </p>
-  <% end %>
-<% end %>
-<p><%= link_to "Create one!", new_piece_path %></p>
+<% title = 'your pieces' %>
+<% provide :title, title %>
+
+<div class="row">
+  <div class="span12">
+    <h1><%= title %></h1>
+
+    <% if @pieces.empty? %>
+      <p>You have no pieces.</p>
+    <% else %>
+      <% @pieces.each do |piece| %>
+        <p>
+          <%= link_to piece.current_version.title, piece %>
+          | <%= link_to "edit", edit_piece_path(piece) %>
+          | <%= link_to "delete", piece, method: :delete %>
+        </p>
+      <% end %>
+    <% end %>
+    <p><%= link_to "Create one!", new_piece_path %></p>
+  </div>
+</div>

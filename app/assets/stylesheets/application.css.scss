@@ -84,3 +84,7 @@ footer {
   @extend .centered;
   margin-top: 30px;
 }
+
+textarea, input {
+  width: 100%;
+}
