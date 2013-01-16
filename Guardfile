@@ -12,6 +12,7 @@ guard 'spork', :cucumber_env => { 'RAILS_ENV' => 'test' }, :rspec_env => { 'RAIL
   watch('test/test_helper.rb') { :test_unit }
   watch('spec/support/')
   watch(%r{features/support/}) { :cucumber }
+  watch(%r{^spec/factories/.+\.rb}) { :rspec }
 end
 
 guard 'rspec', all_after_pass: false, cli: '--drb' do
@@ -26,6 +27,7 @@ guard 'rspec', all_after_pass: false, cli: '--drb' do
   watch(%r{^spec/support/(.+)\.rb$})                  { "spec" }
   watch('config/routes.rb')                           { "spec/routing" }
   watch('app/controllers/application_controller.rb')  { "spec/controllers" }
+  watch(%r{^spec/factories/(.+)\.rb$})                { |m| "spec/models/#{m[1]}_spec.rb" }
 
   # Capybara feature specs
   watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/features/#{m[1]}_spec.rb" }
