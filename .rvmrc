@@ -1,4 +1,2 @@
-rvm use 1.9.3
-rvm gemset create tinder
-rvm gemset use tinder
+rvm use 1.9.3@tinder --create
 source config/initializers/env.sh
