@@ -11,8 +11,4 @@ class Piece < ActiveRecord::Base
   def current_version
     versions.last
   end
-
-  def current_version= version
-    versions << version
-  end
 end
