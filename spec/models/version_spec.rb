@@ -98,5 +98,16 @@ describe Version do
         version.should be_valid
       end
     end
+
+    describe "piece" do
+      it "is not valid without a piece" do
+        version = build_stubbed :version, piece: nil
+        version.should_not be_valid
+      end
+
+      it "is valid with a piece" do
+        @version.should be_valid
+      end
+    end
   end
 end
