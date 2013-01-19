@@ -1,37 +1,37 @@
 require 'spec_helper'
 
 describe Piece do
-  def versions_count; 2 end
   
-  def piece
-    @p ||= build_stubbed :piece, versions_count: versions_count
+  before :all do
+    @versions_count = 2
+    @piece = build_stubbed :piece, versions_count: @versions_count
   end
 
   describe "instance methods" do
     describe "#versions" do
       it "responds to #versions" do
-        piece.should respond_to(:versions)
+        @piece.should respond_to(:versions)
       end
       
       it "has the correct number of versions" do
-        piece = create :piece, versions_count: versions_count
-        piece.versions.length.should == versions_count
+        piece = create :piece, versions_count: @versions_count
+        piece.versions.length.should == @versions_count
       end
     end
 
     describe "#current_version" do
       it "responds to #current_version" do
-        piece.should respond_to(:current_version)
+        @piece.should respond_to(:current_version)
       end
 
       it "has a #current_version is the last item in #versions" do
-        piece.current_version.should ==(piece.versions.last)
+        @piece.current_version.should ==(@piece.versions.last)
       end
     end
   end
 
   it "has a user" do
-    piece.user.should_not be_nil
+    @piece.user.should_not be_nil
   end
 
   it "is not valid without a user" do
@@ -50,24 +50,21 @@ describe Piece do
   end
 
   describe "a new version" do
-    def piece
-      @np ||= create :piece
-    end
-
-    def new_version
-      @nv ||= create :version, piece: piece
+    before :all do
+      @piece = create :piece
+      @new_version = create :version, piece: @piece
     end
 
     it "saves the new version" do
-      new_version.should_not be_a_new_record
+      @new_version.should_not be_a_new_record
     end
 
     it "has piece as its piece" do
-      new_version.piece.should ==(piece)
+      @new_version.piece.should ==(@piece)
     end
 
     it "adds the new version to the versions collection" do
-      piece.versions.should include(new_version)
+      @piece.versions.should include(@new_version)
     end
 
     it "sets the new version as the current version" do

@@ -3,11 +3,11 @@ require 'spec_helper'
 describe User do
 
   describe "instance methods" do
-    def user
-      @u ||= build_stubbed :user
+    before :all do
+      @user = build_stubbed :user
     end
 
-    subject { user }
+    subject { @user }
 
     it { should respond_to(:name) }
     it { should respond_to(:pieces) }
@@ -18,28 +18,25 @@ describe User do
   describe "::create_with_omniauth" do
     describe "creating a user" do
 
-      def auth
-        @a ||= {"provider" => "test", "uid" => "test", "info" => { "name" => "test" }}
+      before :all do
+        @auth = {"provider" => "test", "uid" => "test", "info" => { "name" => "test" }}
+        @user = User.create_with_omniauth @auth
       end
 
-      def user
-        @u ||= User.create_with_omniauth auth
-      end
-
-      subject { user }
+      subject { @user }
 
       it { should be_valid }
 
       it "has the right uid" do
-        subject.uid.should ==(auth["uid"])
+        subject.uid.should ==(@auth["uid"])
       end
 
       it "has the right provider" do
-        subject.provider.should ==(auth["provider"])
+        subject.provider.should ==(@auth["provider"])
       end
 
       it "has the right name" do
-        subject.name.should ==(auth["info"]["name"])
+        subject.name.should ==(@auth["info"]["name"])
       end
 
       it "is saved" do

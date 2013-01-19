@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Version do
-  def version
-    @v ||= build_stubbed :version
+  before :all do
+    @version = build_stubbed :version
   end
 
-  subject { version }
+  subject { @version }
 
   it "has a valid factory" do
     should be_valid
@@ -19,13 +19,13 @@ describe Version do
     it { should respond_to(:piece) }
 
     describe "#title" do
-      subject { version.title }
+      subject { @version.title }
 
       it { should be_a(String) }
     end
 
     describe "#content" do
-      subject { version.content }
+      subject { @version.content }
 
       it { should be_a(String) }
     end
