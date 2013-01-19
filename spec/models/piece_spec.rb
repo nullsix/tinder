@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Piece do
+
+  it "has a valid factory" do
+    FactoryGirl.build_stubbed(:piece).should be_valid
+  end
   
   before :all do
     @versions_count = 2

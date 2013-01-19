@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe User do
 
+  it "has a valid factory" do
+    FactoryGirl.build_stubbed(:user).should be_valid
+  end
+
   describe "instance methods" do
     before :all do
       @user = build_stubbed :user

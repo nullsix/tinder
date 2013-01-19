@@ -1,16 +1,17 @@
 require 'spec_helper'
 
 describe Version do
+
+  it "has a valid factory" do
+    FactoryGirl.build_stubbed(:version).should be_valid
+  end
+  
   before :all do
     @version = build_stubbed :version
   end
 
   subject { @version }
 
-  it "has a valid factory" do
-    should be_valid
-  end
-  
   describe "instance methods" do
     it { should respond_to(:title) }
 
