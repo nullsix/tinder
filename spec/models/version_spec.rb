@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Version do
   def version
-    build_stubbed :version
+    @v ||= build_stubbed :version
   end
 
   subject { version }
@@ -68,7 +68,7 @@ describe Version do
       end
     end
 
-    describe "#content" do
+    describe "content" do
       it "is not valid without a content" do
         version = build_stubbed :version, content: nil
 

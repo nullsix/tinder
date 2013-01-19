@@ -3,7 +3,9 @@ require 'spec_helper'
 describe User do
 
   describe "instance methods" do
-    let(:user) { build_stubbed :user }
+    def user
+      @u ||= build_stubbed :user
+    end
 
     subject { user }
 
@@ -16,8 +18,13 @@ describe User do
   describe "::create_with_omniauth" do
     describe "creating a user" do
 
-      let(:auth) { {"provider" => "test", "uid" => "test", "info" => { "name" => "test" }} }
-      let(:user) { User.create_with_omniauth(auth) }
+      def auth
+        @a ||= {"provider" => "test", "uid" => "test", "info" => { "name" => "test" }}
+      end
+
+      def user
+        @u ||= User.create_with_omniauth auth
+      end
 
       subject { user }
 
@@ -41,4 +48,3 @@ describe User do
     end
   end
 end
-
