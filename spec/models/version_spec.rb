@@ -14,9 +14,7 @@ describe Version do
 
   describe "instance methods" do
     it { should respond_to(:title) }
-
     it { should respond_to(:content) }
-
     it { should respond_to(:piece) }
 
     describe "#title" do
@@ -52,10 +50,6 @@ describe Version do
         version.should be_valid
       end
       
-      it "is valid with a non-blank title" do
-        should be_valid
-      end
-
       it "is valid with a title of 255 characters" do
         version = build_stubbed :version, title: "a" * 255
 
