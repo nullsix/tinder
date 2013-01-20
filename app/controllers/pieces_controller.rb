@@ -1,6 +1,6 @@
 class PiecesController < ApplicationController
   respond_to :html
-  before_filter :signed_in_user
+  before_filter :require_signed_in_user
 
   def index
     @pieces = current_user.pieces

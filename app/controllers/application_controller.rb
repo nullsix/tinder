@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
-  helper_method :current_user, :signed_in_user
+  helper_method :current_user, :require_signed_in_user
 
   private
   def current_user
@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
     !!current_user
   end
 
-  def signed_in_user
+  def require_signed_in_user
     unless signed_in?
       redirect_to root_url
     end
