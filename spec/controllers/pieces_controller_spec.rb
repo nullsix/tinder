@@ -61,14 +61,46 @@ describe PiecesController do
   end
 
   context "with a logged in user" do
-    describe "GET new" do
-      before :all do
-        @user = FactoryGirl.create :user
-        @piece = @user.pieces.build
+    before :all do
+      @user = FactoryGirl.create :user
+      @piece = @user.pieces.build
+    end
+
+    before :each do
+      session[:user_id] = @user.id
+    end
+
+    describe "GET index" do
+      before :each do
+        get :index
       end
 
+      it "renders the index layout" do
+        should render_template(:index)
+      end
+
+      describe "@pieces" do
+        subject{ assigns(:pieces) }
+        it "is set" do
+          should_not be_nil
+        end
+
+        it "is an array" do
+          should be_a Array
+        end
+
+        it "is an array of Pieces" do
+          subject.each { |p| p.should be_a Piece }
+        end
+
+        it "belongs to the logged in user" do
+          subject.each { |p| p.user.should eq(@user) }
+        end
+      end
+    end
+
+    describe "GET new" do
       before :each do
-        session[:user_id] = @user.id
         get :new
       end
 
@@ -76,20 +108,40 @@ describe PiecesController do
         should render_template(:new)
       end
 
-      it "sets @piece to a Piece" do
-        assigns(:piece).should be_a Piece
+      describe "@piece" do
+        subject { assigns(:piece) }
+
+        it "is set" do
+          should_not be_nil
+        end
+
+        it "is a Piece" do
+          should be_a Piece
+        end
+
+        it "is a new Piece" do
+          should be_a_new_record
+        end
+
+        it "belongs to the logged in user" do
+          subject.user.should eq(@user)
+        end
       end
 
-      it "makes @piece a new piece" do
-        assigns(:piece).should be_a_new_record
-      end
+      describe "@version" do
+        subject { assigns(:version) }
 
-      it "sets @version to a Version" do
-        assigns(:version).should be_a Version
-      end
+        it "is set" do
+          should_not be_nil
+        end
 
-      it "makes @version a new version" do
-        assigns(:version).should be_a_new_record
+        it "is a Version" do
+          should be_a Version
+        end
+
+        it "is a new Version" do
+          should be_a_new_record
+        end
       end
     end
   end

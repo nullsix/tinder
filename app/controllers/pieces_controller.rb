@@ -15,7 +15,8 @@ class PiecesController < ApplicationController
     @piece = current_user.pieces.build params[:piece]
     @version = @piece.versions.build params[:version]
 
-    if @piece.save
+    
+    if @piece.save # @version is saved implicitly
       redirect_to @piece, notice: "Piece was successfully created."
     else
       render action: 'new'
