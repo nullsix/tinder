@@ -81,6 +81,7 @@ describe PiecesController do
 
       describe "@pieces" do
         subject{ assigns(:pieces) }
+
         it "is set" do
           should_not be_nil
         end
@@ -146,18 +147,32 @@ describe PiecesController do
     end
 
     describe "PUT create" do
-      context "with a valid piece" do
-        context "with a valid version" do
-          it "redirects to the piece just created"
+      before :each do
+        @piece_attr = FactoryGirl.attributes_for(:piece, user_id: @user)
+        @version_attr = FactoryGirl.attributes_for(:version, piece_id: @piece)
+        @put_create = Proc.new{ put :create, piece: @piece_attr, version: @version_attr }
+      end
+
+      context "with a valid version" do
+        it "creates the new version" do
+          expect { @put_create.call }.to change(Piece, :count).by(1)
         end
 
-        context "with an invalid version" do
-          it "renders the new template"
+        it "redirects to the piece just created" do
+          @put_create.call
+
+          should redirect_to assigns(:piece)
         end
       end
 
-      context "with an invalid piece" do
-        it "renders the new template"
+      context "with an invalid version" do
+        before :each do
+          put :create,
+            piece: @piece_attr,
+            version: @version_attr.merge({ title: nil })
+        end
+
+        it { should render_template(:new) }
       end
     end
   end
