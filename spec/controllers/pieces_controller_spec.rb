@@ -144,5 +144,21 @@ describe PiecesController do
         end
       end
     end
+
+    describe "PUT create" do
+      context "with a valid piece" do
+        context "with a valid version" do
+          it "redirects to the piece just created"
+        end
+
+        context "with an invalid version" do
+          it "renders the new template"
+        end
+      end
+
+      context "with an invalid piece" do
+        it "renders the new template"
+      end
+    end
   end
 end
