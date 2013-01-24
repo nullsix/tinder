@@ -198,17 +198,80 @@ describe PiecesController do
     end
 
     describe "PUT update" do
+      before :each do
+        @piece_attr = FactoryGirl.attributes_for(:piece, piece_id: @piece, user_id: @user)
+        @version_attr = FactoryGirl.attributes_for(:version, piece_id: @piece, title: "I like pie.", content: "La-de-da-de-da")
+      end
+
       context "with a valid piece" do
+
         context "with a valid version" do
-          it "creates a new version"
+          before :each do
+            @valid_update = Proc.new{ put :update, id: @piece.id, piece: @piece_attr, version: @version_attr }
+          end
+
+          it "locates the requested piece" do
+            @valid_update.call
+            assigns(:piece).should eq(@piece)
+          end
+
+          it "sets @version to a Version" do
+            @valid_update.call
+            assigns(:version).should eq(Version.last)
+          end
+
+          it "creates a new version" do
+            expect { @valid_update.call }.to change(Version, :count).by(1)
+          end
+
+          it "associates the new version to the existing piece" do
+            expect { @valid_update.call; @piece.reload }.to change(@piece.versions, :count).by(1)
+          end
+
+          it "creates the version with the given attributes" do
+            @valid_update.call
+            @piece.reload
+            @piece.versions.last.title.should eq("I like pie.")
+            @piece.versions.last.content.should eq("La-de-da-de-da")
+          end
+
+          it "redirects to the piece" do
+            @valid_update.call
+            should redirect_to @piece
+          end
         end
 
         context "with an invalid version" do
-          it "does not create a new version"
+          before :each do
+            @invalid_version_attr = FactoryGirl.attributes_for(:invalid_version, piece_id: @piece, content: "La-de-da-de-da")
+            @invalid_update = Proc.new{ put :update, id: @piece.id, piece: @piece_attr, version: @invalid_version_attr }
+          end
+
+          it "locates the requested piece" do
+            @invalid_update.call
+            assigns(:piece).should eq(@piece)
+          end
+
+          it "does not create a Version with the attributes" do
+            @invalid_update.call
+            Version.last.content.should_not eq("La-de-da-de-da")
+          end
+
+          it "does not create a new version" do
+            expect{ @invalid_update.call }.not_to change(Version, :count)
+          end
+
+          it "re-renders the #edit view" do
+            @invalid_update.call
+            should render_template :edit
+          end
         end
       end
+
       context "with an invalid piece" do
+        it "does not find the requested piece"
         it "does not create a new version"
+        it "renders the error view"
       end
     end
 
@@ -224,6 +287,27 @@ describe PiecesController do
       it "assigns the requested piece to @piece" do
         assigns(:piece).should eq(@piece)
       end
+    end
+
+    describe "DELETE destroy" do
+      before :each do
+        @valid_destroy = Proc.new{ delete :destroy, id: @piece.id }
+      end
+
+      it "deletes the piece" do
+        expect{ @valid_destroy.call }.should change(Piece, :count).by(-1)
+      end
+
+      it "deletes the associated versions" do
+        expect { @valid_destroy.call }.to change(Version, :count).by(-1*@piece.versions.length)
+      end
+
+      it "redirects to the pieces#index" do
+        @valid_destroy.call
+        should redirect_to pieces_url
+      end
+
+      it "doesn't delete a piece that doesn't belong to this user"
     end
   end
 end
