@@ -62,8 +62,8 @@ describe PiecesController do
 
   context "with a logged in user" do
     before :all do
-      @user = FactoryGirl.create :user
-      @piece = @user.pieces.build
+      @user = FactoryGirl.create(:user, pieces_count: 0)
+      @piece = @user.pieces.create
     end
 
     before :each do
@@ -75,23 +75,15 @@ describe PiecesController do
         get :index
       end
 
-      it "renders the index layout" do
+      it "renders the #index view" do
         should render_template(:index)
       end
 
       describe "@pieces" do
         subject{ assigns(:pieces) }
 
-        it "is set" do
-          should_not be_nil
-        end
-
-        it "is an array" do
-          should be_a Array
-        end
-
         it "is an array of Pieces" do
-          subject.each { |p| p.should be_a Piece }
+          should eq([@piece])
         end
 
         it "belongs to the logged in user" do
@@ -112,10 +104,6 @@ describe PiecesController do
       describe "@piece" do
         subject { assigns(:piece) }
 
-        it "is set" do
-          should_not be_nil
-        end
-
         it "is a Piece" do
           should be_a Piece
         end
@@ -132,10 +120,6 @@ describe PiecesController do
       describe "@version" do
         subject { assigns(:version) }
 
-        it "is set" do
-          should_not be_nil
-        end
-
         it "is a Version" do
           should be_a Version
         end
@@ -143,36 +127,102 @@ describe PiecesController do
         it "is a new Version" do
           should be_a_new_record
         end
+
+        it "belongs to the piece being created" do
+          subject.piece.should eq(assigns(:piece))
+        end
       end
     end
 
-    describe "PUT create" do
+    describe "POST create" do
       before :each do
         @piece_attr = FactoryGirl.attributes_for(:piece, user_id: @user)
         @version_attr = FactoryGirl.attributes_for(:version, piece_id: @piece)
-        @put_create = Proc.new{ put :create, piece: @piece_attr, version: @version_attr }
+        @valid_create = Proc.new{ post :create, piece: @piece_attr, version: @version_attr }
       end
 
       context "with a valid version" do
-        it "creates the new version" do
-          expect { @put_create.call }.to change(Piece, :count).by(1)
+        it "creates a new piece" do
+          expect { @valid_create.call }.to change(Piece, :count).by(1)
+        end
+
+        it "creates a new version" do
+          expect { @valid_create.call }.to change(Version, :count).by(1)
         end
 
         it "redirects to the piece just created" do
-          @put_create.call
+          @valid_create.call
 
-          should redirect_to assigns(:piece)
+          should redirect_to Piece.last
         end
       end
 
       context "with an invalid version" do
         before :each do
-          put :create,
-            piece: @piece_attr,
-            version: @version_attr.merge({ title: nil })
+          @invalid_version_attr = FactoryGirl.attributes_for(:invalid_version, piece_id: @piece)
+          @invalid_create = Proc.new{ post :create, piece: @piece_attr, version: @invalid_version_attr }
         end
 
-        it { should render_template(:new) }
+        it "does not create a new piece" do
+          expect { @invalid_create.call }.to_not change(Piece, :count)
+        end
+        
+        it "does not create a new version" do
+          expect { @invalid_create.call }.to_not change(Version, :count)
+        end
+
+        it "renders the #new view" do
+          @invalid_create.call
+
+          should render_template :new
+        end
+      end
+    end
+
+    describe "GET edit" do
+      before :each do
+        get :edit, id: @piece
+      end
+
+      it "renders the #edit view" do
+        should render_template(:edit)
+      end
+
+      it "assigns the requested piece to @piece" do
+        assigns(:piece).should eq(@piece)
+      end
+
+      it "assigns the piece's current version to @version" do
+        assigns(:version).should eq(@piece.current_version)
+      end
+    end
+
+    describe "PUT update" do
+      context "with a valid piece" do
+        context "with a valid version" do
+          it "creates a new version"
+        end
+
+        context "with an invalid version" do
+          it "does not create a new version"
+        end
+      end
+      context "with an invalid piece" do
+        it "does not create a new version"
+      end
+    end
+
+    describe "GET show" do
+      before :each do
+        get :show, id: @piece
+      end
+
+      it "renders the #show view" do
+        should render_template(:show)
+      end
+
+      it "assigns the requested piece to @piece" do
+        assigns(:piece).should eq(@piece)
       end
     end
   end
