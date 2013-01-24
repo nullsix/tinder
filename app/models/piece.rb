@@ -4,7 +4,7 @@ class Piece < ActiveRecord::Base
 
   accepts_nested_attributes_for :versions
 
-  attr_accessible :user, :versions, :current_version, :versions_attributes
+  attr_accessible :user, :user_id, :versions, :current_version
 
   validates :user, presence: true
 
