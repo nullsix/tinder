@@ -3,25 +3,20 @@ require 'spec_helper'
 #TODO: Since all the actions in this controller require you to be logged in, can we pull out the example that tests whether the user is logged in out to a module? This would allow us to to something like PiecesController acts_like_a UserOnlyResource
 describe PiecesController do
   context "with no user logged in" do
-    #TODO: DRY this up with use of a hash for the verb, action and data?
-    describe "GET index" do
-      it "redirects to root_path" do
-        get :index
-        should redirect_to(root_path)
-      end
-    end
-  
-    describe "PUT create" do
-      it "redirects to root_path" do
-        put :create
-        should redirect_to(root_path)
-      end
-    end
+    methods = [
+      { put: :create },
+      { get: :new    },
+      { get: :index  }
+    ]
 
-    describe "GET new" do
-      it "redirects to root_path" do
-        get :new
-        should redirect_to(root_path)
+    methods.each do |m|
+      m.each do |verb, action|
+        describe "#{verb.upcase} #{action}" do
+          it "redirects to root_url" do
+            self.send(verb, action)
+            should redirect_to root_url
+          end
+        end
       end
     end
 
@@ -29,32 +24,22 @@ describe PiecesController do
       before :all do
         @piece = create :piece
       end
+      
+      methods = [
+        { get:    :show    },
+        { get:    :edit    },
+        { put:    :update  },
+        { delete: :destroy }
+      ]
 
-      describe "GET show" do
-        it "redirects to root_path" do
-          get :show, id: @piece.id
-          should redirect_to(root_path)
-        end
-      end
-
-      describe "GET edit" do
-        it "redirects to root_path" do
-          get :edit, id: @piece.id
-          should redirect_to(root_path)
-        end
-      end
-
-      describe "PUT update" do
-        it "redirects to root_path" do
-          put :update, id: @piece.id
-          should redirect_to(root_path)
-        end
-      end
-
-      describe "DELETE destroy" do
-        it "redirects to root_path" do
-          delete :destroy, id: @piece.id
-          should redirect_to(root_path)
+      methods.each do |m|
+        m.each do |action, verb|
+          describe "#{action.upcase} #{verb}" do
+            it "redirects to root_url" do
+              self.send(action, verb, id: @piece.id)
+              should redirect_to root_url
+            end
+          end
         end
       end
     end
