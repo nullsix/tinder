@@ -78,7 +78,15 @@ Spork.prefork do
     config.order = "random"
 
     config.include FactoryGirl::Syntax::Methods
+    config.include FeatureSpecHelper, type: :feature
   end
+
+  OmniAuth.config.test_mode = true
+  OmniAuth.config.add_mock(:google_oauth2, {
+    uid: "12345",
+    provider: "google_oauth2",
+    info: { name: 'testerbob' }
+  })
 end
 
 Spork.each_run do
