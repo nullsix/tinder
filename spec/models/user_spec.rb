@@ -13,10 +13,10 @@ describe User do
 
     subject { @user }
 
-    it { should respond_to(:name) }
-    it { should respond_to(:pieces) }
-    it { should respond_to(:provider) }
-    it { should respond_to(:uid) }
+    it { should respond_to :name }
+    it { should respond_to :pieces }
+    it { should respond_to :provider }
+    it { should respond_to :uid }
   end
 
   describe "::create_with_omniauth" do
@@ -32,15 +32,15 @@ describe User do
       it { should be_valid }
 
       it "has the right uid" do
-        subject.uid.should ==(@auth["uid"])
+        subject.uid.should == @auth["uid"]
       end
 
       it "has the right provider" do
-        subject.provider.should ==(@auth["provider"])
+        subject.provider.should == @auth["provider"]
       end
 
       it "has the right name" do
-        subject.name.should ==(@auth["info"]["name"])
+        subject.name.should == @auth["info"]["name"]
       end
 
       it "is saved" do

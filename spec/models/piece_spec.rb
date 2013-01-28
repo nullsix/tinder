@@ -14,7 +14,7 @@ describe Piece do
   describe "instance methods" do
     describe "#versions" do
       it "responds to #versions" do
-        @piece.should respond_to(:versions)
+        @piece.should respond_to :versions
       end
       
       it "has the correct number of versions" do
@@ -29,7 +29,7 @@ describe Piece do
       end
 
       it "has a #current_version is the last item in #versions" do
-        @piece.current_version.should ==(@piece.versions.last)
+        @piece.current_version.should == @piece.versions.last
       end
     end
   end
@@ -49,7 +49,7 @@ describe Piece do
       expect do
         create :version, piece: piece
         piece.reload
-      end.to change{ piece.versions.length }.by(1)
+      end.to change{ piece.versions.length }.by 1
     end
   end
 
@@ -64,17 +64,17 @@ describe Piece do
     end
 
     it "has piece as its piece" do
-      @new_version.piece.should ==(@piece)
+      @new_version.piece.should == @piece
     end
 
     it "adds the new version to the versions collection" do
-      @piece.versions.should include(@new_version)
+      @piece.versions.should include @new_version
     end
 
     it "sets the new version as the current version" do
       piece = create :piece
       new_version = create :version, piece: piece
-      piece.current_version.should ==(new_version)
+      piece.current_version.should == new_version
     end
   end
 end
