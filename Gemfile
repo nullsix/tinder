@@ -35,11 +35,12 @@ end
 gem 'jquery-rails', '~> 2.1.4'
 
 group :test do
-  gem 'faker',       '~> 1.1.2'
-  gem 'capybara',    '~> 2.0.2'
-  gem 'spork',       '~> 0.9.2'
-  gem 'guard-spork', '~> 1.4.1'
-  gem 'launchy',     '~> 2.1.2'
+  gem 'faker',            '~> 1.1.2'
+  gem 'capybara',         '~> 2.0.2'
+  gem 'database_cleaner', '~> 0.9.1'
+  gem 'spork',            '~> 0.9.2'
+  gem 'guard-spork',      '~> 1.4.1'
+  gem 'launchy',          '~> 2.1.2'
 
   # For watching the file system and notifications on...
   #   linux

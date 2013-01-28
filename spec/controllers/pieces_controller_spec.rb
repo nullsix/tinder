@@ -47,8 +47,8 @@ describe PiecesController do
 
   context "with a logged in user" do
     before :all do
-      @user = FactoryGirl.create(:user, pieces_count: 0)
-      @piece = @user.pieces.create
+      @user = FactoryGirl.create :user, pieces_count: 0
+      @piece = FactoryGirl.create :piece, user_id: @user.id
     end
 
     before :each do
@@ -271,7 +271,8 @@ describe PiecesController do
 
           it "does not create a Version with the attributes" do
             @invalid_update.call
-            Version.last.content.should_not eq "La-de-da-de-da"
+            piece = Piece.find assigns(:piece).id
+            piece.versions.last.content.should_not eq @invalid_version_attr[:content]
           end
 
           it "does not create a new version" do
