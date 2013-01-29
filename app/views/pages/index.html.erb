@@ -26,9 +26,6 @@
   <div class="row">
     <div class="span12">
       <h2><%= title %></h2>
-      <% #TODO: This logic probably shouldn't be here! %>
-      <% @piece = current_user.pieces.build %>
-      <% @version = @piece.versions.build %>
       <%= render partial: '/pieces/form', piece: @piece, version: @version %>
     </div>
   </div>
