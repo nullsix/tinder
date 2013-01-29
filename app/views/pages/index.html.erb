@@ -21,5 +21,16 @@
       <p>Use tinder to boost your skills as author and editor!</p>
     </div>
   </div>
+<% else %>
+  <% title = 'new piece' %>
+  <div class="row">
+    <div class="span12">
+      <h2><%= title %></h2>
+      <% #TODO: This logic probably shouldn't be here! %>
+      <% @piece = current_user.pieces.build %>
+      <% @version = @piece.versions.build %>
+      <%= render partial: '/pieces/form', piece: @piece, version: @version %>
+    </div>
+  </div>
 <% end %>
 

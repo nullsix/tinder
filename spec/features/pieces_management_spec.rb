@@ -5,7 +5,17 @@ feature "Pieces Management" do
 
   subject { page }
 
+  context "from the root path" do
+    background do
+      visit root_path
+    end
 
+    scenario "User can see form for creating a new piece" do
+      should have_content "new piece"
+      should have_selector "#version_title"
+      should have_selector "#version_content"
+    end
+  end
 
   context "from the Pieces path" do
     background do
