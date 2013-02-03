@@ -2,6 +2,8 @@ class PiecesController < ApplicationController
   respond_to :html
   before_filter :require_signed_in_user
 
+  before_filter :get_piece, except: [:index, :new, :create]
+
   def index
     @pieces = current_user.pieces
   end
@@ -23,12 +25,10 @@ class PiecesController < ApplicationController
   end
 
   def edit
-    get_piece
     @version = @piece.current_version
   end
 
   def update
-    get_piece
     @version = @piece.versions.build params[:version]
 
     if @piece.save
@@ -39,12 +39,9 @@ class PiecesController < ApplicationController
   end
 
   def show
-    get_piece
   end
 
   def destroy
-    get_piece
-
     redirect_to root_url unless @piece && @piece.user = current_user
 
     @piece.destroy
@@ -55,5 +52,9 @@ class PiecesController < ApplicationController
   private
   def get_piece
     @piece = current_user.pieces.find params[:id]
+  
+  # The piece either doesn't exist or doesn't belong to this user.
+  rescue ActiveRecord::RecordNotFound
+    redirect_to pieces_path
   end
 end
