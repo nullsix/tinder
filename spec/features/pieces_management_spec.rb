@@ -63,6 +63,23 @@ feature "Pieces Management" do
     it_behaves_like "a user creating a piece"
   end
 
+  context "when creating pieces with multiple lines" do
+    require 'faker'
+
+    background do
+      visit new_piece_path
+    end
+
+    [1,3].each do |num|
+      scenario "User sees #{num} lines rendered properly" do
+        expect_create_piece_success "A good title", Faker::Lorem.sentences(num).join("\n\n")
+        within '#content' do
+          should have_css "p", count: num
+        end
+      end
+    end
+  end
+
   context "from the Pieces path" do
     background { visit pieces_path }
 
