@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-#TODO: Since all the actions in this controller require you to be logged in, can we pull out the example that tests whether the user is logged in out to a module? This would allow us to to something like PiecesController acts_like_a UserOnlyResource
 describe PiecesController do
   context "with no user logged in" do
     methods = [

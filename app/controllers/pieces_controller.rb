@@ -30,7 +30,6 @@ class PiecesController < ApplicationController
   def update
     get_piece
     @version = @piece.versions.build params[:version]
-    #TODO: We don't want to create a new version if it's the exact same as before. Can we enfore a uniqueness of title and content?
 
     if @piece.save
       redirect_to @piece, notice: "Piece was successfully updated."
