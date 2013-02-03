@@ -32,16 +32,16 @@ describe Version do
 
   describe "validations" do
     describe "#title" do
-      it "is not valid without a title" do
+      it "is valid without a title" do
         version = build_stubbed :version, title: nil
 
-        version.should_not be_valid
+        version.should be_valid
       end
 
-      it "is not valid with an empty title" do
+      it "is valid with an empty title" do
         version = build_stubbed :version, title: ""
 
-        version.should_not be_valid
+        version.should be_valid
       end
 
       it "is valid with a title with a single character" do
@@ -64,16 +64,16 @@ describe Version do
     end
 
     describe "content" do
-      it "is not valid without a content" do
+      it "is valid without a content" do
         version = build_stubbed :version, content: nil
 
-        version.should_not be_valid
+        version.should be_valid
       end
 
-      it "is not valid with an empty content" do
+      it "is valid with an empty content" do
         version = build_stubbed :version, content: ""
 
-        version.should_not be_valid
+        version.should be_valid
       end
 
       it "is valid with a content with a single character" do

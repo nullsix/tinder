@@ -8,6 +8,6 @@ FactoryGirl.define do
   end
 
   factory :invalid_version, parent: :version do |f|
-    f.title { nil }
+    f.title { "a"*300 }
   end
 end

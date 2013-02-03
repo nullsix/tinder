@@ -196,10 +196,10 @@ feature "Pieces Management" do
       }.to change(Piece, :count).by 1
     end
 
-    def expect_create_piece_failure(title = "", content = "")
+    def expect_create_piece_failure(title = "a"*300)
       expect {
         expect {
-          create_piece title, content
+          create_piece title, "This should be good content!\n\nIt has multiple lines."
         }.not_to change(Version, :count).by 1
       }.not_to change(Piece, :count).by 1
     end
@@ -231,10 +231,10 @@ feature "Pieces Management" do
       }.not_to change(Piece, :count)
     end
 
-    def expect_edit_piece_failure(title = "", content = "")
+    def expect_edit_piece_failure(title = "a"*300)
       expect {
         expect {
-          edit_piece title, content
+          edit_piece title, "This is a good piece modification."
         }.not_to change(Version, :count)
       }.not_to change(Piece, :count)
     end
@@ -253,8 +253,7 @@ feature "Pieces Management" do
 
     def verify_piece_was_not_accepted
       should have_css "#error_explanation"
-      should have_content "Title can't be blank"
-      should have_content "Content can't be blank"
+      should have_content "Title is too long"
     end
 
     def user_deletes_piece
