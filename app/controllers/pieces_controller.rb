@@ -42,8 +42,6 @@ class PiecesController < ApplicationController
   end
 
   def destroy
-    redirect_to root_url unless @piece && @piece.user = current_user
-
     @piece.destroy
 
     redirect_to pieces_path, notice: "Piece was successfully deleted."

@@ -1,14 +1,42 @@
 require 'spec_helper'
 
-  private
-    def piece_methods
-      [
-        { get:    :show    },
-        { get:    :edit    },
-        { put:    :update  },
-        { delete: :destroy }
-      ]
+shared_examples "an action assigning @piece" do
+  describe "@piece" do
+    subject { assigns :piece }
+
+    it "is a Piece" do
+      should be_a Piece
     end
+
+    it "belongs to the logged in user" do
+      subject.user.should eq @user
+    end
+  end
+end
+
+shared_examples "an action assigning @version" do
+  describe "@version" do
+    subject { assigns :version }
+
+    it "is a Version" do
+      should be_a Version
+    end
+
+    it "belongs to the piece being created" do
+      subject.piece.should eq assigns(:piece)
+    end
+  end
+end
+
+private
+  def piece_methods
+    [
+      { get:    :show    },
+      { get:    :edit    },
+      { put:    :update  },
+      { delete: :destroy }
+    ]
+  end
 
 public
   describe PiecesController do
@@ -67,10 +95,6 @@ public
             get :index
           end
 
-          it "renders the #index view" do
-            should render_template :index
-          end
-
           describe "@pieces" do
             subject{ assigns :pieces }
 
@@ -82,6 +106,10 @@ public
               subject.each { |p| p.user.should eq @user }
             end
           end
+
+          it "renders the #index view" do
+            should render_template :index
+          end
         end
 
         describe "GET new" do
@@ -89,40 +117,20 @@ public
             get :new
           end
 
-          it "renders the new layout" do
+          it_behaves_like "an action assigning @piece"
+
+          specify "@piece is a new Piece" do
+            assigns(:piece).should be_a_new_record
+          end
+
+          it_behaves_like "an action assigning @version"
+
+          specify "@version is a new Version" do
+            assigns(:version).should be_a_new_record
+          end
+
+          it "renders the #new view" do
             should render_template :new
-          end
-
-          describe "@piece" do
-            subject { assigns :piece }
-
-            it "is a Piece" do
-              should be_a Piece
-            end
-
-            it "is a new Piece" do
-              should be_a_new_record
-            end
-
-            it "belongs to the logged in user" do
-              subject.user.should eq @user
-            end
-          end
-
-          describe "@version" do
-            subject { assigns :version }
-
-            it "is a Version" do
-              should be_a Version
-            end
-
-            it "is a new Version" do
-              should be_a_new_record
-            end
-
-            it "belongs to the piece being created" do
-              subject.piece.should eq assigns(:piece)
-            end
           end
         end
 
@@ -168,9 +176,18 @@ public
               expect { @invalid_create.call }.to_not change Version, :count
             end
 
-            it "renders the #new view" do
+            before :each do
               @invalid_create.call
+            end
 
+            it_behaves_like "an action assigning @piece"
+            it_behaves_like "an action assigning @version"
+
+            specify "@version has an error message" do
+              assigns(:version).errors.should_not be_empty
+            end
+
+            it "renders the #new view" do
               should render_template :new
             end
           end
@@ -181,10 +198,6 @@ public
             get :edit, id: @piece
           end
 
-          it "renders the #edit view" do
-            should render_template :edit
-          end
-
           it "assigns the requested piece to @piece" do
             assigns(:piece).should eq @piece
           end
@@ -192,12 +205,20 @@ public
           it "assigns the piece's current version to @version" do
             assigns(:version).should eq @piece.current_version
           end
+
+          it "renders the #edit view" do
+            should render_template :edit
+          end
         end
 
         describe "PUT update" do
           before :each do
             @piece_attr =
-              FactoryGirl.attributes_for :piece, piece_id: @piece, user_id: @user
+              FactoryGirl.attributes_for(
+                :piece,
+                piece_id: @piece,
+                user_id: @user
+              )
             @version_attr =
               FactoryGirl.attributes_for(
                 :version,
@@ -208,7 +229,6 @@ public
           end
 
           context "with a valid piece" do
-
             context "with a valid version" do
               before :each do
                 @valid_update =
@@ -218,16 +238,6 @@ public
                       piece: @piece_attr,
                       version: @version_attr
                   }
-              end
-
-              it "locates the requested piece" do
-                @valid_update.call
-                assigns(:piece).should eq @piece
-              end
-
-              it "sets @version to a Version" do
-                @valid_update.call
-                assigns(:version).should eq Version.last
               end
 
               it "creates a new version" do
@@ -241,15 +251,25 @@ public
                 }.to change(@piece.versions, :count).by 1
               end
 
-              it "creates the version with the given attributes" do
+              before :each do
                 @valid_update.call
+              end
+
+              it "locates the requested piece" do
+                assigns(:piece).should eq @piece
+              end
+
+              specify "locastes the requested version" do
+                assigns(:version).should eq Version.last
+              end
+
+              it "creates the version with the given attributes" do
                 @piece.reload
                 @piece.versions.last.title.should eq "I like pie."
                 @piece.versions.last.content.should eq "La-de-da-de-da"
               end
 
               it "redirects to the piece" do
-                @valid_update.call
                 should redirect_to @piece
               end
             end
@@ -271,32 +291,48 @@ public
                   }
               end
 
-              it "locates the requested piece" do
-                @invalid_update.call
-                assigns(:piece).should eq @piece
-              end
-
-              it "does not create a Version with the attributes" do
-                @invalid_update.call
-                piece = Piece.find assigns(:piece).id
-                piece.versions.last.content.should_not eq @invalid_version_attr[:content]
-              end
-
               it "does not create a new version" do
                 expect{ @invalid_update.call }.not_to change Version, :count
               end
 
-              it "re-renders the #edit view" do
+              before :each do
                 @invalid_update.call
+              end
+
+              it "locates the requested piece" do
+                assigns(:piece).should eq @piece
+              end
+
+              it_behaves_like "an action assigning @version"
+
+              it "does not create a Version with the attributes" do
+                piece = Piece.find assigns(:piece).id
+                piece.versions.last.content.should_not eq @invalid_version_attr[:content]
+              end
+
+              it "re-renders the #edit view" do
                 should render_template :edit
               end
             end
           end
 
           context "with an invalid piece" do
-            it "does not find the requested piece"
-            it "does not create a new version"
-            it "renders the error view"
+            before :each do
+              @no_piece_update =
+                Proc.new {
+                  put :update,
+                    id: -1,
+                    piece: nil,
+                    version: nil
+                }
+            end
+
+            it "does not create a new version" do
+              expect{ @no_piece_update.call }.not_to change(Version, :count)
+            end
+
+            before(:each) { @no_piece_update.call }
+            it { should redirect_to pieces_url }
           end
         end
 
@@ -305,12 +341,12 @@ public
             get :show, id: @piece
           end
 
-          it "renders the #show view" do
-            should render_template :show
-          end
-
           it "assigns the requested piece to @piece" do
             assigns(:piece).should eq @piece
+          end
+
+          it "renders the #show view" do
+            should render_template :show
           end
         end
 
@@ -332,7 +368,6 @@ public
             @valid_destroy.call
             should redirect_to pieces_url
           end
-
         end
       end
 
@@ -349,7 +384,7 @@ public
               it "doesn't allow access to a piece not belonging to the logged in user" do
                 self.send action, verb, id: @others_piece.id
 
-                should redirect_to pieces_path
+                should redirect_to pieces_url
               end
             end
           end
