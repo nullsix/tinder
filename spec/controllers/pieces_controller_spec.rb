@@ -88,6 +88,11 @@ public
       context "where the piece belongs to the user" do
         before :all do
           @piece = FactoryGirl.create :piece, user_id: @user.id
+
+          @other_user = FactoryGirl.create :user, pieces_count: 5
+
+          @other_pieces = @other_user.pieces
+          @user_pieces = @user.pieces
         end
 
         describe "GET index" do
@@ -104,6 +109,22 @@ public
 
             it "belongs to the logged in user" do
               subject.each { |p| p.user.should eq @user }
+            end
+
+            it "is the same size as user's pieces" do
+              assigns(:pieces).size.should == @user_pieces.size
+            end
+
+            it "has all the user's pieces" do
+              @user_pieces.each do |piece|
+                assigns(:pieces).should include piece
+              end
+            end
+
+            it "has no other user's pieces" do
+              @other_pieces.each do |piece|
+                assigns(:pieces).should_not include piece
+              end
             end
           end
 
