@@ -33,6 +33,12 @@ feature "Pieces Management" do
       verify_piece_was_edited
     end
 
+    scenario "doesn't update the piece" do
+      expect_edit_piece_no_change
+
+      verify_piece_wasnt_updated
+    end
+
     scenario "unsuccessfully at first but corrects it" do
       expect_edit_piece_failure
       verify_piece_was_not_accepted
@@ -98,10 +104,10 @@ feature "Pieces Management" do
     context "User has created a piece" do
       background do
         follow_link_and_create_piece
+        @piece = Piece.last
       end
 
       scenario "sees they have no pieces after deleting the created piece" do
-        @piece = Piece.last
         user_deletes_piece
         should have_content "You have no pieces."
       end
@@ -231,6 +237,17 @@ feature "Pieces Management" do
       }.not_to change(Piece, :count)
     end
 
+    def expect_edit_piece_no_change
+      expect {
+        expect {
+          fill_in :version_title, with: @piece.current_version.title
+          fill_in :version_content, with: @piece.current_version.content
+
+          click_button "Update Piece"
+        }.not_to change(Version, :count)
+      }.not_to change(Piece, :count)
+    end
+
     def expect_edit_piece_failure(title = "a"*300)
       expect {
         expect {
@@ -242,6 +259,18 @@ feature "Pieces Management" do
     def verify_piece_was_edited
       within "div.alert-success" do
         should have_content "Piece was successfully updated."
+      end
+
+      within "h2" do
+        should have_content @title
+      end
+
+      should have_content @content
+    end
+
+    def verify_piece_wasnt_updated
+      within "div.alert-success" do
+        should have_content "Piece was already saved."
       end
 
       within "h2" do

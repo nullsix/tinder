@@ -29,12 +29,19 @@ class PiecesController < ApplicationController
   end
 
   def update
-    @version = @piece.versions.build params[:version]
+    original_version = @piece.current_version
+    new_version = @piece.versions.build params[:version]
 
-    if @piece.save
-      redirect_to @piece, notice: "Piece was successfully updated."
+    if version_has_changed?(original_version, new_version)
+      @version = new_version
+      if @piece.save
+        redirect_to @piece, notice: "Piece was successfully updated."
+      else
+        render action: 'edit'
+      end
+
     else
-      render action: 'edit'
+      redirect_to @piece, notice: "Piece was already saved."
     end
   end
 
@@ -54,5 +61,12 @@ class PiecesController < ApplicationController
   # The piece either doesn't exist or doesn't belong to this user.
   rescue ActiveRecord::RecordNotFound
     redirect_to pieces_path
+  end
+
+  def version_has_changed?(original_version, new_version)
+    title_changed = original_version.title != new_version.title
+    content_changed = original_version.content != new_version.content
+
+    title_changed || content_changed
   end
 end

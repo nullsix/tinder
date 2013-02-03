@@ -176,19 +176,21 @@ public
               expect { @invalid_create.call }.to_not change Version, :count
             end
 
-            before :each do
-              @invalid_create.call
-            end
+            context "after the call" do
+              before :each do
+                @invalid_create.call
+              end
 
-            it_behaves_like "an action assigning @piece"
-            it_behaves_like "an action assigning @version"
+              it_behaves_like "an action assigning @piece"
+              it_behaves_like "an action assigning @version"
 
-            specify "@version has an error message" do
-              assigns(:version).errors.should_not be_empty
-            end
+              specify "@version has an error message" do
+                assigns(:version).errors.should_not be_empty
+              end
 
-            it "renders the #new view" do
-              should render_template :new
+              it "renders the #new view" do
+                should render_template :new
+              end
             end
           end
         end
@@ -215,62 +217,90 @@ public
           before :each do
             @piece_attr =
               FactoryGirl.attributes_for(
-                :piece,
-                piece_id: @piece,
-                user_id: @user
-              )
-            @version_attr =
-              FactoryGirl.attributes_for(
-                :version,
-                piece_id: @piece,
-                title: "I like pie.",
-                content: "La-de-da-de-da"
+                :piece, piece_id: @piece, user_id: @user
               )
           end
 
           context "with a valid piece" do
-            context "with a valid version" do
+            context "with an unchanged version" do
               before :each do
-                @valid_update =
-                  Proc.new {
-                    put :update,
-                      id: @piece.id,
-                      piece: @piece_attr,
-                      version: @version_attr
-                  }
+                @unchanged_version_attr = 
+                  FactoryGirl.attributes_for(
+                    :version,
+                    piece_id: @piece,
+                    title: @piece.current_version.title,
+                    content: @piece.current_version.content
+                  )
+                @unchanged_update = Proc.new {
+                  put :update,
+                    id: @piece.id,
+                    piece: @piece_attr,
+                    version: @unchanged_version_attr
+                }
+              end
+
+              it "doesn't create a new version" do
+                expect{
+                  @unchanged_update.call
+                }.not_to change(Version, :count)
+              end
+
+              it "redirects to the piece" do
+                @unchanged_update.call
+                should redirect_to @piece
+              end
+            end
+
+            context "with a changed version" do
+              before :each do
+                @changed_version_attr =
+                  FactoryGirl.attributes_for(
+                    :version,
+                    piece_id: @piece,
+                    title: "I like pie.",
+                    content: "La-de-da-de-da"
+                  )
+                @changed_update = Proc.new {
+                  put :update,
+                    id: @piece.id,
+                    piece: @piece_attr,
+                    version: @changed_version_attr
+                }
               end
 
               it "creates a new version" do
-                expect { @valid_update.call }.to change(Version, :count).by 1
+                expect { @changed_update.call }.to change(Version, :count).by 1
               end
 
               it "associates the new version to the existing piece" do
                 expect {
-                  @valid_update.call
+                  @changed_update.call
                   @piece.reload
                 }.to change(@piece.versions, :count).by 1
               end
 
-              before :each do
-                @valid_update.call
-              end
+              context "after the call" do
+                before :each do
+                  @changed_update.call
+                end
 
-              it "locates the requested piece" do
-                assigns(:piece).should eq @piece
-              end
+                it "locates the requested piece" do
+                  assigns(:piece).should eq @piece
+                end
 
-              specify "locastes the requested version" do
-                assigns(:version).should eq Version.last
-              end
+                specify "locates the requested version" do
+                  assigns(:version).should eq Version.last
+                end
 
-              it "creates the version with the given attributes" do
-                @piece.reload
-                @piece.versions.last.title.should eq "I like pie."
-                @piece.versions.last.content.should eq "La-de-da-de-da"
-              end
+                it "creates the version with the given attributes" do
+                  @piece.reload
+                  @piece.versions.last.title.should eq "I like pie."
+                  @piece.versions.last.content.should eq "La-de-da-de-da"
+                end
 
-              it "redirects to the piece" do
-                should redirect_to @piece
+                it "redirects to the piece" do
+                  should redirect_to @piece
+                end
               end
             end
 
@@ -295,44 +325,35 @@ public
                 expect{ @invalid_update.call }.not_to change Version, :count
               end
 
-              before :each do
-                @invalid_update.call
-              end
+              context "after the call" do
+                before :each do
+                  @invalid_update.call
+                end
 
-              it "locates the requested piece" do
-                assigns(:piece).should eq @piece
-              end
+                it "locates the requested piece" do
+                  assigns(:piece).should eq @piece
+                end
 
-              it_behaves_like "an action assigning @version"
+                it_behaves_like "an action assigning @version"
 
-              it "does not create a Version with the attributes" do
-                piece = Piece.find assigns(:piece).id
-                piece.versions.last.content.should_not eq @invalid_version_attr[:content]
-              end
+                it "does not create a Version with the attributes" do
+                  piece = Piece.find assigns(:piece).id
+                  piece.versions.last.content.should_not eq @invalid_version_attr[:content]
+                end
 
-              it "re-renders the #edit view" do
-                should render_template :edit
+                it "re-renders the #edit view" do
+                  should render_template :edit
+                end
               end
             end
           end
 
           context "with an invalid piece" do
-            before :each do
-              @no_piece_update =
-                Proc.new {
-                  put :update,
-                    id: -1,
-                    piece: nil,
-                    version: nil
-                }
-            end
-
             it "does not create a new version" do
-              expect{ @no_piece_update.call }.not_to change(Version, :count)
+              expect{
+                put :update, id: -1
+              }.not_to change(Version, :count)
             end
-
-            before(:each) { @no_piece_update.call }
-            it { should redirect_to pieces_url }
           end
         end
 
