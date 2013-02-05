@@ -17,6 +17,8 @@ class PiecesController < ApplicationController
     @piece = current_user.pieces.build params[:piece]
     @version = @piece.versions.build params[:version]
 
+    @version.title = title_or_default @version.title
+
     if @piece.save # @version is saved implicitly
       redirect_to @piece, notice: "Piece was successfully created."
     else
@@ -32,8 +34,11 @@ class PiecesController < ApplicationController
     original_version = @piece.current_version
     new_version = @piece.versions.build params[:version]
 
+    new_version.title = title_or_default new_version.title
+
     if version_has_changed?(original_version, new_version)
       @version = new_version
+
       if @piece.save
         redirect_to @piece, notice: "Piece was successfully updated."
       else
@@ -68,5 +73,13 @@ class PiecesController < ApplicationController
     content_changed = original_version.content != new_version.content
 
     title_changed || content_changed
+  end
+
+  def title_or_default(title)
+    if title.empty?
+      "[untitled created at #{DateTime.now.strftime('%I:%M:%S %p on %b %d %Y')}]"
+    else
+      title
+    end
   end
 end

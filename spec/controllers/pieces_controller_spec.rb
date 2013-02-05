@@ -28,6 +28,22 @@ shared_examples "an action assigning @version" do
   end
 end
 
+shared_examples "an action creating a new piece" do
+  it "creates a new piece" do
+    expect { @valid_create.call }.to change(Piece, :count).by 1
+  end
+
+  it "creates a new version" do
+    expect { @valid_create.call }.to change(Version, :count).by 1
+  end
+
+  it "redirects to the piece just created" do
+    @valid_create.call
+
+    should redirect_to Piece.last
+  end
+end
+
 private
   def piece_methods
     [
@@ -158,24 +174,42 @@ public
         describe "POST create" do
           before :each do
             @piece_attr = FactoryGirl.attributes_for :piece, user_id: @user
-            @version_attr = FactoryGirl.attributes_for :version, piece_id: @piece
-            @valid_create =
-              Proc.new { post :create, piece: @piece_attr, version: @version_attr }
           end
 
           context "with a valid version" do
-            it "creates a new piece" do
-              expect { @valid_create.call }.to change(Piece, :count).by 1
+            context "with an empty title" do
+              before :each do
+                @version_attr =
+                  FactoryGirl.attributes_for :version,
+                    piece_id: @piece,
+                    title: ""
+                @valid_create =
+                  Proc.new {
+                    post :create, piece: @piece_attr, version: @version_attr
+                  }
+              end
+
+              it_behaves_like "an action creating a new piece"
+
+              it "has a default title" do
+                @valid_create.call
+
+                version = Version.last
+                version.title.should match /\[untitled created at \d\d:\d\d:\d\d (A|P)M on \w{3} \d{1,2} \d{4}\]/
+              end
             end
 
-            it "creates a new version" do
-              expect { @valid_create.call }.to change(Version, :count).by 1
-            end
+            context "with a non-empty title" do
+              before :each do
+                @version_attr =
+                  FactoryGirl.attributes_for :version, piece_id: @piece
+                @valid_create =
+                  Proc.new {
+                    post :create, piece: @piece_attr, version: @version_attr
+                  }
+              end
 
-            it "redirects to the piece just created" do
-              @valid_create.call
-
-              should redirect_to Piece.last
+              it_behaves_like "an action creating a new piece"
             end
           end
 
