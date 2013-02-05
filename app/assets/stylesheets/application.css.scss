@@ -25,6 +25,7 @@ $headerFontFamily: "Dosis", $sansFontFamily;
 
 html {
   overflow-y: scroll;
+  word-wrap: break-word;
 }
 
 html, a { font-weight: 400; }
