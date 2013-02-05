@@ -1,8 +1,10 @@
 <% provide :title, @piece.current_version.title %>
+<% links = render partial: "pieces/links", locals: { piece: @piece } %>
 
 <div class="row">
   <div class="span12">
+    <p class="links"><%= links %></p>
     <%= render template: 'versions/show', locals: { version: @piece.current_version } %>
-    <p><%= link_to "edit", edit_piece_path(@piece) %> | <%= link_to "delete", piece_path(@piece), method: :delete %></p>
+    <p class="links"><%= links %></p>
   </div>
 </div>

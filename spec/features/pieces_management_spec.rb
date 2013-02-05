@@ -95,13 +95,13 @@ feature "Pieces Management" do
       should have_link "Create one!", href: new_piece_path
     end
 
-    context "User clicks on link to create first piece" do
+    context "when user clicks on link to create first piece" do
       background { click_link "Create one!" }
 
       it_behaves_like "a user creating a piece"
     end
 
-    context "User has created a piece" do
+    context "when user has created a piece" do
       background do
         follow_link_and_create_piece
         @piece = Piece.last
@@ -117,12 +117,13 @@ feature "Pieces Management" do
           visit pieces_path
         end
 
-        scenario "User sees link for piece on the pieces path" do
+        scenario "User sees links for piece" do
           should_not have_content "You have no pieces."
 
           should have_link @title
-          should have_link "edit"
-          should have_link "delete"
+
+          has_edit_link
+          has_delete_link
         end
 
         scenario "User visits piece and sees content" do
@@ -132,8 +133,8 @@ feature "Pieces Management" do
           should have_content @content
         end
 
-        context "User clicks on the edit link" do
-          background { click_link "edit" }
+        context "when user clicks on the edit link" do
+          background { click_edit_link }
           
           it_behaves_like "a user editing a piece"
         end
@@ -147,8 +148,14 @@ feature "Pieces Management" do
           visit piece_path @piece
         end
 
-        context "User clicks on the edit link" do
-          background { click_link "edit" }
+        scenario "User sees edit/delete links" do
+          should have_css "p.links", count: 2
+          has_edit_link
+          has_delete_link
+        end
+
+        context "when user clicks on the edit link" do
+          background { click_edit_link }
           
           it_behaves_like "a user editing a piece"
         end
@@ -160,6 +167,24 @@ feature "Pieces Management" do
 
   private 
     # General form actions
+    def has_edit_link
+      should have_link "edit"
+      should have_css 'a button i.icon-edit'
+    end
+
+    def has_delete_link
+      should have_link "delete"
+      should have_css 'a button i.icon-trash'
+    end
+
+    def click_edit_link
+      all("a").select { |e| e.text == "edit" }.first.click
+    end
+    
+    def click_delete_link
+      all("a").select { |e| e.text == "delete" }.first.click
+    end
+
     def verify_user_sees_piece_form
       should have_selector "#version_title"
       should have_selector "#version_content"
@@ -288,7 +313,7 @@ feature "Pieces Management" do
     def user_deletes_piece
       expect {
         expect {
-          click_link "delete"
+          click_delete_link
         }.to change(Piece, :count).by -1
       }.to change(Version, :count).by @piece.versions.count*-1
     end

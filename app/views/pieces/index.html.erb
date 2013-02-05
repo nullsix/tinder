@@ -11,8 +11,7 @@
       <% @pieces.each do |piece| %>
         <p>
           <%= link_to piece.current_version.title, piece %>
-          | <%= link_to "edit", edit_piece_path(piece) %>
-          | <%= link_to "delete", piece, method: :delete %>
+          <%= render partial: "pieces/links", locals: { piece: piece } %>
         </p>
       <% end %>
     <% end %>
