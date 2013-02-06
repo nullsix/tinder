@@ -195,7 +195,6 @@ feature "Pieces Management" do
     end
 
     def has_delete_link
-      should have_link "delete"
       should have_css 'a button i.icon-trash'
     end
 
@@ -204,7 +203,7 @@ feature "Pieces Management" do
     end
     
     def click_delete_link
-      all("a").select { |e| e.text == "delete" }.first.click
+      all("a.delete").first.click
     end
 
     def verify_user_sees_piece_form
