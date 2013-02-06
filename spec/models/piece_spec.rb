@@ -12,24 +12,59 @@ describe Piece do
   end
 
   describe "instance methods" do
-    describe "#versions" do
-      it "responds to #versions" do
-        @piece.should respond_to :versions
-      end
-      
-      it "has the correct number of versions" do
-        piece = create :piece, versions_count: @versions_count
-        piece.versions.length.should == @versions_count
+    subject { @piece }
+
+    [:versions, :current_version, :title, :content, :blurb].each do |m|
+      it "responds to ##{m}" do
+        should respond_to m
       end
     end
 
-    describe "#current_version" do
-      it "responds to #current_version" do
-        @piece.should respond_to(:current_version)
+    context "with a saved piece" do
+      before :each do
+        @saved_piece = create :piece, versions_count: @versions_count
+      end
+
+      subject { @saved_piece }
+
+      it "has the correct number of versions" do
+        subject.versions.length.should == @versions_count
       end
 
       it "has a #current_version is the last item in #versions" do
-        @piece.current_version.should == @piece.versions.last
+        subject.current_version.should == subject.versions.last
+      end
+
+      specify "#title gives the current version's title" do
+        subject.title.should == subject.current_version.title
+      end
+
+      specify "#content gives the current version's content" do
+        subject.content.should == subject.current_version.content
+      end
+
+      specify "#blurb gives the current version's content" do
+        subject.blurb.should == subject.current_version.blurb
+      end
+    end
+
+    context "with a piece with no versions" do
+      before :each do
+        @no_versions_piece = create :piece, versions_count: 0
+      end
+
+      subject { @no_versions_piece }
+
+      specify "#title is nil" do
+        subject.title.should be_nil
+      end
+
+      specify "#content is nil" do
+        subject.content.should be_nil
+      end
+
+      specify "#blurb is nil" do
+        subject.blurb.should be_nil
       end
     end
   end

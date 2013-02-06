@@ -11,4 +11,16 @@ class Piece < ActiveRecord::Base
   def current_version
     versions.last
   end
+
+  def title
+    current_version.title if !!current_version
+  end
+
+  def content
+    current_version.content if !!current_version
+  end
+
+  def blurb
+    current_version.blurb if !!current_version
+  end
 end
