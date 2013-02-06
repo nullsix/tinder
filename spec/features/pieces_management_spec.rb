@@ -9,9 +9,16 @@ feature "Pieces Management" do
   shared_examples "a user creating a piece" do
     it_behaves_like "a user seeing a new piece form"
 
-    scenario "successfully" do 
-      expect_create_piece_success
-      verify_piece_was_created
+    context "successfully" do 
+      scenario "with blank title" do
+        expect_create_piece_success("")
+        verify_piece_was_created
+      end
+
+      scenario "with non-blank title" do
+        expect_create_piece_success
+        verify_piece_was_created
+      end
     end
 
     scenario "unsuccessfully at first but corrects it" do
@@ -28,9 +35,19 @@ feature "Pieces Management" do
       verify_user_sees_piece_form
     end
 
-    scenario "successfully" do
-      expect_edit_piece_success
-      verify_piece_was_edited
+    context "successfully" do
+      scenario "with blank title" do
+        content = "blah blah"
+        expect_edit_piece_success "", content
+        verify_piece_was_edited "Untitled Piece", content
+      end
+
+      scenario "with non-blank title" do
+        title = "This is not blank"
+        content = "Nor is this"
+        expect_edit_piece_success title, content
+        verify_piece_was_edited title, content
+      end
     end
 
     scenario "doesn't update the piece" do
@@ -42,16 +59,19 @@ feature "Pieces Management" do
     scenario "unsuccessfully at first but corrects it" do
       expect_edit_piece_failure
       verify_piece_was_not_accepted
-      expect_edit_piece_success
-      verify_piece_was_edited
+      title = "This is a modified title!"
+      content = "This is a modified content too!"
+      expect_edit_piece_success title, content
+      verify_piece_was_edited title, content
     end
   end
 
   shared_examples "a user deleting a piece" do
     scenario "successfully" do
       @piece = Piece.last
+      title = @piece.current_version.title
       user_deletes_piece
-      should_not have_link @title
+      should_not have_link title
       within "div.alert-success" do
         should have_content "Piece was successfully deleted."
       end
@@ -105,6 +125,8 @@ feature "Pieces Management" do
       background do
         follow_link_and_create_piece
         @piece = Piece.last
+        @title = @piece.current_version.title
+        @content = @piece.current_version.content
       end
 
       scenario "sees they have no pieces after deleting the created piece" do
@@ -112,7 +134,7 @@ feature "Pieces Management" do
         should have_content "You have no pieces."
       end
 
-      context "and is on the pieces path" do
+      context "when on the pieces path" do
         background do
           visit pieces_path
         end
@@ -191,11 +213,13 @@ feature "Pieces Management" do
     end
 
     def fill_in_piece_form(title, content)
-      @title = title
-      @content = content
+      fill_in :version_title, with: title
+      fill_in :version_content, with: content
+    end
 
-      fill_in :version_title, with: @title
-      fill_in :version_content, with: @content
+    def title_or_default(title)
+      "Untitled Piece" if title.nil? || title.empty?
+      title
     end
 
     def user_wants_to_fail?(hash = {})
@@ -239,12 +263,15 @@ feature "Pieces Management" do
       within "div.alert-success" do
         should have_content "Piece was successfully created."
       end
+
+      title = title_or_default @title
+
       within "h2" do
-        should have_content @title
+        should have_content title
       end
 
       visit pieces_path
-      should have_link @title
+      should have_link title
     end
 
     # Edit testing
@@ -276,21 +303,22 @@ feature "Pieces Management" do
     def expect_edit_piece_failure(title = "a"*300)
       expect {
         expect {
-          edit_piece title, "This is a good piece modification."
+          edit_piece title, "This is a good content modification."
         }.not_to change(Version, :count)
       }.not_to change(Piece, :count)
     end
 
-    def verify_piece_was_edited
+    def verify_piece_was_edited (title, content)
       within "div.alert-success" do
         should have_content "Piece was successfully updated."
       end
 
+      title = title_or_default title
       within "h2" do
-        should have_content @title
+        should have_content title
       end
 
-      should have_content @content
+      should have_content content
     end
 
     def verify_piece_wasnt_updated

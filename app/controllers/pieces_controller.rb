@@ -77,7 +77,7 @@ class PiecesController < ApplicationController
 
   def title_or_default(title)
     if title.empty?
-      "[untitled created at #{DateTime.now.strftime('%I:%M:%S %p on %b %d %Y')}]"
+      "Untitled Piece"
     else
       title
     end

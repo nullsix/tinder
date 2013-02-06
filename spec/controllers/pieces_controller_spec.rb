@@ -195,7 +195,7 @@ public
                 @valid_create.call
 
                 version = Version.last
-                version.title.should match /\[untitled created at \d\d:\d\d:\d\d (A|P)M on \w{3} \d{1,2} \d{4}\]/
+                version.title.should match /Untitled Piece/
               end
             end
 
