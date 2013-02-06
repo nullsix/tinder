@@ -5,4 +5,12 @@ class Version < ActiveRecord::Base
   validates :title, length: { maximum: 255 }
 
   validates :piece, presence: true
+
+  def blurb
+    if content.length > 50
+      "#{content[0..46]}..."
+    else
+      content
+    end
+  end
 end

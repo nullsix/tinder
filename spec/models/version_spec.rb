@@ -13,20 +13,17 @@ describe Version do
   subject { @version }
 
   describe "instance methods" do
-    it { should respond_to(:title) }
-    it { should respond_to(:content) }
-    it { should respond_to(:piece) }
+    [:title, :content, :piece, :blurb].each do |m|
+      it { should respond_to m }
 
-    describe "#title" do
-      subject { @version.title }
-
-      it { should be_a(String) }
     end
 
-    describe "#content" do
-      subject { @version.content }
+    [:title, :content, :blurb].each do |m|
+      describe "##{m}" do
+        subject { @version.send m }
 
-      it { should be_a(String) }
+        it { should be_a(String) }
+      end
     end
   end
 
@@ -101,6 +98,36 @@ describe Version do
 
       it "is valid with a piece" do
         @version.should be_valid
+      end
+    end
+
+    describe "#blurb" do
+      context "with a content whose size is > 50" do
+        before :each do
+          @version = build_stubbed :version, content: "a"*51
+        end
+
+        specify "has a blurb of 50 characters" do
+          @version.blurb.length.should == 50
+        end
+
+        specify "has first 47 characters of the string" do
+          @version.blurb[0..46].should == "a"*47
+        end
+
+        specify "has '...' as last 3 characters" do
+          @version.blurb[-3..-1].should == "..."
+        end
+      end
+
+      context "with a content whose size is 50 or less" do
+        before :each do
+          @version = build_stubbed :version, content: "a"*50
+        end
+
+        specify "has a blurb which equals the content" do
+          @version.blurb.should == @version.content
+        end
       end
     end
   end
