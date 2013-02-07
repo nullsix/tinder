@@ -109,6 +109,37 @@ feature "Pieces Management" do
   context "from the Pieces path" do
     background { visit pieces_path }
 
+    context "with many pieces" do
+      before :each do
+        @pieces_count = 5
+        @pieces_count.times do |i|
+          visit new_piece_path
+          expect_create_piece_success i, i
+        end
+      end
+
+      scenario "User sees all the pieces displayed" do
+        visit pieces_path
+
+        piece_rows = all("tr.piece-row")
+
+        piece_rows.count.should == @pieces_count
+
+        piece_rows.each_with_index do |piece, index|
+          within piece do
+            within ".piece-links" do
+              should have_link "edit"
+              should have_css ".delete"
+            end
+
+            find(".piece-title").should have_link index.to_s
+            find(".piece-blurb").text.should == index.to_s
+            find(".piece-last-modified").text.should match /Last modified .* ago/
+          end
+        end
+      end
+    end
+
     scenario "User sees they have no pieces" do
       should have_content "your pieces"
       should have_content "You have no pieces."

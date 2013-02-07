@@ -8,12 +8,21 @@
     <% if @pieces.empty? %>
       <p>You have no pieces.</p>
     <% else %>
-      <% @pieces.each do |piece| %>
-        <p>
-          <%= link_to piece.current_version.title, piece %>
-          <%= render partial: "pieces/links", locals: { piece: piece } %>
-        </p>
-      <% end %>
+      <table class="table table-striped table-condensed">
+        <% @pieces.each do |piece| %>
+          <tr class="piece-row">
+            <td class="span2 piece-links" style="vertical-align:middle;">
+              <%= render partial: "pieces/links", locals: { piece: piece } %>
+            </td>
+            <td style="text-align:left;" class="piece-version">
+              <h3 class="piece-title"><%= link_to piece.title, piece %></h3>
+              <p class="piece-blurb muted"><%= piece.blurb %></p>
+              <% last_modified = "Last modified #{time_ago_in_words(piece.current_version.updated_at)} ago" %>
+              <p class="piece-last-modified muted small"><small><%= last_modified %></small></p>
+            </td>
+          </tr>
+        <% end %>
+      </table>
     <% end %>
     <p><%= link_to "Create one!", new_piece_path %></p>
   </div>
