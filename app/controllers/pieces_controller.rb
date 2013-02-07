@@ -5,7 +5,11 @@ class PiecesController < ApplicationController
   before_filter :get_piece, except: [:index, :new, :create]
 
   def index
-    @pieces = current_user.pieces
+    pieces_by_last_modified_version = current_user.pieces.sort do |a,b|
+      b.current_version.updated_at <=> a.current_version.updated_at
+    end
+    
+    @pieces = pieces_by_last_modified_version 
   end
 
   def new

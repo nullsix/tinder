@@ -104,6 +104,8 @@ public
       context "where the piece belongs to the user" do
         before :all do
           @piece = FactoryGirl.create :piece, user_id: @user.id
+          @second_piece = FactoryGirl.create :piece, user_id: @user.id
+          FactoryGirl.create :version, piece_id: @piece.id
 
           @other_user = FactoryGirl.create :user, pieces_count: 5
 
@@ -119,8 +121,8 @@ public
           describe "@pieces" do
             subject{ assigns :pieces }
 
-            it "is an array of Pieces" do
-              should eq [@piece]
+            it "is an array of Pieces ordered by current_version's last modified" do
+              should eq [@piece, @second_piece]
             end
 
             it "belongs to the logged in user" do

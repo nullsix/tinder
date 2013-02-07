@@ -126,14 +126,15 @@ feature "Pieces Management" do
         piece_rows.count.should == @pieces_count
 
         piece_rows.each_with_index do |piece, index|
+          expected_index = @pieces_count - index - 1
           within piece do
             within ".piece-links" do
               should have_link "edit"
               should have_css ".delete"
             end
 
-            find(".piece-title").should have_link index.to_s
-            find(".piece-blurb").text.should == index.to_s
+            find(".piece-title").text.should == expected_index.to_s
+            find(".piece-blurb").text.should == expected_index.to_s
             find(".piece-last-modified").text.should match /Last modified .* ago/
           end
         end
