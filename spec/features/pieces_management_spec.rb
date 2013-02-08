@@ -144,11 +144,12 @@ feature "Pieces Management" do
     scenario "User sees they have no pieces" do
       should have_content "your pieces"
       should have_content "You have no pieces."
-      should have_link "Create one!", href: new_piece_path
+      should have_link "Create a new piece!", href: new_piece_path
+      should have_css "a.create-piece", count: 2
     end
 
     context "when user clicks on link to create first piece" do
-      background { click_link "Create one!" }
+      background { click_new_link }
 
       it_behaves_like "a user creating a piece"
     end
@@ -230,6 +231,10 @@ feature "Pieces Management" do
       should have_css 'a button i.icon-trash'
     end
 
+    def click_new_link
+      all("a.create-piece").first.click
+    end
+
     def click_edit_link
       all("a").select { |e| e.text == "edit" }.first.click
     end
@@ -259,7 +264,7 @@ feature "Pieces Management" do
 
     # Create testing
     def follow_link_and_create_piece(hash = {})
-      click_link "Create one!"
+      click_new_link
 
       if user_wants_to_fail? hash
         expect_create_piece_failure

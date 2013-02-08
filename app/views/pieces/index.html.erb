@@ -4,7 +4,7 @@
 <div class="row">
   <div class="span12">
     <h1><%= title %></h1>
-
+    <%= render partial: "pieces/create_button" %>
     <% if @pieces.empty? %>
       <p>You have no pieces.</p>
     <% else %>
@@ -24,6 +24,6 @@
         <% end %>
       </table>
     <% end %>
-    <p><%= link_to "Create one!", new_piece_path %></p>
+    <%= render partial: "pieces/create_button" %>
   </div>
 </div>
