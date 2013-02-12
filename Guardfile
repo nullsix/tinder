@@ -30,7 +30,7 @@ guard 'rspec', all_after_pass: false, cli: '--drb' do
   watch(%r{^spec/factories/(.+)\.rb$})                { |m| "spec/models/#{m[1]}_spec.rb" }
 
   # Capybara feature specs
-  watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/features/#{m[1]}_spec.rb" }
+  watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| ["spec/features/#{m[1]}_spec.rb", "spec/features/#{m[1]}_management_spec.rb"] }
 
   # Turnip features and steps
   watch(%r{^spec/acceptance/(.+)\.feature$})

@@ -8,3 +8,15 @@
     margin-right: .5em;
   }
 }
+
+td.piece-links, td.versions-link {
+  vertical-align: middle;
+}
+
+.piece-version {
+  text-align: left;
+}
+
+td.versions-link {
+  text-align: right;
+}

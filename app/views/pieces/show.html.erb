@@ -1,5 +1,6 @@
 <% provide :title, @piece.current_version.title %>
-<% links = render partial: "pieces/links", locals: { piece: @piece } %>
+<% links = render partial: "pieces/piece_links", locals: { piece: @piece } %>
+<% links += render partial: "pieces/versions_link", locals: { piece: @piece } %>
 
 <div class="row">
   <div class="span12">

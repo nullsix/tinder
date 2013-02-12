@@ -11,14 +11,17 @@
       <table class="table table-striped table-condensed">
         <% @pieces.each do |piece| %>
           <tr class="piece-row">
-            <td class="span2 piece-links" style="vertical-align:middle;">
-              <%= render partial: "pieces/links", locals: { piece: piece } %>
+            <td class="piece-links span2">
+              <%= render partial: "pieces/piece_links", locals: { piece: piece } %>
             </td>
-            <td style="text-align:left;" class="piece-version">
+            <td class="piece-version span8">
               <h3 class="piece-title"><%= link_to piece.title, piece %></h3>
               <p class="piece-blurb muted"><%= piece.blurb %></p>
               <% last_modified = "Last modified #{time_ago_in_words(piece.current_version.updated_at)} ago" %>
-              <p class="piece-last-modified muted small"><small><%= last_modified %></small></p>
+              <small class="piece-last-modified muted small"><%= last_modified %></small>
+            </td>
+            <td class="versions-link span2">
+              <%= render partial: "pieces/versions_link", locals: { piece: piece } %>
             </td>
           </tr>
         <% end %>

@@ -130,12 +130,16 @@ feature "Pieces Management" do
           within piece do
             within ".piece-links" do
               should have_link "edit"
-              should have_css ".delete"
+              should have_css ".delete-link"
             end
 
             find(".piece-title").text.should == expected_index.to_s
             find(".piece-blurb").text.should == expected_index.to_s
             find(".piece-last-modified").text.should match /Last modified .* ago/
+
+            within ".versions-link" do
+              should have_link "see all versions"
+            end
           end
         end
       end
@@ -203,10 +207,13 @@ feature "Pieces Management" do
           visit piece_path @piece
         end
 
-        scenario "User sees edit/delete links" do
+        scenario "User sees all the links" do
           should have_css "p.links", count: 2
           has_edit_link
           has_delete_link
+
+          should have_content "see all versions"
+          should have_css ".all-versions-link", count: 2
         end
 
         context "when user clicks on the edit link" do
@@ -236,11 +243,11 @@ feature "Pieces Management" do
     end
 
     def click_edit_link
-      all("a").select { |e| e.text == "edit" }.first.click
+      all("a.edit-link").first.click
     end
     
     def click_delete_link
-      all("a.delete").first.click
+      all("a.delete-link").first.click
     end
 
     def verify_user_sees_piece_form
