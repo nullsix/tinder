@@ -26,21 +26,37 @@ describe VersionsController do
   context "with a logged in user" do
     before :each do
       session[:user_id] = @user.id
+
+      @versions = []
+      5.times do |i|
+        @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s)
+      end
     end
 
     describe "GET index" do
       before :each do
-
-        @versions = []
-        5.times do |i|
-          @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s)
-
-          get :index, piece_id: @piece.id
-        end
+        get :index, piece_id: @piece.id
       end
 
       specify "@versions is set" do
         assigns(:versions).should eq @versions.reverse
+      end
+
+      specify "@piece is set" do
+        assigns(:piece).should eq @piece
+      end
+    end
+
+    describe "GET show" do
+      before :each do
+        @version_wanted = @versions.last
+        visit piece_version_path piece_id: @piece.id, id: @version_wanted.id
+
+        get :show, piece_id: @piece.id, id: @version_wanted.id
+      end
+
+      specify "@version is set" do
+        assigns(:version).should eq @version_wanted
       end
 
       specify "@piece is set" do

@@ -6,6 +6,10 @@ class VersionsController < ApplicationController
     @versions = @piece.versions.order(&:created_at).reverse
   end
 
+  def show
+    @version = @piece.versions.find params[:id]
+  end
+
   private
   def get_piece
     @piece = current_user.pieces.find params[:piece_id]
