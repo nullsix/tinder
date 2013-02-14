@@ -36,5 +36,23 @@ feature "Versions Management" do
         end
       end
     end
+
+    scenario "displays a version's data" do
+      version_wanted = @versions.last
+      within ".versions" do
+        all("a").select { |e| e.text == version_wanted.title }.first.click
+      end
+
+      within ".version" do
+        within ".piece-title" do
+          should have_content /a version of '#{@piece.title}'/
+          should have_link @piece.title
+        end
+
+        should have_link "see all versions"
+        should have_content version_wanted.title
+        should have_content version_wanted.content
+      end
+    end
   end
 end

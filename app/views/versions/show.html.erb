@@ -1,2 +1,12 @@
-<h2><%= version.title %></h2>
-<div id="content"><%= simple_format version.content %></div>
+<% title = @version.title %>
+<% provide :title, title %>
+
+<% piece_link = link_to @piece.title, piece_path(@piece) %>
+
+<div class="row">
+  <div class="version span12">
+    <h2 class="piece-title">a version of '<%= piece_link %>'</h2>
+    <%= render partial: 'pieces/versions_link', locals: { piece: @piece } %>
+    <%= render partial: "versions/version", locals: { version: @version } %>
+  </div>
+</div>
