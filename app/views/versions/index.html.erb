@@ -13,7 +13,7 @@
           <tr class="version-row">
             <td>
               <p class="version-title">
-                <%= version.title %> 
+                <%= link_to version.title, piece_version_path(piece_id: @piece.id, id: version.id) %> 
                 <small class="version-number muted">
                   (version #<%= version_number %>)
                 </small>

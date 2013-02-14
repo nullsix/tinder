@@ -29,6 +29,7 @@ feature "Versions Management" do
           expected_index = @versions.count - index - 1
           within version do
             find(".version-title").should have_content @versions[expected_index].title
+            find(".version-title").should have_link @versions[expected_index].title, href: piece_version_path(piece_id: @piece.id, id: @versions[expected_index].id)
             find(".version-number").should have_content /(version ##{expected_index+1})/
             find(".version-last-modified").should have_content /Last modified .* ago/
           end
