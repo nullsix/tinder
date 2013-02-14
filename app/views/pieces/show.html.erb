@@ -5,7 +5,7 @@
 <div class="row">
   <div class="span12">
     <p class="links"><%= links %></p>
-    <%= render template: 'versions/show', locals: { version: @piece.current_version } %>
+    <%= render partial: 'versions/version', locals: { version: @piece.current_version } %>
     <p class="links"><%= links %></p>
   </div>
 </div>
