@@ -154,17 +154,17 @@ describe Version do
           subject.short_title[-3..-1].should == "..."
         end
       end
-    end
 
-    describe "with a title whose size is 30 or less" do
-      before :each do
-        @version = build_stubbed :version, title: "a"*30
-      end
+      context "with a title whose size is 30 or less" do
+        before :each do
+          @version = build_stubbed :version, title: "a"*30
+        end
 
-      subject { @version }
+        subject { @version }
 
-      specify "has a short_title which equals the title" do
-        subject.short_title.should == @version.title
+        specify "has a short_title which equals the title" do
+          subject.short_title.should == @version.title
+        end
       end
     end
   end
