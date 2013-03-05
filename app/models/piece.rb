@@ -23,4 +23,8 @@ class Piece < ActiveRecord::Base
   def blurb
     current_version.blurb if !!current_version
   end
+
+  def short_title
+    current_version.short_title if !!current_version
+  end
 end

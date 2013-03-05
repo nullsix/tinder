@@ -14,7 +14,8 @@ describe Piece do
   describe "instance methods" do
     subject { @piece }
 
-    [:versions, :current_version, :title, :content, :blurb].each do |m|
+    methods = [:versions, :current_version, :title, :content, :blurb, :short_title]
+    methods.each do |m|
       it "responds to ##{m}" do
         should respond_to m
       end
@@ -46,6 +47,10 @@ describe Piece do
       specify "#blurb gives the current version's content" do
         subject.blurb.should == subject.current_version.blurb
       end
+
+      specify "#short_title gives the current version's short title" do
+        subject.short_title == subject.current_version.short_title
+      end
     end
 
     context "with a piece with no versions" do
@@ -65,6 +70,10 @@ describe Piece do
 
       specify "#blurb is nil" do
         subject.blurb.should be_nil
+      end
+
+      specify "#short_title is nil" do
+        subject.short_title.should be_nil
       end
     end
   end
