@@ -15,7 +15,6 @@ describe Version do
   describe "instance methods" do
     [:title, :content, :piece, :blurb].each do |m|
       it { should respond_to m }
-
     end
 
     [:title, :content, :blurb].each do |m|
@@ -107,16 +106,18 @@ describe Version do
           @version = build_stubbed :version, content: "a"*51
         end
 
+        subject { @version }
+
         specify "has a blurb of 50 characters" do
-          @version.blurb.length.should == 50
+          subject.blurb.length.should == 50
         end
 
         specify "has first 47 characters of the string" do
-          @version.blurb[0..46].should == "a"*47
+          subject.blurb[0..46].should == "a"*47
         end
 
         specify "has '...' as last 3 characters" do
-          @version.blurb[-3..-1].should == "..."
+          subject.blurb[-3..-1].should == "..."
         end
       end
 
@@ -125,8 +126,10 @@ describe Version do
           @version = build_stubbed :version, content: "a"*50
         end
 
+        subject { @version }
+
         specify "has a blurb which equals the content" do
-          @version.blurb.should == @version.content
+          subject.blurb.should == @version.content
         end
       end
     end
