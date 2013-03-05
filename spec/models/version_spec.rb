@@ -17,7 +17,7 @@ describe Version do
       it { should respond_to m }
     end
 
-    [:title, :content, :blurb].each do |m|
+    [:title, :content, :blurb, :short_title].each do |m|
       describe "##{m}" do
         subject { @version.send m }
 
@@ -131,6 +131,40 @@ describe Version do
         specify "has a blurb which equals the content" do
           subject.blurb.should == @version.content
         end
+      end
+    end
+
+    describe "#short_title" do
+      context "with a title whose size is > 30" do
+        before :each do
+          @version = build_stubbed :version, title: "a"*31
+        end
+
+        subject { @version }
+
+        specify "has a short_title of 30 characters" do
+          subject.short_title.length.should == 30
+        end
+
+        specify "has first 27 characters of the title" do
+          subject.short_title[0..26].should == "a"*27
+        end
+
+        specify "has '...' as the last 3 characters" do
+          subject.short_title[-3..-1].should == "..."
+        end
+      end
+    end
+
+    describe "with a title whose size is 30 or less" do
+      before :each do
+        @version = build_stubbed :version, title: "a"*30
+      end
+
+      subject { @version }
+
+      specify "has a short_title which equals the title" do
+        subject.short_title.should == @version.title
       end
     end
   end

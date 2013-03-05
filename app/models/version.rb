@@ -7,10 +7,20 @@ class Version < ActiveRecord::Base
   validates :piece, presence: true
 
   def blurb
-    if content.length > 50
-      "#{content[0..46]}..."
+    content_length = 50
+    if content.length > content_length
+      "#{content[0..(content_length-4)]}..."
     else
       content
+    end
+  end
+
+  def short_title
+    title_length = 30
+    if title.length > title_length
+      "#{title[0..(title_length-4)]}..."
+    else
+      title
     end
   end
 end
