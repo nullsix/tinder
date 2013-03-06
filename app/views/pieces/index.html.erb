@@ -1,32 +1,31 @@
 <% title = 'your pieces' %>
 <% provide :title, title %>
 
+<%  piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :pieces } %>
+
+<%= piece_bar %>
 <div class="row">
   <div class="span12">
-    <h1><%= title %></h1>
-    <%= render partial: "pieces/create_button" %>
     <% if @pieces.empty? %>
       <p>You have no pieces.</p>
     <% else %>
       <table class="table table-striped table-condensed">
         <% @pieces.each do |piece| %>
           <tr class="piece-row">
-            <td class="piece-links span2">
-              <%= render partial: "pieces/piece_links", locals: { piece: piece } %>
-            </td>
             <td class="piece-version span8">
               <h3 class="piece-title"><%= link_to piece.title, piece %></h3>
               <p class="piece-blurb muted"><%= piece.blurb %></p>
               <% last_modified = "Last modified #{time_ago_in_words(piece.current_version.updated_at)} ago" %>
               <small class="piece-last-modified muted small"><%= last_modified %></small>
             </td>
-            <td class="versions-link span2">
+            <td class="piece-links span1">
+              <%= render partial: "pieces/piece_links", locals: { piece: piece } %>
               <%= render partial: "pieces/versions_link", locals: { piece: piece } %>
             </td>
           </tr>
         <% end %>
       </table>
     <% end %>
-    <%= render partial: "pieces/create_button" %>
   </div>
 </div>
+<%= piece_bar %>

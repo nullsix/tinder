@@ -1,8 +1,8 @@
 <% title = "'#{@piece.title}' - versions" %>
 <% provide :title, title %>
+<% piece_bar = render partial: "pieces/piece_bar", locals: { piece: @piece, current_page: :versions } %>
 
-<% piece_link = link_to @piece.title, piece_path(@piece) %>
-
+<%= piece_bar %>
 <div class="row">
   <div class="span12">
     <h2><%= piece_link.html_safe %> - versions</h2>
@@ -25,3 +25,4 @@
       </table>
   </div>
 </div>
+<%= piece_bar %>

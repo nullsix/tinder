@@ -2,21 +2,12 @@
   text-align: right;
 }
 
-.create-piece button{
-  margin: 1em;
-  .icon-pencil {
-    margin-right: .5em;
-  }
-}
-
-td.piece-links, td.versions-link {
+td.piece-links {
   vertical-align: middle;
+  text-align:center;
+  button { margin-bottom: 5px; }
 }
 
-.piece-version {
-  text-align: left;
-}
-
-td.versions-link {
-  text-align: right;
+div.piece-bar:last-of-type ul.breadcrumb {
+  margin: 20px 0px 0px 0px;
 }

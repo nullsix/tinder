@@ -11,14 +11,18 @@ feature "Versions Management" do
   end
 
   context "view a piece's versions" do
-    before :each do
+    background do
       visit piece_versions_path @piece.id
     end
 
     subject { page }
 
+    #TODO: Update to include versions links
+    it_behaves_like "piece bar for versions" do
+      let(:piece) { @piece }
+    end
+
     scenario "displays the piece's versions" do
-      should have_content "#{@piece.title} - versions"
       should have_link @piece.title
 
       within ".versions" do
@@ -36,22 +40,25 @@ feature "Versions Management" do
         end
       end
     end
+  end
+
+  context "view a piece's version" do
+    before :each do
+      @version_wanted = @versions.last
+      visit piece_version_path @piece.id, @version_wanted.id
+    end
+
+    subject { page }
+
+    it_behaves_like "piece bar for version" do
+      let(:piece) { @piece }
+      let(:version) { @version_wanted }
+    end
 
     scenario "displays a version's data" do
-      version_wanted = @versions.last
-      within ".versions" do
-        all("a").select { |e| e.text == version_wanted.title }.first.click
-      end
-
       within ".version" do
-        within ".piece-title" do
-          should have_content /a version of '#{@piece.title}'/
-          should have_link @piece.title
-        end
-
-        should have_link "see all versions"
-        should have_content version_wanted.title
-        should have_content version_wanted.content
+        should have_content @version_wanted.title
+        should have_content @version_wanted.content
       end
     end
   end

@@ -1,83 +1,83 @@
-feature "Pieces Management" do
-  shared_examples "a user seeing a new piece form" do
-    scenario "User sees the form" do
-      should have_content "new piece"
-      verify_user_sees_piece_form
-    end
+shared_examples "a user seeing a new piece form" do
+  scenario "User sees the form" do
+    should have_content "new piece"
+    verify_user_sees_piece_form
   end
+end
 
-  shared_examples "a user creating a piece" do
-    it_behaves_like "a user seeing a new piece form"
+shared_examples "a user creating a piece" do
+  it_behaves_like "a user seeing a new piece form"
 
-    context "successfully" do 
-      scenario "with blank title" do
-        expect_create_piece_success("")
-        verify_piece_was_created
-      end
-
-      scenario "with non-blank title" do
-        expect_create_piece_success
-        verify_piece_was_created
-      end
+  context "successfully" do 
+    scenario "with blank title" do
+      expect_create_piece_success("")
+      verify_piece_was_created
     end
 
-    scenario "unsuccessfully at first but corrects it" do
-      expect_create_piece_failure
-      verify_piece_was_not_accepted
+    scenario "with non-blank title" do
       expect_create_piece_success
       verify_piece_was_created
     end
   end
 
-  shared_examples "a user editing a piece" do
-    scenario "sees the form" do
-      should have_content "edit piece"
-      verify_user_sees_piece_form
+  scenario "unsuccessfully at first but corrects it" do
+    expect_create_piece_failure
+    verify_piece_was_not_accepted
+    expect_create_piece_success
+    verify_piece_was_created
+  end
+end
+
+shared_examples "a user editing a piece" do
+  scenario "sees the form" do
+    should have_content "edit piece"
+    verify_user_sees_piece_form
+  end
+
+  context "successfully" do
+    scenario "with blank title" do
+      content = "blah blah"
+      expect_edit_piece_success "", content
+      verify_piece_was_edited "Untitled Piece", content
     end
 
-    context "successfully" do
-      scenario "with blank title" do
-        content = "blah blah"
-        expect_edit_piece_success "", content
-        verify_piece_was_edited "Untitled Piece", content
-      end
-
-      scenario "with non-blank title" do
-        title = "This is not blank"
-        content = "Nor is this"
-        expect_edit_piece_success title, content
-        verify_piece_was_edited title, content
-      end
-    end
-
-    scenario "doesn't update the piece" do
-      expect_edit_piece_no_change
-
-      verify_piece_wasnt_updated
-    end
-
-    scenario "unsuccessfully at first but corrects it" do
-      expect_edit_piece_failure
-      verify_piece_was_not_accepted
-      title = "This is a modified title!"
-      content = "This is a modified content too!"
+    scenario "with non-blank title" do
+      title = "This is not blank"
+      content = "Nor is this"
       expect_edit_piece_success title, content
       verify_piece_was_edited title, content
     end
   end
 
-  shared_examples "a user deleting a piece" do
-    scenario "successfully" do
-      @piece = Piece.last
-      title = @piece.current_version.title
-      user_deletes_piece
-      should_not have_link title
-      within "div.alert-success" do
-        should have_content "Piece was successfully deleted."
-      end
-    end
+  scenario "doesn't update the piece" do
+    expect_edit_piece_no_change
+
+    verify_piece_wasnt_updated
   end
 
+  scenario "unsuccessfully at first but corrects it" do
+    expect_edit_piece_failure
+    verify_piece_was_not_accepted
+    title = "This is a modified title!"
+    content = "This is a modified content too!"
+    expect_edit_piece_success title, content
+    verify_piece_was_edited title, content
+  end
+end
+
+shared_examples "a user deleting a piece" do
+  scenario "successfully" do
+    @piece = Piece.last
+    title = @piece.current_version.title
+    user_deletes_piece
+    should_not have_link title
+    within "div.alert-success" do
+      should have_content "Piece was successfully deleted."
+    end
+  end
+end
+
+feature "Pieces Management" do
   background do
     login_with_oauth
   end
@@ -109,6 +109,15 @@ feature "Pieces Management" do
   context "from the Pieces path" do
     background { visit pieces_path }
 
+    it_behaves_like "piece bar"
+
+    context "with no pieces" do
+      scenario "User sees they have no pieces" do
+        should have_content "your pieces"
+        should have_content "You have no pieces."
+      end
+    end
+
     context "with many pieces" do
       before :each do
         @pieces_count = 5
@@ -130,26 +139,16 @@ feature "Pieces Management" do
           within piece do
             within ".piece-links" do
               should have_link "edit"
-              should have_css ".delete-link"
+              should have_css ".delete-piece-link"
+              should have_link "all versions"
             end
 
             find(".piece-title").text.should == expected_index.to_s
             find(".piece-blurb").text.should == expected_index.to_s
             find(".piece-last-modified").text.should match /Last modified .* ago/
-
-            within ".versions-link" do
-              should have_link "see all versions"
-            end
           end
         end
       end
-    end
-
-    scenario "User sees they have no pieces" do
-      should have_content "your pieces"
-      should have_content "You have no pieces."
-      should have_link "Create a new piece!", href: new_piece_path
-      should have_css "a.create-piece", count: 2
     end
 
     context "when user clicks on link to create first piece" do
@@ -207,13 +206,8 @@ feature "Pieces Management" do
           visit piece_path @piece
         end
 
-        scenario "User sees all the links" do
-          should have_css "p.links", count: 2
-          has_edit_link
-          has_delete_link
-
-          should have_content "see all versions"
-          should have_css ".all-versions-link", count: 2
+        it_behaves_like "piece bar for piece" do
+          let(:piece) { @piece }
         end
 
         context "when user clicks on the edit link" do
@@ -243,11 +237,11 @@ feature "Pieces Management" do
     end
 
     def click_edit_link
-      all("a.edit-link").first.click
+      all("a.edit-piece-link").first.click
     end
     
     def click_delete_link
-      all("a.delete-link").first.click
+      all("a.delete-piece-link").first.click
     end
 
     def verify_user_sees_piece_form

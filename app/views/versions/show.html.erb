@@ -1,12 +1,12 @@
 <% title = @version.title %>
 <% provide :title, title %>
 
-<% piece_link = link_to @piece.title, piece_path(@piece) %>
+<% piece_bar = render partial: "pieces/piece_bar", locals: { piece: @piece, current_page: :version, version: @version } %>
 
+<%= piece_bar %>
 <div class="row">
   <div class="version span12">
-    <h2 class="piece-title">a version of '<%= piece_link %>'</h2>
-    <%= render partial: 'pieces/versions_link', locals: { piece: @piece } %>
     <%= render partial: "versions/version", locals: { version: @version } %>
   </div>
 </div>
+<%= piece_bar %>
