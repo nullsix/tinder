@@ -13,7 +13,7 @@ describe Version do
   subject { @version }
 
   describe "instance methods" do
-    [:title, :content, :piece, :blurb].each do |m|
+    [:title, :content, :piece, :blurb, :short_title].each do |m|
       it { should respond_to m }
     end
 
