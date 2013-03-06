@@ -15,7 +15,7 @@
   <%= fields_for :version, @version do |version_fields| %>
     <div class="row">
       <div class="span12">
-        <%= version_fields.text_field :title, placeholder: :title %>
+        <%= version_fields.text_field :title, placeholder: :title, autofocus: true %>
         <%= version_fields.text_area :content, placeholder: :content %>
       </div>
     </div>
