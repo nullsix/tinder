@@ -18,6 +18,7 @@ group :development, :test do
   gem 'rack-livereload',  '~> 0.3.10'
   gem 'yajl-ruby',        '~> 1.1.0'
   gem 'factory_girl_rails', '~> 4.1.0'
+  gem 'annotate', '~> 2.5.0'
 end
 
 # Gems used only for assets and not required
