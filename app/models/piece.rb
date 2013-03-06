@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: pieces
+#
+#  id         :integer          not null, primary key
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  user_id    :integer
+#
+
 class Piece < ActiveRecord::Base
   belongs_to :user, inverse_of: :pieces
   has_many :versions, dependent: :destroy, inverse_of: :piece
