@@ -1,6 +1,3 @@
-#TODO: Update RSpec docs
-# it_behaves_like and include_example don't make it apparent that they are different in how they get included into the including example. Does it share their context? Does it get run with the before hooks? Need more examples on how to pass in data and a block.
-
 shared_examples "piece bar" do
   scenario "has two piece bars" do
     should have_css ".piece-bar", count: 2
