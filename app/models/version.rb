@@ -8,13 +8,16 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  piece_id   :integer
+#  number     :integer
 #
 
 class Version < ActiveRecord::Base
   belongs_to :piece, inverse_of: :versions
   attr_accessible :title, :content, :piece, :piece_id
+  attr_protected :number
 
   validates :title, length: { maximum: 255 }
+  validates :number, numericality: { greater_than: 0 }
 
   validates :piece, presence: true
 

@@ -6,15 +6,14 @@
 <div class="row">
   <div class="span12">
     <table class="versions table table-striped">
-      <% @versions.each_with_index do |version, index| %>
-        <% version_number = @versions.count - index %>
+      <% @versions.each do |version| %>
         <% last_modified = "Last modified #{time_ago_in_words(version.updated_at)} ago" %>
         <tr class="version-row">
           <td>
             <p class="version-title">
-              <%= link_to version.title, piece_version_path(piece_id: @piece.id, id: version.id) %> 
+              <%= link_to version.title, piece_version_path(piece_id: @piece.id, id: version.number) %> 
               <small class="version-number muted">
-                (version #<%= version_number %>)
+                (version #<%= version.number %>)
               </small>
             </p>
             <small class="version-last-modified muted"><%= last_modified %></small>

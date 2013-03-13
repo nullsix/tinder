@@ -18,10 +18,9 @@ class PiecesController < ApplicationController
   end
 
   def create
-    @piece = current_user.pieces.build params[:piece]
-    @version = @piece.versions.build params[:version]
+    @piece = current_user.pieces.build
 
-    @version.title = title_or_default @version.title
+    @version = build_version @piece, params[:version]
 
     if @piece.save # @version is saved implicitly
       redirect_to @piece, notice: "Piece was successfully created."
@@ -36,9 +35,8 @@ class PiecesController < ApplicationController
 
   def update
     original_version = @piece.current_version
-    new_version = @piece.versions.build params[:version]
 
-    new_version.title = title_or_default new_version.title
+    new_version = build_version @piece, params[:version]
 
     if version_has_changed?(original_version, new_version)
       @version = new_version
@@ -85,5 +83,17 @@ class PiecesController < ApplicationController
     else
       title
     end
+  end
+
+  def build_version(piece, hash)
+    version = piece.versions.build
+    version.title = title_or_default hash[:title]
+    version.content = hash[:content]
+    version = set_version_number version
+  end
+
+  def set_version_number(version)
+    version.number = version.piece.versions.count + 1
+    version
   end
 end

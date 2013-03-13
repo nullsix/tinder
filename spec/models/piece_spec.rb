@@ -14,7 +14,8 @@ describe Piece do
   describe "instance methods" do
     subject { @piece }
 
-    methods = [:versions, :current_version, :title, :content, :blurb, :short_title]
+    methods = [ :versions, :current_version, :title, :content,
+                :blurb, :short_title ]
     methods.each do |m|
       it "responds to ##{m}" do
         should respond_to m

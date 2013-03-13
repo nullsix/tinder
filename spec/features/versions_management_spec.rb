@@ -6,7 +6,7 @@ feature "Versions Management" do
 
     @versions = []
     5.times do |i|
-      @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s, content: i.to_s)
+      @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s, content: i.to_s, number: (i+1).to_s)
     end
   end
 
@@ -17,7 +17,6 @@ feature "Versions Management" do
 
     subject { page }
 
-    #TODO: Update to include versions links
     it_behaves_like "piece bar for versions" do
       let(:piece) { @piece }
     end
@@ -33,7 +32,8 @@ feature "Versions Management" do
           expected_index = @versions.count - index - 1
           within version do
             find(".version-title").should have_content @versions[expected_index].title
-            find(".version-title").should have_link @versions[expected_index].title, href: piece_version_path(piece_id: @piece.id, id: @versions[expected_index].id)
+            find(".version-title").should have_link @versions[expected_index].title,
+              href: piece_version_path(piece_id: @piece.id, id: @versions[expected_index].number)
             find(".version-number").should have_content /(version ##{expected_index+1})/
             find(".version-last-modified").should have_content /Last modified .* ago/
           end
@@ -45,7 +45,7 @@ feature "Versions Management" do
   context "view a piece's version" do
     before :each do
       @version_wanted = @versions.last
-      visit piece_version_path @piece.id, @version_wanted.id
+      visit piece_version_path @piece.id, @version_wanted.number
     end
 
     subject { page }

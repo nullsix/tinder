@@ -38,7 +38,7 @@
 
         <% if current_page == :version %>
           <li>
-            <%= link_to version.short_title, piece_version_path(piece.id, version.id), class: "btn" %>
+            <%= link_to "##{version.number}", piece_version_path(piece.id, version.number), class: "btn" %>
           </li>
         <% end %>
       <% end %>

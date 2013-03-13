@@ -42,6 +42,11 @@ shared_examples "an action creating a new piece" do
 
     should redirect_to Piece.last
   end
+
+  it "has the correct version number" do
+    @valid_create.call
+    Version.last.number == Piece.last.versions.count
+  end
 end
 
 private
@@ -107,9 +112,9 @@ public
           @second_piece = FactoryGirl.create :piece, user_id: @user.id
           FactoryGirl.create :version, piece_id: @piece.id
 
-          @other_user = FactoryGirl.create :user, pieces_count: 5
+          other_user = FactoryGirl.create :user, pieces_count: 5
 
-          @other_pieces = @other_user.pieces
+          @other_pieces = other_user.pieces
           @user_pieces = @user.pieces
         end
 
@@ -334,6 +339,11 @@ public
                   @changed_update.call
                   @piece.reload
                 }.to change(@piece.versions, :count).by 1
+              end
+
+              it "has the correct version number" do
+                @changed_update.call
+                @piece.current_version.number == @piece.versions.count
               end
 
               context "after the call" do

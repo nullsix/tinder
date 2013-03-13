@@ -21,6 +21,23 @@ describe VersionsController do
         end
       end
     end
+
+    context "where methods require a version" do
+      methods = [
+        { get: :show }
+      ]
+
+      methods.each do |m|
+        m.each do |verb, action|
+          describe "redirects to root_url" do
+            it "redirects to root_url" do
+              version = FactoryGirl.create :version, piece_id: @piece.id
+              self.send verb, action, id: version.number, piece_id: @piece.id
+            end
+          end
+        end
+      end
+    end
   end
 
   context "with a logged in user" do
@@ -29,7 +46,7 @@ describe VersionsController do
 
       @versions = []
       5.times do |i|
-        @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s)
+        @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s, number: (i+1).to_s)
       end
     end
 
@@ -50,9 +67,7 @@ describe VersionsController do
     describe "GET show" do
       before :each do
         @version_wanted = @versions.last
-        visit piece_version_path piece_id: @piece.id, id: @version_wanted.id
-
-        get :show, piece_id: @piece.id, id: @version_wanted.id
+        get :show, piece_id: @piece.id, id: @version_wanted.number
       end
 
       specify "@version is set" do

@@ -13,11 +13,12 @@ describe Version do
   subject { @version }
 
   describe "instance methods" do
-    [:title, :content, :piece, :blurb, :short_title].each do |m|
+    [ :title, :content, :piece, :blurb,
+      :short_title, :number ].each do |m|
       it { should respond_to m }
     end
 
-    [:title, :content, :blurb, :short_title].each do |m|
+    [ :title, :content, :blurb, :short_title ].each do |m|
       describe "##{m}" do
         subject { @version.send m }
 
@@ -59,7 +60,7 @@ describe Version do
       end
     end
 
-    describe "content" do
+    describe "#content" do
       it "is valid without a content" do
         version = build_stubbed :version, content: nil
 
@@ -89,7 +90,7 @@ describe Version do
       end
     end
 
-    describe "piece" do
+    describe "#piece" do
       it "is not valid without a piece" do
         version = build_stubbed :version, piece: nil
         version.should_not be_valid
@@ -164,6 +165,22 @@ describe Version do
 
         specify "has a short_title which equals the title" do
           subject.short_title.should == @version.title
+        end
+      end
+    end
+
+    describe "#number" do
+      context "with a number < 1" do
+        it "is invalid" do
+          version = build_stubbed :version, number: rand(-5..0)
+          version.should_not be_valid
+        end
+      end
+
+      context "with a number >= 1" do
+        it "is valid" do
+          version = build_stubbed :version, number: rand(1..100)
+          version.should be_valid
         end
       end
     end
