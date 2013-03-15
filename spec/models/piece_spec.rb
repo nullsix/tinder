@@ -25,7 +25,7 @@ describe Piece do
     subject { @piece }
 
     methods = [ :versions, :current_version, :title, :content,
-                :blurb, :short_title ]
+                :blurb, :short_title, :drafts ]
     methods.each do |m|
       it "responds to ##{m}" do
         should respond_to m
