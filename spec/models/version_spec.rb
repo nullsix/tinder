@@ -20,14 +20,14 @@ describe Version do
   end
   
   before :all do
-    @version = build_stubbed :version
+    @version = FactoryGirl.build_stubbed :version
   end
 
   subject { @version }
 
   describe "instance methods" do
     [ :title, :content, :piece, :blurb,
-      :short_title, :number ].each do |m|
+      :short_title, :number, :draft ].each do |m|
       it { should respond_to m }
     end
 
@@ -35,7 +35,24 @@ describe Version do
       describe "##{m}" do
         subject { @version.send m }
 
-        it { should be_a(String) }
+        it { should be_a String }
+      end
+    end
+
+    describe "#piece" do
+      subject { @version.piece }
+      it { should be_a Piece }
+    end
+
+    context "with a draft" do
+      describe "#draft" do
+        it "is a Draft" do
+          draft = Draft.new
+          draft.version_id = @version.id
+          draft.number = 1
+          draft.save
+          @version.draft.should == draft
+        end
       end
     end
   end
