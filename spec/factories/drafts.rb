@@ -1,7 +1,10 @@
 FactoryGirl.define do
   factory :draft do
-    piece { FactoryGirl.build_stubbed :piece }
-    version { FactoryGirl.build_stubbed :version }
+    association :version
     number { 0 }
+
+    after :create do |draft, evaluator|
+      draft.version ||= FactoryGirl.create :version, draft: draft
+    end
   end
 end
