@@ -1,0 +1,11 @@
+<% provide :title, "Draft #{@draft.number}" %>
+
+<% piece_bar = render partial: "pieces/piece_bar", locals: { piece: @draft.version.piece, current_page: :version, version: @draft } %>
+
+<%= piece_bar %>
+<div class="row">
+  <div class="span12">
+    <%= render partial: 'versions/version', locals: { version: @draft.version } %>
+  </div>
+</div>
+<%= piece_bar %>

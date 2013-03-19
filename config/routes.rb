@@ -9,6 +9,7 @@ Tinder::Application.routes.draw do
 
   resources :pieces do
     resources :versions
+    resources :drafts, only: [ :create, :show ]
   end
 
   # The priority is based upon order of creation:
