@@ -44,7 +44,8 @@ feature "Session Management" do
     end
 
     scenario "User logs out" do
-      click_link "Sign Out"
+      logout
+      should_not have_link "Sign Out"
 
       should have_link "Sign in with Google"
     end
