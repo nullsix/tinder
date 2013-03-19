@@ -1,6 +1,7 @@
 class DraftsController < ApplicationController
   before_filter :require_signed_in_user, only: :create
   before_filter :get_piece
+  before_filter :require_owner, only: :create
 
   def create
     @draft = @piece.current_version.build_draft
@@ -26,5 +27,12 @@ class DraftsController < ApplicationController
     # The piece either doesn't exist or doesn't belong to this user.
     rescue ActiveRecord::RecordNotFound
       redirect_to pieces_path
+    end
+
+    def require_owner
+      unless owner_is_logged_in? @piece.user
+        redirect_to pieces_path
+        return
+      end
     end
 end

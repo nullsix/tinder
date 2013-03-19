@@ -15,7 +15,6 @@ class Version < ActiveRecord::Base
   belongs_to :piece, inverse_of: :versions
   has_one :draft, dependent: :destroy
 
-
   validates :title, length: { maximum: 255 }
   validates :number, numericality: { greater_than: 0 }
 

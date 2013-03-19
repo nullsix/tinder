@@ -46,6 +46,16 @@ describe DraftsController, "POST create" do
       expect{ @post_create.call }.not_to change(Draft, :count)
     end
   end
+
+  describe "with another user logged in" do
+    it "redirects to their pieces path" do
+      other_user = FactoryGirl.create :user, pieces_count: 0
+      session[:user_id] = other_user.id
+      post :create, piece_id: @piece
+      should redirect_to pieces_path
+    end
+  end
+
 end
 
 describe DraftsController, "GET show" do

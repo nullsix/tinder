@@ -16,4 +16,8 @@ class ApplicationController < ActionController::Base
       redirect_to root_url
     end
   end
+
+  def owner_is_logged_in?(owning_user)
+    current_user && current_user == owning_user
+  end
 end
