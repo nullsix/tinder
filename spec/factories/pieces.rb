@@ -4,7 +4,7 @@ FactoryGirl.define do
       versions_count 1
     end
     
-    user { build_stubbed(:user) }
+    user { FactoryGirl.build_stubbed :user }
 
     before :stub do |piece, evaluator|
       FactoryGirl.stub_list :version, evaluator.versions_count, piece: piece
@@ -13,5 +13,6 @@ FactoryGirl.define do
     before :build, :create do |piece, evaluator|
       FactoryGirl.create_list :version, evaluator.versions_count, piece: piece
     end
+
   end
 end

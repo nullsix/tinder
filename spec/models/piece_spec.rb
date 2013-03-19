@@ -18,7 +18,7 @@ describe Piece do
   
   before :all do
     @versions_count = 2
-    @piece = build_stubbed :piece, versions_count: @versions_count
+    @piece = FactoryGirl.build_stubbed :piece, versions_count: @versions_count
   end
 
   describe "instance methods" do
@@ -34,10 +34,10 @@ describe Piece do
 
     context "with a saved piece" do
       before :each do
-        @saved_piece = create :piece, versions_count: @versions_count
+        @piece = FactoryGirl.create :piece, versions_count: @versions_count 
       end
 
-      subject { @saved_piece }
+      subject { @piece }
 
       it "has the correct number of versions" do
         subject.versions.length.should == @versions_count
@@ -62,14 +62,35 @@ describe Piece do
       specify "#short_title gives the current version's short title" do
         subject.short_title == subject.current_version.short_title
       end
+
+      context "with a draft" do
+        before :each do
+          @version = @piece.versions.first
+          @draft = FactoryGirl.create :draft, version: @version
+        end
+
+        subject { @piece }
+
+        it "has one draft" do
+          subject.drafts == [@draft]
+        end
+      end
     end
 
     context "with a piece with no versions" do
       before :each do
-        @no_versions_piece = create :piece, versions_count: 0
+        @no_versions_piece = FactoryGirl.create :piece, versions_count: 0
       end
 
       subject { @no_versions_piece }
+
+      specify "#versions is empty" do
+        subject.versions.should be_empty
+      end
+
+      specify "#drafts is empty" do
+        subject.drafts.should be_empty
+      end
 
       specify "#title is nil" do
         subject.title.should be_nil
@@ -94,15 +115,15 @@ describe Piece do
   end
 
   it "is not valid without a user" do
-    no_user_piece = build_stubbed :piece, user: nil
+    no_user_piece = FactoryGirl.build_stubbed :piece, user: nil
     no_user_piece.should_not be_valid
   end
 
   describe "creating a new version" do
     it "increases the size of the versions collection by 1" do
-      piece = create :piece
+      piece = FactoryGirl.create :piece
       expect do
-        create :version, piece: piece
+        FactoryGirl.create :version, piece: piece
         piece.reload
       end.to change{ piece.versions.length }.by 1
     end
@@ -110,8 +131,8 @@ describe Piece do
 
   describe "a new version" do
     before :all do
-      @piece = create :piece
-      @new_version = create :version, piece: @piece
+      @piece = FactoryGirl.create :piece
+      @new_version = FactoryGirl.create :version, piece: @piece
     end
 
     it "saves the new version" do
@@ -127,8 +148,8 @@ describe Piece do
     end
 
     it "sets the new version as the current version" do
-      piece = create :piece
-      new_version = create :version, piece: piece
+      piece = FactoryGirl.create :piece
+      new_version = FactoryGirl.create :version, piece: piece
       piece.current_version.should == new_version
     end
   end
