@@ -98,7 +98,7 @@ Spork.prefork do
   OmniAuth.config.add_mock(:google_oauth2, {
     uid: "12345",
     provider: "google_oauth2",
-    info: { name: 'testerbob' }
+    info: { name: 'bobburger' }
   })
 end
 
