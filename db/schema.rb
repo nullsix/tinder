@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130316200447) do
+ActiveRecord::Schema.define(:version => 20130321133545) do
 
   create_table "drafts", :force => true do |t|
     t.integer  "number"
