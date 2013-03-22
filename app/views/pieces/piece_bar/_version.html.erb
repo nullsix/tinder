@@ -1,0 +1,9 @@
+<% if current_page == :version %>
+  <li>
+    <%= link_to "##{version.number}", piece_version_path(version.piece.id, version.number), class: "btn" %>
+  </li>
+<% elsif current_page == :draft %>
+  <li>
+    <%= link_to "##{version.number}", piece_draft_path(version.piece.id, version.number), class: "btn" %>
+  </li>
+<% end %>

@@ -1,5 +1,5 @@
 <h2><%= version.title %></h2>
-<% unless current_user %>
+<% unless owner_is_logged_in?(version.piece.user) %>
   <h4 class="author muted">by <%= version.piece.user.name %></h4>
 <% end %>
 <div id="content"><%= simple_format version.content %></div>

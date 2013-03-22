@@ -1,0 +1,23 @@
+<li>
+<% versions_class = "btn"
+  versions_class += " btn-link" unless [:versions, :drafts].include? current_page %>
+
+    <% if current_page == :piece %>
+      <div class="btn-group">
+        <%= link_to "all versions", piece_versions_path(piece.id), class: versions_class %>
+      </div>
+      <span class="divider">/</span>
+      <div class="btn-group">
+      <%= link_to "all drafts", piece_drafts_path(piece.id), class: versions_class %>
+      </div>
+      <span class="divider">/</span>
+    <% end %>
+      
+    <% if [:versions, :version].include? current_page %>
+      <%= link_to "all versions", piece_versions_path(piece.id), class: versions_class %>
+    <% elsif [:drafts, :draft].include? current_page %>
+      <%= link_to "all drafts", piece_drafts_path(piece.id), class: versions_class %>
+    <% end %>
+  <% if [:version, :draft].include? current_page %>
+  <% end %>
+</li>

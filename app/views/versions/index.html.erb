@@ -1,6 +1,6 @@
-<% title = "'#{@piece.title}' - versions" %>
+<% title = "all versions - '#{@piece.title}'" %>
 <% provide :title, title %>
-<% piece_bar = render partial: "pieces/piece_bar", locals: { piece: @piece, current_page: :versions } %>
+<% piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :versions, piece: @piece } %>
 
 <%= piece_bar %>
 <div class="row">

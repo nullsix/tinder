@@ -17,7 +17,7 @@ feature "Versions Management" do
 
     subject { page }
 
-    it_behaves_like "piece bar for versions" do
+    it_behaves_like "piece bar for piece" do
       let(:piece) { @piece }
     end
 
