@@ -5,6 +5,7 @@ class AddNumberToVersion < ActiveRecord::Migration
   def up
     add_column :versions, :number, :int
 
+    ActiveRecord::Base.record_timestamps = false
     Version.reset_column_information
     Piece.all.each do |piece|
       piece.versions.each.with_index do |version, index|
