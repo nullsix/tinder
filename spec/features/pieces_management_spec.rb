@@ -89,7 +89,7 @@ feature "Pieces Management" do
       end
 
       scenario "sees they have no pieces after deleting the created piece" do
-        user_deletes_piece
+        gui_delete_piece
         should have_content "You have no pieces."
       end
 

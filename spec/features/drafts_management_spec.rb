@@ -1,75 +1,5 @@
-shared_examples "draft information" do
-  scenario "shows draft information" do
-    should have_content @piece.title
-    should have_content @piece.content
-    find(".created-time").text.should match /created .* ago/
-  end
-end
-
-shared_examples "logged in draft information" do
-  it_behaves_like "piece bar for draft" do
-    let(:piece) { @piece }
-    let(:draft) { @draft }
-  end
-
-  it_behaves_like "draft information"
-
-  scenario "shows the right extra info" do
-    should have_link "##{@draft.number}", href: piece_draft_path(piece_id: @piece, id: @draft.number)
-    should_not have_content "by #{@piece.user.name}"
-  end
-end
-
-shared_examples "non owner draft information" do
-  it_behaves_like "draft information"
-
-  scenario "shows the piece's user's name" do
-    should have_content "by #{@piece.user.name}"
-  end
-end
-
-module DraftHelper
-  def create_user(name = "bobburger")
-    user = User.new
-    user.name = name
-    user.save
-    user
-  end
-
-  def create_piece(user)
-    piece = Piece.new
-    piece.user_id = user.id
-    piece.save
-    piece
-  end
-
-  def create_version(piece, title = Time.now.to_s, content = Time.now.to_s)
-    version = Version.new
-    version.piece_id = piece.id
-    version.title = title
-    version.content = content
-    version.number = piece.versions.count + 1
-    version.save
-    version
-  end
-
-  def create_draft(version)
-    draft = Draft.new
-    draft.version_id = version.id
-    draft.number = version.piece.drafts.count + 1
-    draft.save
-    draft
-  end
-
-  def ui_create_draft
-    visit piece_path @piece
-    all("a.make-draft-link").first.click
-    @draft = @piece.current_version.draft
-  end
-end
-
 feature "Drafts Management" do
-  include DraftHelper
+  include PieceHelper
 
   subject { page }
 
@@ -92,7 +22,7 @@ feature "Drafts Management" do
     context "while logged in" do
       context "as the owner" do
         background do
-          ui_create_draft
+          gui_create_draft
         end
 
         it_behaves_like "draft information"
