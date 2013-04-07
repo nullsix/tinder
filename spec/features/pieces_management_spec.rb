@@ -129,7 +129,7 @@ feature "Pieces Management" do
           visit piece_path @piece
         end
 
-        it_behaves_like "piece bar for piece" do
+        it_behaves_like "piece bar with history" do
           let(:piece) { @piece }
         end
 

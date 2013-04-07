@@ -1,0 +1,11 @@
+<li>
+<% versions_class = "btn"
+  versions_class += " btn-link" unless current_page == :drafts %>
+
+  <div class="btn-group">
+    <%= link_to "all drafts", piece_drafts_path(piece.id), class: versions_class %>
+  </div>
+  <% unless current_page == :drafts %>
+    <span class="divider">/</span>
+  <% end %>
+</li>

@@ -26,9 +26,16 @@ shared_examples "piece bar for piece" do
       should have_css ".make-draft-link"
       should have_link "", href: piece_path(piece.id)
       should have_css ".delete-piece-link"
+    end
+  end
+end
 
-      # should have_link "all versions", href: piece_versions_path(piece.id)
-      # should have_link "all drafts", href: piece_drafts_path(piece.id)
+shared_examples "piece bar with history" do
+  it_behaves_like "piece bar for piece"
+
+  scenario "shows history link" do
+    within(first(".piece-bar")) do
+      should have_link "history", href: history_piece_path(piece.id)
     end
   end
 end

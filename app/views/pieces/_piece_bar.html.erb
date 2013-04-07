@@ -8,8 +8,16 @@
         <%= render partial: "pieces/piece_bar/piece",
           locals: { current_page: current_page, piece: piece } %>
 
-        <%= render partial: "pieces/piece_bar/versions",
-          locals: { current_page: current_page, piece: piece } %>
+        <% if [:versions, :version].include? current_page %>
+          <%= render partial: "pieces/piece_bar/versions",
+            locals: { current_page: current_page, piece: piece } %>
+        <% elsif [:drafts, :draft].include? current_page %>
+          <%= render partial: "pieces/piece_bar/drafts",
+            locals: { current_page: current_page, piece: piece } %>
+        <% elsif %>
+          <%= render partial: "pieces/piece_bar/history",
+            locals: { current_page: current_page, piece: piece } %>
+        <% end %>
 
         <% if [:version, :draft].include? current_page %>
           <%= render partial: "pieces/piece_bar/version",
