@@ -3,7 +3,7 @@ class VersionsController < ApplicationController
   before_filter :require_signed_in_user, :get_piece
   
   def index
-    @versions = @piece.versions.sort_by(&:created_at).reverse
+    @versions = @piece.versions.reverse
   end
 
   def show

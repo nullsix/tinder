@@ -12,7 +12,7 @@ class Piece < ActiveRecord::Base
   belongs_to :user, inverse_of: :pieces
   validates :user, presence: true
 
-  has_many :versions, dependent: :destroy, inverse_of: :piece
+  has_many :versions, dependent: :destroy, inverse_of: :piece, order: "created_at ASC"
   has_many :drafts, through: :versions
 
   def current_version
