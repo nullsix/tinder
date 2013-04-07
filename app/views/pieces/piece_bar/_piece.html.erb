@@ -2,13 +2,23 @@
 <% piece_class = "btn"
   piece_class += " btn-link" if current_page != :piece %>
   <div class="btn-group">
-    <%= link_to "<i class=\"icon-edit\"></i> edit".html_safe, edit_piece_path(piece.id), class: "btn btn-success edit-piece-link", title: "edit this piece" %>
+    <%= link_to "<i class=\"icon-edit\"></i> edit".html_safe,
+          edit_piece_path(piece.id),
+          class: "btn btn-success edit-piece-link",
+          title: "edit this piece" %>
     <%= link_to "<i class=\"icon-bookmark\"></i> make draft".html_safe,
           piece_drafts_path(piece_id: piece.id),
           class: "btn btn-info make-draft-link",
           method: :post %>
-    <%= link_to piece.short_title, piece_path(piece.id), class: piece_class, title: piece.title %>
-    <%= link_to "<i class=\"icon-trash\"></i>".html_safe, piece_path(piece.id), class: "btn btn-danger delete-piece-link", method: :delete, title: "delete this piece" %>
+    <%= link_to piece.short_title,
+          piece_path(piece.id),
+          class: piece_class,
+          title: piece.title %>
+    <%= link_to "<i class=\"icon-trash\"></i>".html_safe,
+          piece_path(piece.id),
+          class: "btn btn-danger delete-piece-link",
+          method: :delete,
+          title: "delete this piece" %>
   </div>
   <span class="divider">/</span>
 </li>
