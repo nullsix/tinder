@@ -9,11 +9,14 @@
 #
 
 class Piece < ActiveRecord::Base
+
   belongs_to :user, inverse_of: :pieces
   validates :user, presence: true
 
   has_many :versions, dependent: :destroy, inverse_of: :piece, order: "created_at ASC"
   has_many :drafts, through: :versions
+
+  scope :last_modified_first, order("updated_at DESC")
 
   def current_version
     versions.last
