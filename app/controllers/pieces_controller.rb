@@ -1,8 +1,8 @@
 class PiecesController < ApplicationController
   respond_to :html
-  before_filter :require_signed_in_user
+  before_filter :require_signed_in_user, except: [ :history ]
 
-  before_filter :get_piece, except: [:index, :new, :create]
+  before_filter :get_piece, except: [ :index, :new, :create, :history ]
 
   def index
     @pieces = current_user.pieces.last_modified_first
@@ -55,6 +55,24 @@ class PiecesController < ApplicationController
     @piece.destroy
 
     redirect_to pieces_path, notice: "Piece was successfully deleted."
+  end
+
+  def history
+    piece = Piece.find params[:id]
+
+    if owner_is_logged_in? piece.user
+      # Include all versions, but use the draft if they have one.
+      @history = piece.versions.map do |v|
+        if v.draft.nil?
+          v
+        else
+          v.draft
+        end
+      end
+
+    else
+      @history = piece.versions.select{|v| !v.draft.nil? }.map{|v| v.draft }
+    end
   end
 
   private

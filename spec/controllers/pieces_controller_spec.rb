@@ -81,7 +81,7 @@ public
 
       context "where actions require a piece" do 
         before :all do
-          @piece = create :piece
+          @piece = FactoryGirl.create :piece
         end
         
         piece_methods.each do |m|
@@ -92,6 +92,39 @@ public
                 should redirect_to root_url
               end
             end
+          end
+        end
+
+        describe "GET history" do
+          before :each do
+            user = create_user
+            @piece = create_piece user
+            versions = []
+
+            # Create several versions
+            5.times do |i|
+              versions << create_version(@piece, i.to_s, i.to_s)
+            end
+
+            # Create drafts for the even pieces
+            @drafts = []
+            versions.each.with_index do |v, i|
+              @drafts << create_draft(v) if (i%2).zero?
+            end
+
+            get :history, id: @piece.id
+          end
+
+          specify "assigns @history" do
+            assigns(:history).should be
+          end
+
+          specify "@history is the piece's drafts" do
+            assigns(:history).should == @drafts
+          end
+
+          it "renders the history view" do
+            should render_template :history
           end
         end
       end
@@ -126,8 +159,8 @@ public
           describe "@pieces" do
             subject{ assigns :pieces }
 
-            it "is an array of Pieces ordered by current_version's last modified" do
-              should eq [@piece, @second_piece]
+            it "is an array of Pieces ordered by last modified first" do
+              should eq [@second_piece, @piece]
             end
 
             it "belongs to the logged in user" do
@@ -457,15 +490,45 @@ public
             should redirect_to pieces_url
           end
         end
+
+        describe "GET history" do
+          before :each do
+            third_piece = FactoryGirl.create :piece, versions_count: 5, user_id: @user.id
+            @history = third_piece.versions
+
+            third_piece.versions.each.with_index do |v, i|
+              if (i%2) == 0
+                @history[i] = create_draft(v)
+              end
+            end
+
+            get :history, id: third_piece.id
+          end
+
+          specify "assigns @history" do
+            assigns(:history).should be
+          end
+
+          specify "@history is the users versions and drafts" do
+            assigns(:history).should == @history
+          end
+
+          it "renders the history view" do
+            should render_template :history
+          end
+        end
       end
 
       context "where the piece doesn't belong to the user" do
+        before :each do
+          @other_user = FactoryGirl.create :user, name: "Other"
+          @others_piece = FactoryGirl.create :piece, user: @other_user
+        end
+
         piece_methods.each do |m|
           m.each do |action, verb|
             describe "#{action.upcase} #{verb}" do
               before :each do
-                @other_user = FactoryGirl.create :user, name: "Other"
-                @others_piece = FactoryGirl.create :piece, user: @other_user
                 FactoryGirl.create :version, title: "Other's piece", piece: @others_piece
               end
 
@@ -475,6 +538,36 @@ public
                 should redirect_to pieces_url
               end
             end
+          end
+        end
+
+        describe "GET history" do
+          before :each do
+            # Create several versions
+            others_versions = []
+            5.times do |i|
+              others_versions << create_version(@others_piece, i.to_s, i.to_s)
+            end
+
+            # Create drafts for the even pieces
+            @others_drafts = []
+            others_versions.each.with_index do |v, i|
+              @others_drafts << create_draft(v) if (i%2).zero?
+            end
+
+            get :history, id: @others_piece.id
+          end
+
+          specify "assigns @history" do
+            assigns(:history).should be
+          end
+
+          specify "@history is the piece's drafts" do
+            assigns(:history).should == @others_drafts
+          end
+
+          it "renders the history view" do
+            should render_template :history
           end
         end
       end
