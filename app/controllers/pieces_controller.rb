@@ -9,8 +9,8 @@ class PiecesController < ApplicationController
   end
 
   def new
-    @piece = current_user.pieces.build
-    @version = @piece.versions.build
+    @piece = Piece.new
+    @version = Version.new
   end
 
   def create

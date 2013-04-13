@@ -179,28 +179,23 @@ describe PiecesController, "GET new" do
     let(:needs_piece) { false }
   end
 
-  context "with a logged in user" do
-    context "who is the owner" do
-      include_context "is owner"
+  context "with owner logged in" do
+    include_context "is owner"
 
-      before :each do
-        get :new
-      end
+    before :each do
+      get :new
+    end
 
-      it_behaves_like "assigns @piece"
-      it_behaves_like "assigns @version"
+    specify "@piece is a new Piece" do
+      assigns(:piece).should be_a_new_record
+    end
 
-      specify "@piece is a new Piece" do
-        assigns(:piece).should be_a_new_record
-      end
+    specify "@version is a new Version" do
+      assigns(:version).should be_a_new_record
+    end
 
-      specify "@version is a new Version" do
-        assigns(:version).should be_a_new_record
-      end
-
-      it "renders the #new view" do
-        should render_template :new
-      end
+    it "renders the #new view" do
+      should render_template :new
     end
   end
 end
