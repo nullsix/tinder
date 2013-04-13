@@ -129,45 +129,19 @@ describe PiecesController, "GET index" do
     let(:needs_piece) { false }
   end
 
-  context "with a user logged in" do
-    context "who is the owner" do
-      include_context "with owner's pieces"
+  context "with owner logged in" do
+    include_context "with owner's pieces"
 
-      before :each do
-        get :index
-      end
+    before :each do
+      get :index
+    end
 
-      describe "@pieces" do
-        subject{ assigns :pieces }
+    specify "@pieces is the user's pieces" do
+      assigns(:pieces).should eq [second_piece, first_piece]
+    end
 
-        it "is an array of Pieces ordered by last modified first" do
-          should eq [second_piece, first_piece]
-        end
-
-        it "belongs to the logged in user" do
-          subject.each { |p| p.user.should eq user }
-        end
-
-        it "is the same size as user's pieces" do
-          subject.size.should == user_pieces.size
-        end
-
-        it "has all the user's pieces" do
-          user_pieces.each do |piece|
-            subject.should include piece
-          end
-        end
-
-        it "has no other user's pieces" do
-          other_pieces.each do |piece|
-            subject.should_not include piece
-          end
-        end
-      end
-
-      it "renders the #index view" do
-        should render_template :index
-      end
+    it "renders the #index view" do
+      should render_template :index
     end
   end
 end
@@ -329,28 +303,25 @@ describe PiecesController, "GET edit" do
   let(:needs_piece) { true }
 
   it_behaves_like "requires user"
-
   it_behaves_like "requires owner"
 
-  context "with a logged in user" do
-    context "who is the owner" do
-      include_context "with owner's pieces"
+  context "with owner logged in" do
+    include_context "with owner's pieces"
 
-      before :each do
-        get :edit, id: first_piece
-      end
+    before :each do
+      get :edit, id: first_piece
+    end
 
-      it "assigns the requested piece to @piece" do
-        assigns(:piece).should eq first_piece
-      end
+    it "assigns the requested piece to @piece" do
+      assigns(:piece).should eq first_piece
+    end
 
-      it "assigns the piece's current version to @version" do
-        assigns(:version).should eq first_piece.current_version
-      end
+    it "assigns the piece's current version to @version" do
+      assigns(:version).should eq first_piece.current_version
+    end
 
-      it "renders the #edit view" do
-        should render_template :edit
-      end
+    it "renders the #edit view" do
+      should render_template :edit
     end
   end
 end
@@ -552,19 +523,19 @@ describe PiecesController, "DELETE destroy" do
   end
 end
 
-shared_context "multiple drafts" do
-  before :each do
-    # Create drafts for the even pieces
-    @drafts = []
-    piece.versions.each.with_index do |v, i|
-      @drafts << create_draft(v) if i.even?
-    end
-
-    get :history, id: piece.id
-  end
-end
-
 describe PiecesController, "GET history" do
+  shared_context "multiple drafts" do
+    before :each do
+      # Create drafts for the even pieces
+      @drafts = []
+      piece.versions.each.with_index do |v, i|
+        @drafts << create_draft(v) if i.even?
+      end
+
+      get :history, id: piece.id
+    end
+  end
+
   let(:piece) { FactoryGirl.create :piece, user: user, versions_count: 5 }
 
   context "with no user logged in" do
