@@ -17,6 +17,7 @@ class Piece < ActiveRecord::Base
   has_many :drafts, through: :versions
 
   scope :last_modified_first, order("updated_at DESC")
+  default_scope last_modified_first
 
   def current_version
     versions.last

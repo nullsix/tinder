@@ -19,7 +19,7 @@ describe User do
   end
 
   describe "instance methods" do
-    before :all do
+    before :each do
       @user = build_stubbed :user
     end
 

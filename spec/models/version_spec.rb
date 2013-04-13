@@ -19,7 +19,7 @@ describe Version do
     FactoryGirl.build_stubbed(:version).should be_valid
   end
   
-  before :all do
+  before :each do
     @version = FactoryGirl.build_stubbed :version
   end
 

@@ -83,7 +83,7 @@ feature "Pieces Management" do
     context "when user has created a piece" do
       background do
         follow_link_and_create_piece
-        @piece = Piece.last
+        @piece = Piece.first
         @title = @piece.current_version.title
         @content = @piece.current_version.content
       end
@@ -125,7 +125,7 @@ feature "Pieces Management" do
       
       context "and is on a piece page" do
         background do
-          @piece = Piece.last
+          @piece = Piece.first
           visit piece_path @piece
         end
 

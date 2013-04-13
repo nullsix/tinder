@@ -22,7 +22,7 @@ describe PagesController do
   end
 
   context "with a logged in user" do
-    before :all do
+    before :each do
       @user = FactoryGirl.create :user, pieces_count: 0
     end
 

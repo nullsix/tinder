@@ -69,7 +69,7 @@ end
 
 shared_examples "a user deleting a piece" do
   scenario "successfully" do
-    @piece = Piece.last
+    @piece = Piece.first
     title = @piece.current_version.title
     gui_delete_piece
     should_not have_link title

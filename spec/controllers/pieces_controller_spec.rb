@@ -65,7 +65,7 @@ shared_context "with owner's pieces" do
     FactoryGirl.create :piece, user: user, versions_count: 1
   end
 
-  let!(:user_pieces) { user.pieces }
+  let!(:user_pieces) { user.pieces.last_modified_first }
 
   let!(:other_pieces) do
     op = []
@@ -113,12 +113,12 @@ shared_examples "creates new piece" do
   it "redirects to the piece just created" do
     @valid_create.call
 
-    should redirect_to Piece.last
+    should redirect_to Piece.first
   end
 
   it "has the correct version number" do
     @valid_create.call
-    Version.last.number == Piece.last.versions.count
+    Version.last.number == Piece.first.versions.count
   end
 end
 
@@ -220,7 +220,7 @@ describe PiecesController, "POST create" do
     context "who is the owner" do
       include_context "is owner"
 
-      before :all do
+      before :each do
         @piece = FactoryGirl.create :piece, user: user
       end
 

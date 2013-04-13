@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe VersionsController do
-  before :all do
+  before :each do
     @user = FactoryGirl.create :user, pieces_count: 0
     @piece = FactoryGirl.create :piece, versions_count: 0, user_id: @user.id
   end
