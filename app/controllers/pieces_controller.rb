@@ -61,17 +61,9 @@ class PiecesController < ApplicationController
     piece = Piece.find params[:id]
 
     if owner_is_logged_in? piece.user
-      # Include all versions, but use the draft if they have one.
-      @history = piece.versions.map do |v|
-        if v.draft.nil?
-          v
-        else
-          v.draft
-        end
-      end
-
+      @versions = piece.versions
     else
-      @history = piece.versions.select{|v| !v.draft.nil? }.map{|v| v.draft }
+      @versions = piece.versions.select{|v| !v.draft.nil? }
     end
   end
 

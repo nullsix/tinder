@@ -527,9 +527,12 @@ describe PiecesController, "GET history" do
   shared_context "multiple drafts" do
     before :each do
       # Create drafts for the even pieces
-      @drafts = []
+      @versions = []
       piece.versions.each.with_index do |v, i|
-        @drafts << create_draft(v) if i.even?
+        if i.even?
+          create_draft(v) 
+          @versions << v
+        end
       end
 
       get :history, id: piece.id
@@ -542,12 +545,8 @@ describe PiecesController, "GET history" do
     include_context "users"
     include_context "multiple drafts"
 
-    specify "assigns @history" do
-      assigns(:history).should be
-    end
-
-    specify "@history is the piece's drafts" do
-      assigns(:history).should == @drafts
+    specify "@versions contains only those pieces with drafts" do
+      assigns(:versions).should == @versions
     end
 
     it "renders the history view" do
@@ -560,21 +559,17 @@ describe PiecesController, "GET history" do
       include_context "is owner"
 
       before :each do
-        @history = piece.versions
+        @versions = piece.versions
 
-        piece.versions.each.with_index do |v, i|
-            @history[i] = create_draft(v) if i.even?
+        @versions.each.with_index do |v, i|
+          create_draft(v) if i.even?
         end
 
         get :history, id: piece.id
       end
 
-      specify "assigns @history" do
-        assigns(:history).should be
-      end
-
-      specify "@history is the users versions and drafts" do
-        assigns(:history).should == @history
+      specify "@versions contains all the user's versions" do
+        assigns(:versions).should == @versions
       end
 
       it "renders the history view" do
@@ -584,18 +579,33 @@ describe PiecesController, "GET history" do
 
     context "who isn't the owner" do
       include_context "is not owner"
-      include_context "multiple drafts"
+      
+      context "with no drafts" do
+        before :each do
+          @versions = piece.versions
 
-      specify "assigns @history" do
-        assigns(:history).should be
+          get :history, id: piece.id
+        end
+
+        specify "@versions is empty" do
+          assigns(:versions).should be_empty
+        end
+
+        it "renders the history view" do
+          should render_template :history
+        end
       end
 
-      specify "@history is the piece's drafts" do
-        assigns(:history).should == @drafts
-      end
+      context "with at least one draft" do
+        include_context "multiple drafts"
 
-      it "renders the history view" do
-        should render_template :history
+        specify "@versions contains only those versions with drafts" do
+          assigns(:versions).should == @versions
+        end
+
+        it "renders the history view" do
+          should render_template :history
+        end
       end
     end
   end
