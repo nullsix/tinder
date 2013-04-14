@@ -1,0 +1,46 @@
+<% provide(:title) { 'piece history' } %>
+
+<% if @versions.empty? %>
+  <div class="row">
+    <div class="span12">
+      <p>This piece has no history you can view.</p>
+    </div>
+  </div>
+
+<% else %>
+  <% piece = @versions.first.piece %>
+  <% piece_bar = "" %>
+  <% if owner_is_logged_in?(piece.user) %>
+    <% piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :history, piece: piece } %>
+  <% end %>
+
+  <%= piece_bar %>
+  <div class="row">
+    <div class="span12">
+      <table class="versions table table-striped">
+        <% @versions.each do |version| %>
+          <% last_modified = "Last modified #{time_ago_in_words(version.updated_at)} ago" %>
+          <tr class="version-row">
+            <td>
+              <p class="version-title">
+                <%= link_to version.title,
+                  piece_version_path(
+                    piece_id: version.piece.id, id: version.number
+                  ) %> 
+                <small class="number muted">
+                  <% if version.draft.nil? %>
+                    (version #<%= version.number %>)
+                  <% else %>
+                    (draft #<%= version.draft.number %>)
+                  <% end %>
+                </small>
+              </p>
+              <small class="version-last-modified muted"><%= last_modified %></small>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+  <%= piece_bar %>
+<% end %>
