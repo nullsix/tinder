@@ -58,12 +58,19 @@ class PiecesController < ApplicationController
   end
 
   def history
-    piece = Piece.find params[:id]
+    @piece = Piece.find params[:id]
 
-    if owner_is_logged_in? piece.user
-      @versions = piece.versions
+    if owner_is_logged_in? @piece.user
+      versions = @piece.versions
     else
-      @versions = piece.versions.select{|v| !v.draft.nil? }
+      versions = @piece.versions.select{|v| !v.draft.nil? }
+    end
+    @versions = versions.reverse
+  rescue ActiveRecord::RecordNotFound
+    if current_user
+      redirect_to pieces_path
+    else
+      redirect_to root_path
     end
   end
 

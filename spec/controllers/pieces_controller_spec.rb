@@ -527,13 +527,8 @@ describe PiecesController, "GET history" do
   shared_context "multiple drafts" do
     before :each do
       # Create drafts for the even pieces
-      @versions = []
-      piece.versions.each.with_index do |v, i|
-        if i.even?
-          create_draft(v) 
-          @versions << v
-        end
-      end
+      create_drafts piece.versions
+      @versions = piece.versions.select{|v| !v.draft.nil? }.reverse!
 
       get :history, id: piece.id
     end
@@ -549,8 +544,20 @@ describe PiecesController, "GET history" do
       assigns(:versions).should == @versions
     end
 
+    specify "@piece is the right piece" do
+      assigns(:piece).should == piece
+    end
+
     it "renders the history view" do
       should render_template :history
+    end
+
+    context "with a non-existent piece" do
+      it "redirects to root" do
+        get :history, id: -1
+        
+        should redirect_to root_path
+      end
     end
   end
 
@@ -558,53 +565,83 @@ describe PiecesController, "GET history" do
     context "who is the owner" do
       include_context "is owner"
 
-      before :each do
-        @versions = piece.versions
+      context "with a non-existent piece" do
+        it "redirects to root" do
+          get :history, id: -1
+          
+          should redirect_to pieces_path
+        end
+      end
 
-        @versions.each.with_index do |v, i|
-          create_draft(v) if i.even?
+      context "with an existing piece" do
+        before :each do
+          @versions = piece.versions
+          create_drafts @versions
+          @versions.reverse!
+
+          get :history, id: piece.id
         end
 
-        get :history, id: piece.id
-      end
+        specify "@versions contains all the user's versions" do
+          assigns(:versions).should == @versions
+        end
 
-      specify "@versions contains all the user's versions" do
-        assigns(:versions).should == @versions
-      end
+        specify "@piece is the right piece" do
+          assigns(:piece).should == piece
+        end
 
-      it "renders the history view" do
-        should render_template :history
+        it "renders the history view" do
+          should render_template :history
+        end
       end
     end
 
     context "who isn't the owner" do
       include_context "is not owner"
       
-      context "with no drafts" do
-        before :each do
-          @versions = piece.versions
-
-          get :history, id: piece.id
-        end
-
-        specify "@versions is empty" do
-          assigns(:versions).should be_empty
-        end
-
-        it "renders the history view" do
-          should render_template :history
+      context "with a non-existent piece" do
+        it "redirects to root" do
+          get :history, id: -1
+          
+          should redirect_to pieces_path
         end
       end
 
-      context "with at least one draft" do
-        include_context "multiple drafts"
+      context "with a valid piece" do
+        context "with no drafts" do
+          before :each do
+            @versions = piece.versions
 
-        specify "@versions contains only those versions with drafts" do
-          assigns(:versions).should == @versions
+            get :history, id: piece.id
+          end
+
+          specify "@versions is empty" do
+            assigns(:versions).should be_empty
+          end
+
+          specify "@piece is the right piece" do
+            assigns(:piece).should == piece
+          end
+
+          it "renders the history view" do
+            should render_template :history
+          end
         end
 
-        it "renders the history view" do
-          should render_template :history
+        context "with at least one draft" do
+          include_context "multiple drafts"
+
+          specify "@versions contains only those versions with drafts" do
+            assigns(:versions).should == @versions
+          end
+
+          specify "@piece is the right piece" do
+            assigns(:piece).should == piece
+          end
+
+          it "renders the history view" do
+            should render_template :history
+          end
         end
       end
     end

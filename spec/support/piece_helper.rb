@@ -25,12 +25,28 @@ module PieceHelper
     version
   end
 
+  def create_versions(piece, number = 3)
+    versions = []
+    number.times do |i|
+      versions << create_version(piece, i.to_s, i.to_s)
+    end
+    versions
+  end
+
   def create_draft(version)
     draft = Draft.new
     draft.version_id = version.id
     draft.number = version.piece.drafts.count + 1
     draft.save
     draft
+  end
+
+  def create_drafts(versions)
+    drafts = []
+    versions.each.with_index do |v, i|
+      drafts << create_draft(v) if i.even?
+    end
+    drafts
   end
 
   #GUI actions
