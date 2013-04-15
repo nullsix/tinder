@@ -1,3 +1,6 @@
 <li>
-  <%= link_to "history", history_piece_path(piece.id) %>
+  <% history_class = "btn"
+    history_class += " btn-link" unless current_page == :history %>
+
+  <%= link_to "history", history_piece_path(piece.id), class: history_class %>
 </li>

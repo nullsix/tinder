@@ -1,6 +1,6 @@
 <li>
-<% versions_class = "btn"
-  versions_class += " btn-link" unless current_page == :versions %>
+  <% versions_class = "btn"
+    versions_class += " btn-link" unless current_page == :versions %>
 
   <div class="btn-group">
     <%= link_to "all versions", piece_versions_path(piece.id), class: versions_class %>
