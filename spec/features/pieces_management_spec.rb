@@ -22,7 +22,6 @@ feature "Pieces Management", "User wants to create a new piece" do
     end
 
     it_behaves_like "a user creating a piece"
-    #TODO: Does this check to make sure they're redirected to the piece page after creating the piece?
   end
 end
 
@@ -175,19 +174,39 @@ feature "Pieces Management", "User wants to delete a piece they've created" do
   end
 end
 
-feature "Pieces Management", "User views history of a piece they've created" do
+shared_examples "User sees the drafts" do
+  scenario "User sees the drafts" do
+    history_rows = all(".history-row")
+    history_rows.count.should be > 0
+    history_rows.count.should == @versions.count
+
+    should_not have_content "version"
+
+    history_rows.each.with_index do |v, i|
+      expected_index = history_rows.count - i - 1
+      expected_version = @versions[expected_index]
+
+      within v do
+        should have_content expected_version.title
+        should have_link expected_version.title, href: piece_draft_path(piece_id: expected_version.piece.id, id: expected_version.draft.number)
+        should have_content "(draft ##{expected_version.draft.number})"
+        should have_content /Last modified .* ago/
+      end
+    end
+  end
+
+end
+
+feature "Pieces Management", "User wants to view the history of a piece" do
   context "with a user logged in" do
     context "who is the owner" do
       include_context "common"
 
       background do
         user = User.last
-        @piece = FactoryGirl.create :piece, user: user, versions_count: 5
-
-        @versions = @piece.versions
-        @versions.each.with_index do |v, i|
-          create_draft v if i.even?
-        end
+        @piece = create_piece user
+        @versions = create_versions @piece
+        create_drafts @versions
 
         visit history_piece_path id: @piece.id
       end
@@ -197,17 +216,21 @@ feature "Pieces Management", "User views history of a piece they've created" do
       end
 
       scenario "User sees all versions and pieces" do
-        version_rows = all(".version-row")
-        version_rows.count.should eq @versions.count
+        history_rows = all(".history-row")
+        history_rows.count.should be > 0
+        history_rows.count.should eq @versions.count
 
-        version_rows.each.with_index do |v, i|
-          expected_version = @versions[i]
+        history_rows.each.with_index do |v, i|
+          expected_index = history_rows.count - i - 1
+          expected_version = @versions[expected_index]
           within v do
             should have_content expected_version.title
 
             if expected_version.draft.nil?
+              should have_link expected_version.title, href: piece_version_path(piece_id: expected_version.piece.id, id: expected_version.number)
               should have_content "(version ##{expected_version.number})"
             else
+              should have_link expected_version.title, href: piece_draft_path(piece_id: expected_version.piece.id, id: expected_version.draft.number)
               should have_content "(draft ##{expected_version.draft.number})"
             end
 
@@ -221,8 +244,9 @@ feature "Pieces Management", "User views history of a piece they've created" do
       include_context "common"
 
       background do
-        user = FactoryGirl.create :user, name: "Bob Burger"
-        @piece = FactoryGirl.create :piece, user: user, versions_count: 5
+        user = create_user
+        @piece = create_piece user
+        @piece.versions = create_versions @piece
       end
 
       context "with no drafts" do
@@ -239,31 +263,15 @@ feature "Pieces Management", "User views history of a piece they've created" do
 
       context "with at least one draft" do
         background do
-          @drafts = []
-          @piece.versions.each.with_index do |v, i|
-            @drafts << create_draft(v) if i.even?
-          end
+          create_drafts @piece.versions
+          @versions = @piece.versions.select{|v| !v.draft.nil? }
 
           visit history_piece_path id: @piece.id
         end
 
         it_behaves_like "no piece bar"
 
-        scenario "User sees the drafts" do
-          version_rows = all(".version-rows")
-
-          version_rows.each.with_index do |v, i|
-            expected_version = @drafts[i]
-
-            within v do
-              should have_content expected_version.title
-
-              should have_content "(draft ##{expect_create_piece_success.draft.number})"
-
-              should have_content /Last modified .* ago/
-            end
-          end
-        end
+        include_examples "User sees the drafts"
       end
     end
   end
@@ -272,8 +280,9 @@ feature "Pieces Management", "User views history of a piece they've created" do
     subject { page }
 
     background do
-      user = FactoryGirl.create :user, name: "Bob Burger"
-      @piece = FactoryGirl.create :piece, user: user, versions_count: 5
+      user = create_user
+      @piece = create_piece user
+      create_versions @piece
     end
 
     context "with no drafts" do
@@ -290,31 +299,15 @@ feature "Pieces Management", "User views history of a piece they've created" do
 
     context "with at least one draft" do
       background do
-        @drafts = []
-        @piece.versions.each.with_index do |v, i|
-          @drafts << create_draft(v) if i.even?
-        end
+        create_drafts @piece.versions
+        @versions = @piece.versions.select{|v| !v.draft.nil? }
 
         visit history_piece_path id: @piece.id
       end
 
       it_behaves_like "no piece bar"
 
-      scenario "User sees the drafts" do
-        version_rows = all(".version-rows")
-
-        version_rows.each.with_index do |v, i|
-          expected_version = @drafts[i]
-
-          within v do
-            should have_content expected_version.title
-
-            should have_content "(draft ##{expect_create_piece_success.draft.number})"
-
-            should have_content /Last modified .* ago/
-          end
-        end
-      end
+      include_examples "User sees the drafts"
     end
   end
 end
