@@ -1,5 +1,5 @@
 <% provide :title, @piece.current_version.title %>
-<% piece_bar = render partial: "pieces/piece_bar", locals: { piece: @piece, current_page: :piece } %>
+<% piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :piece, piece: @piece } %>
 
 <%= piece_bar %>
 <div class="row">

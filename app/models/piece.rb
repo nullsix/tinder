@@ -9,14 +9,15 @@
 #
 
 class Piece < ActiveRecord::Base
+
   belongs_to :user, inverse_of: :pieces
-  has_many :versions, dependent: :destroy, inverse_of: :piece
-
-  accepts_nested_attributes_for :versions
-
-  attr_accessible :user, :user_id, :versions, :current_version
-
   validates :user, presence: true
+
+  has_many :versions, dependent: :destroy, inverse_of: :piece, order: "created_at ASC"
+  has_many :drafts, through: :versions
+
+  scope :last_modified_first, order("updated_at DESC")
+  default_scope last_modified_first
 
   def current_version
     versions.last

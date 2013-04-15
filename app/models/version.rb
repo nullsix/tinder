@@ -13,8 +13,7 @@
 
 class Version < ActiveRecord::Base
   belongs_to :piece, inverse_of: :versions
-  attr_accessible :title, :content, :piece, :piece_id
-  attr_protected :number
+  has_one :draft, dependent: :destroy
 
   validates :title, length: { maximum: 255 }
   validates :number, numericality: { greater_than: 0 }

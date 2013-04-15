@@ -1,20 +1,16 @@
 class PiecesController < ApplicationController
   respond_to :html
-  before_filter :require_signed_in_user
+  before_filter :require_signed_in_user, except: [ :history ]
 
-  before_filter :get_piece, except: [:index, :new, :create]
+  before_filter :get_piece, except: [ :index, :new, :create, :history ]
 
   def index
-    pieces_by_last_modified_version = current_user.pieces.sort do |a,b|
-      b.current_version.updated_at <=> a.current_version.updated_at
-    end
-    
-    @pieces = pieces_by_last_modified_version 
+    @pieces = current_user.pieces.last_modified_first
   end
 
   def new
-    @piece = current_user.pieces.build
-    @version = @piece.versions.build
+    @piece = Piece.new
+    @version = Version.new
   end
 
   def create
@@ -59,6 +55,23 @@ class PiecesController < ApplicationController
     @piece.destroy
 
     redirect_to pieces_path, notice: "Piece was successfully deleted."
+  end
+
+  def history
+    @piece = Piece.find params[:id]
+
+    if owner_is_logged_in? @piece.user
+      versions = @piece.versions
+    else
+      versions = @piece.versions.select{|v| !v.draft.nil? }
+    end
+    @versions = versions.reverse
+  rescue ActiveRecord::RecordNotFound
+    if current_user
+      redirect_to pieces_path
+    else
+      redirect_to root_path
+    end
   end
 
   private

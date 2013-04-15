@@ -1,41 +1,25 @@
 require 'spec_helper'
 
 describe VersionsController do
-  before :all do
+  before :each do
     @user = FactoryGirl.create :user, pieces_count: 0
     @piece = FactoryGirl.create :piece, versions_count: 0, user_id: @user.id
   end
 
   context "with no user logged in" do
-    methods = [
-      { get: :index  }
-    ]
-
-    methods.each do |m|
-      m.each do |verb, action|
-        describe "#{verb.upcase} #{action}" do
-          it "redirects to root_url" do
-            self.send verb, action, piece_id: @piece.id
-            should redirect_to root_url
-          end
-        end
+    describe "GET index" do
+      it "redirects to root_url" do
+        get :index, piece_id: @piece.id
+        should redirect_to root_url
       end
     end
 
-    context "where methods require a version" do
-      methods = [
-        { get: :show }
-      ]
+    describe "GET show" do
+      it "redirects to root_url" do
+        version = FactoryGirl.create :version, piece_id: @piece.id
+        get :show, piece_id: @piece.id, id: version.number
 
-      methods.each do |m|
-        m.each do |verb, action|
-          describe "redirects to root_url" do
-            it "redirects to root_url" do
-              version = FactoryGirl.create :version, piece_id: @piece.id
-              self.send verb, action, id: version.number, piece_id: @piece.id
-            end
-          end
-        end
+        should redirect_to root_url
       end
     end
   end
@@ -51,16 +35,9 @@ describe VersionsController do
     end
 
     describe "GET index" do
-      before :each do
+      it "redirects to piece's history" do
         get :index, piece_id: @piece.id
-      end
-
-      specify "@versions is set" do
-        assigns(:versions).should eq @versions.reverse
-      end
-
-      specify "@piece is set" do
-        assigns(:piece).should eq @piece
+        should redirect_to history_piece_path id: @piece.id
       end
     end
 

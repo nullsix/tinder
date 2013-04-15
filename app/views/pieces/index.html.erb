@@ -18,9 +18,8 @@
               <% last_modified = "Last modified #{time_ago_in_words(piece.current_version.updated_at)} ago" %>
               <small class="piece-last-modified muted small"><%= last_modified %></small>
             </td>
-            <td class="piece-links span1">
+            <td class="piece-links span2">
               <%= render partial: "pieces/piece_links", locals: { piece: piece } %>
-              <%= render partial: "pieces/versions_link", locals: { piece: piece } %>
             </td>
           </tr>
         <% end %>

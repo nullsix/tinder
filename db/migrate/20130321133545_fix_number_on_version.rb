@@ -1,14 +1,12 @@
-class AddNumberToVersion < ActiveRecord::Migration
+class FixNumberOnVersion < ActiveRecord::Migration
   class Version < ActiveRecord::Base
   end
 
   def up
-    add_column :versions, :number, :int
-
     ActiveRecord::Base.record_timestamps = false
-    Version.reset_column_information
+
     Piece.all.each do |piece|
-      piece.versions.each.with_index do |version, index|
+      piece.versions.sort_by(&:created_at).each.with_index do |version, index|
         version.number = index + 1
         version.save
       end
@@ -16,6 +14,6 @@ class AddNumberToVersion < ActiveRecord::Migration
   end
 
   def down
-    remove_column :versions, :number
+    # Can't really undo this.
   end
 end

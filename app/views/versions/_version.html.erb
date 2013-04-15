@@ -1,2 +1,14 @@
-<h2><%= version.title %></h2>
+<% is_owner = owner_is_logged_in?(version.piece.user) %>
+<% unless is_owner %>
+  <%= link_to "piece history", history_piece_path(id: version.piece.id) %>
+<% end %>
+
+<h2>
+  <%= version.title %>
+</h2>
+
+<% unless is_owner %>
+  <h4 class="author muted">by <%= version.piece.user.name %></h4>
+<% end %>
 <div id="content"><%= simple_format version.content %></div>
+<p class="created-time small muted">created <%= time_ago_in_words(version.created_at) %> ago</p>

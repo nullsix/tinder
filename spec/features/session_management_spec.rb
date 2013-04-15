@@ -10,7 +10,7 @@ feature "Session Management" do
     end
 
     scenario "User does not see a profile link" do
-      should_not have_link "testerbob", href: "/profile"
+      should_not have_link "bobburger", href: "/profile"
     end
 
     scenario "User does not see Sign Out link" do
@@ -20,7 +20,7 @@ feature "Session Management" do
     scenario "User logs in" do
       click_link "Sign in with Google"
 
-      should have_link "testerbob", href: "/profile"
+      should have_link "bobburger", href: "/profile"
       should_not have_link "Sign in with Google"
     end
   end
@@ -36,7 +36,7 @@ feature "Session Management" do
     end
 
     scenario "User sees a profile link" do
-      should have_link "testerbob", href: "/profile"
+      should have_link "bobburger", href: "/profile"
     end
 
     scenario "User sees a pieces link" do
@@ -44,7 +44,8 @@ feature "Session Management" do
     end
 
     scenario "User logs out" do
-      click_link "Sign Out"
+      logout
+      should_not have_link "Sign Out"
 
       should have_link "Sign in with Google"
     end

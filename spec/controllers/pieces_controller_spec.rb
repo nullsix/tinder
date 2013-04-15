@@ -1,34 +1,107 @@
 require 'spec_helper'
 
-shared_examples "an action assigning @piece" do
-  describe "@piece" do
-    subject { assigns :piece }
+shared_examples "requires user" do
+  context "with no user logged in" do
+    it "redirects to root_url" do
+      if needs_piece
+        piece = FactoryGirl.create :piece
+        self.send verb, action, id: piece.id
+      else
+        self.send verb, action
+      end
 
+      should redirect_to root_url
+    end
+  end
+end
+
+shared_examples "requires owner" do
+  context "with a user logged in" do
+    context "who is not the owner" do
+      include_context "is not owner"
+
+      it "redirects to the logged in user's pieces" do
+        if needs_piece
+          piece =
+            FactoryGirl.create :piece, user: user, versions_count: 1
+          self.send verb, action, id: piece.id
+        else
+          self.send verb, action
+        end
+
+        should redirect_to pieces_url
+      end
+    end
+  end
+end
+
+shared_context "users" do
+  let(:user) { FactoryGirl.create :user, name: "Bob", pieces_count: 0 }
+  let(:other_user) { FactoryGirl.create :user, name: "Other", pieces_count: 0 }
+end
+
+shared_context "is owner" do
+  include_context "users"
+  before :each do
+    session[:user_id] = user.id
+  end
+end
+
+shared_context "is not owner" do
+  include_context "users"
+  before :each do
+    session[:user_id] = other_user.id
+  end
+end
+
+shared_context "with owner's pieces" do
+  include_context "is owner"
+
+  let!(:first_piece) do
+    FactoryGirl.create :piece, user: user, versions_count: 1
+  end
+
+  let!(:second_piece) do
+    FactoryGirl.create :piece, user: user, versions_count: 1
+  end
+
+  let!(:user_pieces) { user.pieces.last_modified_first }
+
+  let!(:other_pieces) do
+    op = []
+    5.times do
+      op <<
+        FactoryGirl.create(:piece, user: other_user, versions_count: 1)
+    end
+    op
+  end
+end
+
+shared_examples "assigns @piece" do
+  describe "@piece" do
     it "is a Piece" do
-      should be_a Piece
+      assigns(:piece).should be_a Piece
     end
 
     it "belongs to the logged in user" do
-      subject.user.should eq @user
+      assigns(:piece).user.should eq user
     end
   end
 end
 
-shared_examples "an action assigning @version" do
+shared_examples "assigns @version" do
   describe "@version" do
-    subject { assigns :version }
-
     it "is a Version" do
-      should be_a Version
+      assigns(:version).should be_a Version
     end
 
     it "belongs to the piece being created" do
-      subject.piece.should eq assigns(:piece)
+      assigns(:version).piece.should eq assigns(:piece)
     end
   end
 end
 
-shared_examples "an action creating a new piece" do
+shared_examples "creates new piece" do
   it "creates a new piece" do
     expect { @valid_create.call }.to change(Piece, :count).by 1
   end
@@ -40,443 +113,537 @@ shared_examples "an action creating a new piece" do
   it "redirects to the piece just created" do
     @valid_create.call
 
-    should redirect_to Piece.last
+    should redirect_to Piece.first
   end
 
   it "has the correct version number" do
     @valid_create.call
-    Version.last.number == Piece.last.versions.count
+    Version.last.number == Piece.first.versions.count
   end
 end
 
-private
-  def piece_methods
-    [
-      { get:    :show    },
-      { get:    :edit    },
-      { put:    :update  },
-      { delete: :destroy }
-    ]
+describe PiecesController, "GET index" do
+  it_behaves_like "requires user" do
+    let(:verb) { "get" }
+    let(:action) { "new" }
+    let(:needs_piece) { false }
   end
 
-public
-  describe PiecesController do
-    context "with no user logged in" do
-      methods = [
-        { put: :create },
-        { get: :new    },
-        { get: :index  }
-      ]
+  context "with owner logged in" do
+    include_context "with owner's pieces"
 
-      methods.each do |m|
-        m.each do |verb, action|
-          describe "#{verb.upcase} #{action}" do
-            it "redirects to root_url" do
-              self.send verb, action
-              should redirect_to root_url
-            end
-          end
-        end
-      end
-
-      context "where actions require a piece" do 
-        before :all do
-          @piece = create :piece
-        end
-        
-        piece_methods.each do |m|
-          m.each do |action, verb|
-            describe "#{action.upcase} #{verb}" do
-              it "redirects to root_url" do
-                self.send action, verb, id: @piece.id
-                should redirect_to root_url
-              end
-            end
-          end
-        end
-      end
+    before :each do
+      get :index
     end
 
-    context "with a logged in user" do
-      before :all do
-        @user = FactoryGirl.create :user, pieces_count: 0
-      end
+    specify "@pieces is the user's pieces" do
+      assigns(:pieces).should eq [second_piece, first_piece]
+    end
+
+    it "renders the #index view" do
+      should render_template :index
+    end
+  end
+end
+
+describe PiecesController, "GET new" do
+  it_behaves_like "requires user" do
+    let(:verb) { "get" }
+    let(:action) { "new" }
+    let(:needs_piece) { false }
+  end
+
+  context "with owner logged in" do
+    include_context "is owner"
+
+    before :each do
+      get :new
+    end
+
+    specify "@piece is a new Piece" do
+      assigns(:piece).should be_a_new_record
+    end
+
+    specify "@version is a new Version" do
+      assigns(:version).should be_a_new_record
+    end
+
+    it "renders the #new view" do
+      should render_template :new
+    end
+  end
+end
+
+describe PiecesController, "POST create" do
+  it_behaves_like "requires user" do
+    let(:verb) { "post" }
+    let(:action) { "create" }
+    let(:needs_piece) { false }
+  end
+
+  context "with a logged in user" do
+    before :each do
+      @piece_attr = FactoryGirl.attributes_for :piece, user: user
+    end
+
+    context "who is the owner" do
+      include_context "is owner"
 
       before :each do
-        session[:user_id] = @user.id
+        @piece = FactoryGirl.create :piece, user: user
       end
 
-      context "where the piece belongs to the user" do
-        before :all do
-          @piece = FactoryGirl.create :piece, user_id: @user.id
-          @second_piece = FactoryGirl.create :piece, user_id: @user.id
-          FactoryGirl.create :version, piece_id: @piece.id
-
-          other_user = FactoryGirl.create :user, pieces_count: 5
-
-          @other_pieces = other_user.pieces
-          @user_pieces = @user.pieces
-        end
-
-        describe "GET index" do
+      context "with a valid version" do
+        context "with an empty title" do
           before :each do
-            get :index
+            @version_attr =
+              FactoryGirl.attributes_for :version,
+                piece_id: @piece,
+                title: ""
+            @valid_create =
+              Proc.new {
+                post :create, piece: @piece_attr, version: @version_attr
+              }
           end
 
-          describe "@pieces" do
-            subject{ assigns :pieces }
+          it_behaves_like "creates new piece"
 
-            it "is an array of Pieces ordered by current_version's last modified" do
-              should eq [@piece, @second_piece]
-            end
+          it "has a default title" do
+            @valid_create.call
 
-            it "belongs to the logged in user" do
-              subject.each { |p| p.user.should eq @user }
-            end
-
-            it "is the same size as user's pieces" do
-              assigns(:pieces).size.should == @user_pieces.size
-            end
-
-            it "has all the user's pieces" do
-              @user_pieces.each do |piece|
-                assigns(:pieces).should include piece
-              end
-            end
-
-            it "has no other user's pieces" do
-              @other_pieces.each do |piece|
-                assigns(:pieces).should_not include piece
-              end
-            end
-          end
-
-          it "renders the #index view" do
-            should render_template :index
+            version = Version.last
+            version.title.should match /Untitled Piece/
           end
         end
 
-        describe "GET new" do
+        context "with a non-empty title" do
           before :each do
-            get :new
+            @version_attr =
+              FactoryGirl.attributes_for :version, piece_id: @piece
+            @valid_create =
+              Proc.new {
+                post :create, piece: @piece_attr, version: @version_attr
+              }
           end
 
-          it_behaves_like "an action assigning @piece"
+          it_behaves_like "creates new piece"
+        end
+      end
 
-          specify "@piece is a new Piece" do
-            assigns(:piece).should be_a_new_record
+      context "with an invalid version" do
+        before :each do
+          @invalid_version_attr =
+            FactoryGirl.attributes_for :invalid_version, piece_id: @piece
+          @invalid_create =
+            Proc.new {
+              post :create, piece: @piece_attr, version: @invalid_version_attr
+            }
+        end
+
+        it "does not create a new piece" do
+          expect { @invalid_create.call }.to_not change Piece, :count
+        end
+        
+        it "does not create a new version" do
+          expect { @invalid_create.call }.to_not change Version, :count
+        end
+
+        context "after the call" do
+          before :each do
+            @invalid_create.call
           end
 
-          it_behaves_like "an action assigning @version"
+          it_behaves_like "assigns @piece"
+          it_behaves_like "assigns @version"
 
-          specify "@version is a new Version" do
-            assigns(:version).should be_a_new_record
+          specify "@version has an error message" do
+            assigns(:version).errors.should_not be_empty
           end
 
           it "renders the #new view" do
             should render_template :new
           end
         end
+      end
+    end
+  end
+end
 
-        describe "POST create" do
+describe PiecesController, "GET show" do
+  let(:verb) { "get" }
+  let(:action) { "show" }
+  let(:needs_piece) { true }
+
+  it_behaves_like "requires user"
+
+  it_behaves_like "requires owner"
+
+  context "with a logged in user" do
+    context "who is the owner" do
+      include_context "with owner's pieces"
+
+      before :each do
+        get :show, id: first_piece
+      end
+
+      it "assigns the requested piece to @piece" do
+        assigns(:piece).should eq first_piece
+      end
+
+      it "renders the #show view" do
+        should render_template :show
+      end
+    end
+  end
+end
+
+describe PiecesController, "GET edit" do
+  let(:verb) { "get" }
+  let(:action) { "edit" }
+  let(:needs_piece) { true }
+
+  it_behaves_like "requires user"
+  it_behaves_like "requires owner"
+
+  context "with owner logged in" do
+    include_context "with owner's pieces"
+
+    before :each do
+      get :edit, id: first_piece
+    end
+
+    it "assigns the requested piece to @piece" do
+      assigns(:piece).should eq first_piece
+    end
+
+    it "assigns the piece's current version to @version" do
+      assigns(:version).should eq first_piece.current_version
+    end
+
+    it "renders the #edit view" do
+      should render_template :edit
+    end
+  end
+end
+
+describe PiecesController, "PUT update" do
+  let(:verb) { "put" }
+  let(:action) { "update" }
+  let(:needs_piece) { true }
+
+  it_behaves_like "requires user"
+
+  it_behaves_like "requires owner"
+
+  describe "with a user logged in" do
+    context "who is the owner" do
+      include_context "with owner's pieces"
+
+      before :each do
+        @piece_attr =
+          FactoryGirl.attributes_for(
+            :piece, piece_id: first_piece, user: user
+          )
+      end
+
+      context "with a valid piece" do
+        context "with an unchanged version" do
           before :each do
-            @piece_attr = FactoryGirl.attributes_for :piece, user_id: @user
-          end
-
-          context "with a valid version" do
-            context "with an empty title" do
-              before :each do
-                @version_attr =
-                  FactoryGirl.attributes_for :version,
-                    piece_id: @piece,
-                    title: ""
-                @valid_create =
-                  Proc.new {
-                    post :create, piece: @piece_attr, version: @version_attr
-                  }
-              end
-
-              it_behaves_like "an action creating a new piece"
-
-              it "has a default title" do
-                @valid_create.call
-
-                version = Version.last
-                version.title.should match /Untitled Piece/
-              end
-            end
-
-            context "with a non-empty title" do
-              before :each do
-                @version_attr =
-                  FactoryGirl.attributes_for :version, piece_id: @piece
-                @valid_create =
-                  Proc.new {
-                    post :create, piece: @piece_attr, version: @version_attr
-                  }
-              end
-
-              it_behaves_like "an action creating a new piece"
-            end
-          end
-
-          context "with an invalid version" do
-            before :each do
-              @invalid_version_attr =
-                FactoryGirl.attributes_for :invalid_version, piece_id: @piece
-              @invalid_create =
-                Proc.new {
-                  post :create, piece: @piece_attr, version: @invalid_version_attr
-                }
-            end
-
-            it "does not create a new piece" do
-              expect { @invalid_create.call }.to_not change Piece, :count
-            end
-            
-            it "does not create a new version" do
-              expect { @invalid_create.call }.to_not change Version, :count
-            end
-
-            context "after the call" do
-              before :each do
-                @invalid_create.call
-              end
-
-              it_behaves_like "an action assigning @piece"
-              it_behaves_like "an action assigning @version"
-
-              specify "@version has an error message" do
-                assigns(:version).errors.should_not be_empty
-              end
-
-              it "renders the #new view" do
-                should render_template :new
-              end
-            end
-          end
-        end
-
-        describe "GET edit" do
-          before :each do
-            get :edit, id: @piece
-          end
-
-          it "assigns the requested piece to @piece" do
-            assigns(:piece).should eq @piece
-          end
-
-          it "assigns the piece's current version to @version" do
-            assigns(:version).should eq @piece.current_version
-          end
-
-          it "renders the #edit view" do
-            should render_template :edit
-          end
-        end
-
-        describe "PUT update" do
-          before :each do
-            @piece_attr =
+            @unchanged_version_attr = 
               FactoryGirl.attributes_for(
-                :piece, piece_id: @piece, user_id: @user
+                :version,
+                piece_id: first_piece,
+                title: first_piece.current_version.title,
+                content: first_piece.current_version.content
               )
+            @unchanged_update = Proc.new {
+              put :update,
+                id: first_piece.id,
+                piece: @piece_attr,
+                version: @unchanged_version_attr
+            }
           end
 
-          context "with a valid piece" do
-            context "with an unchanged version" do
-              before :each do
-                @unchanged_version_attr = 
-                  FactoryGirl.attributes_for(
-                    :version,
-                    piece_id: @piece,
-                    title: @piece.current_version.title,
-                    content: @piece.current_version.content
-                  )
-                @unchanged_update = Proc.new {
-                  put :update,
-                    id: @piece.id,
-                    piece: @piece_attr,
-                    version: @unchanged_version_attr
-                }
-              end
-
-              it "doesn't create a new version" do
-                expect{
-                  @unchanged_update.call
-                }.not_to change(Version, :count)
-              end
-
-              it "redirects to the piece" do
-                @unchanged_update.call
-                should redirect_to @piece
-              end
-            end
-
-            context "with a changed version" do
-              before :each do
-                @changed_version_attr =
-                  FactoryGirl.attributes_for(
-                    :version,
-                    piece_id: @piece,
-                    title: "I like pie.",
-                    content: "La-de-da-de-da"
-                  )
-                @changed_update = Proc.new {
-                  put :update,
-                    id: @piece.id,
-                    piece: @piece_attr,
-                    version: @changed_version_attr
-                }
-              end
-
-              it "creates a new version" do
-                expect { @changed_update.call }.to change(Version, :count).by 1
-              end
-
-              it "associates the new version to the existing piece" do
-                expect {
-                  @changed_update.call
-                  @piece.reload
-                }.to change(@piece.versions, :count).by 1
-              end
-
-              it "has the correct version number" do
-                @changed_update.call
-                @piece.current_version.number == @piece.versions.count
-              end
-
-              context "after the call" do
-                before :each do
-                  @changed_update.call
-                end
-
-                it "locates the requested piece" do
-                  assigns(:piece).should eq @piece
-                end
-
-                specify "locates the requested version" do
-                  assigns(:version).should eq Version.last
-                end
-
-                it "creates the version with the given attributes" do
-                  @piece.reload
-                  @piece.versions.last.title.should eq "I like pie."
-                  @piece.versions.last.content.should eq "La-de-da-de-da"
-                end
-
-                it "redirects to the piece" do
-                  should redirect_to @piece
-                end
-              end
-            end
-
-            context "with an invalid version" do
-              before :each do
-                @invalid_version_attr =
-                  FactoryGirl.attributes_for(
-                    :invalid_version,
-                    piece_id: @piece,
-                    content: "La-de-da-de-da"
-                  )
-                @invalid_update =
-                  Proc.new {
-                    put :update,
-                      id: @piece.id,
-                      piece: @piece_attr,
-                      version: @invalid_version_attr
-                  }
-              end
-
-              it "does not create a new version" do
-                expect{ @invalid_update.call }.not_to change Version, :count
-              end
-
-              context "after the call" do
-                before :each do
-                  @invalid_update.call
-                end
-
-                it "locates the requested piece" do
-                  assigns(:piece).should eq @piece
-                end
-
-                it_behaves_like "an action assigning @version"
-
-                it "does not create a Version with the attributes" do
-                  piece = Piece.find assigns(:piece).id
-                  piece.versions.last.content.should_not eq @invalid_version_attr[:content]
-                end
-
-                it "re-renders the #edit view" do
-                  should render_template :edit
-                end
-              end
-            end
+          it "doesn't create a new version" do
+            expect{
+              @unchanged_update.call
+            }.not_to change(Version, :count)
           end
 
-          context "with an invalid piece" do
-            it "does not create a new version" do
-              expect{
-                put :update, id: -1
-              }.not_to change(Version, :count)
+          it "redirects to the piece" do
+            @unchanged_update.call
+            should redirect_to first_piece
+          end
+        end
+
+        context "with a changed version" do
+          before :each do
+            @changed_version_attr =
+              FactoryGirl.attributes_for(
+                :version,
+                piece_id: first_piece,
+                title: "I like pie.",
+                content: "La-de-da-de-da"
+              )
+            @changed_update = Proc.new {
+              put :update,
+                id: first_piece.id,
+                piece: @piece_attr,
+                version: @changed_version_attr
+            }
+          end
+
+          it "creates a new version" do
+            expect { @changed_update.call }.to change(Version, :count).by 1
+          end
+
+          it "associates the new version to the existing piece" do
+            expect {
+              @changed_update.call
+              first_piece.reload
+            }.to change(first_piece.versions, :count).by 1
+          end
+
+          it "has the correct version number" do
+            @changed_update.call
+            first_piece.current_version.number == first_piece.versions.count
+          end
+
+          context "after the call" do
+            before :each do
+              @changed_update.call
+            end
+
+            it "locates the requested piece" do
+              assigns(:piece).should eq first_piece
+            end
+
+            specify "locates the requested version" do
+              assigns(:version).should eq Version.last
+            end
+
+            it "creates the version with the given attributes" do
+              first_piece.reload
+              first_piece.versions.last.title.should eq "I like pie."
+              first_piece.versions.last.content.should eq "La-de-da-de-da"
+            end
+
+            it "redirects to the piece" do
+              should redirect_to first_piece
             end
           end
         end
 
-        describe "GET show" do
+        context "with an invalid version" do
           before :each do
-            get :show, id: @piece
+            @invalid_version_attr =
+              FactoryGirl.attributes_for(
+                :invalid_version,
+                piece_id: first_piece,
+                content: "La-de-da-de-da"
+              )
+            @invalid_update =
+              Proc.new {
+                put :update,
+                  id: first_piece.id,
+                  piece: @piece_attr,
+                  version: @invalid_version_attr
+              }
           end
 
-          it "assigns the requested piece to @piece" do
-            assigns(:piece).should eq @piece
+          it "does not create a new version" do
+            expect{ @invalid_update.call }.not_to change Version, :count
           end
 
-          it "renders the #show view" do
-            should render_template :show
-          end
-        end
+          context "after the call" do
+            before :each do
+              @invalid_update.call
+            end
 
-        describe "DELETE destroy" do
-          before :each do
-            @valid_destroy = Proc.new{ delete :destroy, id: @piece.id }
-          end
+            it "locates the requested piece" do
+              assigns(:piece).should eq first_piece
+            end
 
-          it "deletes the piece" do
-            expect{ @valid_destroy.call }.to change(Piece, :count).by -1
-          end
+            it_behaves_like "assigns @version"
 
-          it "deletes the associated versions" do
-            expect { @valid_destroy.call }.to change(Version, :count).
-              by -1*@piece.versions.length
-          end
+            it "does not create a Version with the attributes" do
+              piece = Piece.find assigns(:piece).id
+              piece.versions.last.content.should_not eq @invalid_version_attr[:content]
+            end
 
-          it "redirects to the pieces#index" do
-            @valid_destroy.call
-            should redirect_to pieces_url
+            it "re-renders the #edit view" do
+              should render_template :edit
+            end
           end
         end
       end
 
-      context "where the piece doesn't belong to the user" do
-        piece_methods.each do |m|
-          m.each do |action, verb|
-            describe "#{action.upcase} #{verb}" do
-              before :each do
-                @other_user = FactoryGirl.create :user, name: "Other"
-                @others_piece = FactoryGirl.create :piece, user: @other_user
-                FactoryGirl.create :version, title: "Other's piece", piece: @others_piece
-              end
+      context "with an invalid piece" do
+        it "does not create a new version" do
+          expect{
+            put :update, id: -1
+          }.not_to change(Version, :count)
+        end
+      end
+    end
+  end
+end
 
-              it "doesn't allow access to a piece not belonging to the logged in user" do
-                self.send action, verb, id: @others_piece.id
+describe PiecesController, "DELETE destroy" do
+  let(:verb) { "delete" }
+  let(:action) { "destroy" }
+  let(:needs_piece) { true }
 
-                should redirect_to pieces_url
-              end
-            end
+  it_behaves_like "requires user"
+
+  it_behaves_like "requires owner"
+
+  context "with a logged in user" do
+    context "who is the owner" do
+      include_context "with owner's pieces"
+
+      before :each do
+        @valid_destroy = Proc.new{ delete :destroy, id: first_piece.id }
+      end
+
+      it "deletes the piece" do
+        expect{ @valid_destroy.call }.to change(Piece, :count).by -1
+      end
+
+      it "deletes the associated versions" do
+        expect { @valid_destroy.call }.to change(Version, :count).
+          by -1*first_piece.versions.length
+      end
+
+      it "redirects to the pieces#index" do
+        @valid_destroy.call
+        should redirect_to pieces_url
+      end
+    end
+  end
+end
+
+describe PiecesController, "GET history" do
+  shared_context "multiple drafts" do
+    before :each do
+      # Create drafts for the even pieces
+      create_drafts piece.versions
+      @versions = piece.versions.select{|v| !v.draft.nil? }.reverse!
+
+      get :history, id: piece.id
+    end
+  end
+
+  let(:piece) { FactoryGirl.create :piece, user: user, versions_count: 5 }
+
+  context "with no user logged in" do
+    include_context "users"
+    include_context "multiple drafts"
+
+    specify "@versions contains only those pieces with drafts" do
+      assigns(:versions).should == @versions
+    end
+
+    specify "@piece is the right piece" do
+      assigns(:piece).should == piece
+    end
+
+    it "renders the history view" do
+      should render_template :history
+    end
+
+    context "with a non-existent piece" do
+      it "redirects to root" do
+        get :history, id: -1
+        
+        should redirect_to root_path
+      end
+    end
+  end
+
+  context "with a user logged in" do
+    context "who is the owner" do
+      include_context "is owner"
+
+      context "with a non-existent piece" do
+        it "redirects to root" do
+          get :history, id: -1
+          
+          should redirect_to pieces_path
+        end
+      end
+
+      context "with an existing piece" do
+        before :each do
+          @versions = piece.versions
+          create_drafts @versions
+          @versions.reverse!
+
+          get :history, id: piece.id
+        end
+
+        specify "@versions contains all the user's versions" do
+          assigns(:versions).should == @versions
+        end
+
+        specify "@piece is the right piece" do
+          assigns(:piece).should == piece
+        end
+
+        it "renders the history view" do
+          should render_template :history
+        end
+      end
+    end
+
+    context "who isn't the owner" do
+      include_context "is not owner"
+      
+      context "with a non-existent piece" do
+        it "redirects to root" do
+          get :history, id: -1
+          
+          should redirect_to pieces_path
+        end
+      end
+
+      context "with a valid piece" do
+        context "with no drafts" do
+          before :each do
+            @versions = piece.versions
+
+            get :history, id: piece.id
+          end
+
+          specify "@versions is empty" do
+            assigns(:versions).should be_empty
+          end
+
+          specify "@piece is the right piece" do
+            assigns(:piece).should == piece
+          end
+
+          it "renders the history view" do
+            should render_template :history
+          end
+        end
+
+        context "with at least one draft" do
+          include_context "multiple drafts"
+
+          specify "@versions contains only those versions with drafts" do
+            assigns(:versions).should == @versions
+          end
+
+          specify "@piece is the right piece" do
+            assigns(:piece).should == piece
+          end
+
+          it "renders the history view" do
+            should render_template :history
           end
         end
       end
     end
   end
+end

@@ -1,0 +1,15 @@
+<% provide :title, "Draft #{@draft.number}" %>
+
+
+<% piece_bar = "" %>
+<% if owner_is_logged_in?(@draft.piece.user) %>
+  <% piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :history, piece: @piece, version: @draft } %>
+<% end %>
+
+<%= piece_bar %>
+<div class="row">
+  <div class="span12">
+    <%= render partial: 'versions/version', locals: { version: @draft.version } %>
+  </div>
+</div>
+<%= piece_bar %>
