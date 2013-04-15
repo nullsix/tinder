@@ -88,3 +88,17 @@ describe DraftsController, "GET show" do
     end
   end
 end
+
+describe DraftsController, "GET index" do
+  before :each do
+    user = create_user
+    @piece = create_piece user
+    @version = create_version @piece
+    @draft = create_draft @version
+    get :index, piece_id: @piece.id, id: @draft.number
+  end
+
+  it "redirects to piece history" do
+    should redirect_to history_piece_path id: @piece
+  end
+end

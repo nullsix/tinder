@@ -9,7 +9,7 @@ Tinder::Application.routes.draw do
 
   resources :pieces do
     resources :versions
-    resources :drafts, only: [ :create, :show ]
+    resources :drafts, only: [ :create, :show, :index ]
     member do
       get 'history'
     end

@@ -101,4 +101,16 @@ feature "Drafts Management" do
       end
     end
   end
+
+  context "viewing a piece's drafts" do
+    scenario "redirects to history" do
+      login_with_oauth
+      user = User.last
+      @piece = create_piece user
+
+      visit piece_drafts_path @piece.id
+
+      current_path.should == history_piece_path(id: @piece.id)
+    end
+  end
 end

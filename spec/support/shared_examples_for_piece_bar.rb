@@ -30,42 +30,12 @@ shared_examples "piece bar for piece" do
   end
 end
 
-shared_examples "piece bar with history" do
+shared_examples "piece bar for history" do
   it_behaves_like "piece bar for piece"
 
   scenario "shows history link" do
     within(first(".piece-bar")) do
       should have_link "history", href: history_piece_path(piece.id)
-    end
-  end
-end
-
-shared_examples "piece bar for version" do
-  it_behaves_like "piece bar for piece"
-
-  scenario "shows version link" do
-    within(first(".piece-bar")) do
-      should have_link "##{version.number}", href: piece_version_path(piece.id, version.number)
-    end
-  end
-end
-
-shared_examples "piece bar for drafts" do
-  it_behaves_like "piece bar for piece"
-
-  scenario "shows all drafts link" do
-    within(first(".piece-bar")) do
-      should have_link "all drafts", href: piece_drafts_path(piece.id)
-    end
-  end
-end
-
-shared_examples "piece bar for draft" do
-  it_behaves_like "piece bar for drafts"
-
-  scenario "shows draft link" do
-    within(first(".piece-bar")) do
-      should have_link "##{draft.number}", href: piece_draft_path(piece.id, draft.number)
     end
   end
 end

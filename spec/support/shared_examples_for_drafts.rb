@@ -7,15 +7,13 @@ shared_examples "draft information" do
 end
 
 shared_examples "logged in draft information" do
-  it_behaves_like "piece bar for draft" do
+  it_behaves_like "piece bar for history" do
     let(:piece) { @piece }
-    let(:draft) { @draft }
   end
 
   it_behaves_like "draft information"
 
-  scenario "shows the right extra info" do
-    should have_link "##{@draft.number}", href: piece_draft_path(piece_id: @piece, id: @draft.number)
+  scenario "shows no extra info" do
     should_not have_content "by #{@piece.user.name}"
   end
 end
@@ -24,6 +22,7 @@ shared_examples "non owner draft information" do
   it_behaves_like "draft information"
 
   scenario "shows the piece's user's name" do
+    should have_link "history", href: history_piece_path(id: @piece.id)
     should have_content "by #{@piece.user.name}"
   end
 end

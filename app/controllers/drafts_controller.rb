@@ -3,6 +3,10 @@ class DraftsController < ApplicationController
   before_filter :get_piece
   before_filter :require_owner, only: :create
 
+  def index
+    redirect_to history_piece_path id: @piece.id
+  end
+
   def create
     @draft = @piece.current_version.build_draft
     @draft.number = @piece.drafts.count + 1

@@ -10,35 +10,14 @@ feature "Versions Management" do
     end
   end
 
+  subject { page }
+
   context "view a piece's versions" do
-    background do
+    scenario "redirects to history" do
+      version = @versions.last
       visit piece_versions_path @piece.id
-    end
 
-    subject { page }
-
-    it_behaves_like "piece bar for piece" do
-      let(:piece) { @piece }
-    end
-
-    scenario "displays the piece's versions" do
-      should have_link @piece.title
-
-      within ".versions" do
-        version_rows = all("tr.version-row")
-        version_rows.count.should == @versions.count
-
-        version_rows.each_with_index do |version, index|
-          expected_index = @versions.count - index - 1
-          within version do
-            find(".version-title").should have_content @versions[expected_index].title
-            find(".version-title").should have_link @versions[expected_index].title,
-              href: piece_version_path(piece_id: @piece.id, id: @versions[expected_index].number)
-            find(".version-number").should have_content /(version ##{expected_index+1})/
-            find(".version-last-modified").should have_content /Last modified .* ago/
-          end
-        end
-      end
+      current_path.should == history_piece_path(id: @piece.id)
     end
   end
 
@@ -48,11 +27,8 @@ feature "Versions Management" do
       visit piece_version_path @piece.id, @version_wanted.number
     end
 
-    subject { page }
-
-    it_behaves_like "piece bar for version" do
+    it_behaves_like "piece bar for history" do
       let(:piece) { @piece }
-      let(:version) { @version_wanted }
     end
 
     scenario "displays a version's data" do

@@ -3,7 +3,7 @@ class VersionsController < ApplicationController
   before_filter :require_signed_in_user, :get_piece
   
   def index
-    @versions = @piece.versions.reverse
+    redirect_to history_piece_path id: @piece.id
   end
 
   def show

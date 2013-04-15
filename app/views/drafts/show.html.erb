@@ -3,7 +3,7 @@
 
 <% piece_bar = "" %>
 <% if owner_is_logged_in?(@draft.piece.user) %>
-  <% piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :draft, piece: @piece, version: @draft } %>
+  <% piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :history, piece: @piece, version: @draft } %>
 <% end %>
 
 <%= piece_bar %>

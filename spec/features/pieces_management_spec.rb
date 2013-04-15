@@ -121,7 +121,7 @@ feature "Pieces Management", "User wants to see a piece they've created" do
   context "on the piece page" do
     background { click_link @piece.title }
 
-    it_behaves_like "piece bar with history" do
+    it_behaves_like "piece bar for history" do
       let(:piece) { @piece }
     end
 
@@ -211,7 +211,7 @@ feature "Pieces Management", "User wants to view the history of a piece" do
         visit history_piece_path id: @piece.id
       end
 
-      it_behaves_like "piece bar with history" do
+      it_behaves_like "piece bar for history" do
         let(:piece) { @piece }
       end
 
