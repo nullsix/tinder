@@ -86,7 +86,7 @@ feature "Pieces Management", "User wants to see all their pieces" do
           within ".piece-links" do
             should have_link "edit"
             should have_css ".delete-piece-link"
-            should have_link "all versions"
+            should have_link "history"
           end
 
           find(".piece-title").text.should == @pieces[i].short_title
@@ -208,7 +208,8 @@ feature "Pieces Management", "User wants to view the history of a piece" do
         @versions = create_versions @piece
         create_drafts @versions
 
-        visit history_piece_path id: @piece.id
+        visit pieces_path
+        first(:link, "history").click
       end
 
       it_behaves_like "piece bar for history" do
