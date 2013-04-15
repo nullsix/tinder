@@ -12,7 +12,7 @@ class DraftsController < ApplicationController
     @draft.number = @piece.drafts.count + 1
 
     if @draft.save
-      redirect_to piece_draft_path piece_id: @piece, id: @draft.number
+      redirect_to piece_draft_path(piece_id: @piece, id: @draft.number), notice: "Draft has been successfully created. You can now share this page's link with others and they will be able to read this draft!"
     end
   end
 

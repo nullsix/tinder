@@ -26,6 +26,10 @@ feature "Drafts Management" do
         end
 
         it_behaves_like "draft information"
+
+        scenario "User sees the flash" do
+          should have_content "Draft has been successfully created. You can now share this page's link with others and they will be able to read this draft!"
+        end
       end
 
       context "not as the owner" do
