@@ -1,2 +1,2 @@
-rvm use 1.9.3@tinder --create
+rvm use 2.0.0@tinder --create
 source config/initializers/env.sh
