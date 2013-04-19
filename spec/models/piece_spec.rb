@@ -10,11 +10,48 @@
 
 require 'spec_helper'
 
+shared_examples "instance method" do
+  subject { piece }
+
+  let(:piece) { FactoryGirl.build_stubbed :piece, versions_count: 0 }
+
+  it "exists" do
+    should respond_to method
+  end
+end
+
 describe Piece do
   it "has a valid factory" do
     FactoryGirl.build_stubbed(:piece).should be_valid
   end
-  
+
+  let(:piece) { FactoryGirl.create :piece }
+
+  subject { piece }
+
+  describe "#versions" do
+    it_behaves_like "instance method" do
+      let(:method) { :versions }
+    end
+
+    context "with versions" do
+      it "returns the correct number of versions" do
+        versions_count = 5
+        piece = FactoryGirl.create :piece, versions_count: versions_count
+
+        piece.versions.count.should == versions_count
+      end
+    end
+
+    context "with no versions" do
+      it "is empty" do
+        piece = FactoryGirl.create :piece, versions_count: 0
+
+        piece.versions.should be_empty
+      end
+    end
+  end
+
   context "with a piece" do
     before :each do
       @versions_count = 2
@@ -24,7 +61,7 @@ describe Piece do
     describe "instance methods" do
       subject { @piece }
 
-      methods = [ :versions, :current_version, :title, :content,
+      methods = [ :current_version, :title, :content,
                   :blurb, :short_title, :drafts ]
       methods.each do |m|
         it "responds to ##{m}" do
@@ -38,10 +75,6 @@ describe Piece do
         end
 
         subject { @piece }
-
-        it "has the correct number of versions" do
-          subject.versions.length.should == @versions_count
-        end
 
         it "has a #current_version is the last item in #versions" do
           subject.current_version.should == subject.versions.last
@@ -83,10 +116,6 @@ describe Piece do
         end
 
         subject { @no_versions_piece }
-
-        specify "#versions is empty" do
-          subject.versions.should be_empty
-        end
 
         specify "#drafts is empty" do
           subject.drafts.should be_empty
