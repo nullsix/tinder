@@ -8,9 +8,7 @@ module SessionsHelper
   end
 
   def require_signed_in_user
-    unless signed_in?
-      redirect_to root_url
-    end
+    redirect_to(root_url) unless signed_in?
   end
 
   def owner_is_logged_in?(owning_user)

@@ -35,4 +35,6 @@ Tinder::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+  OmniAuth.config.test_mode = true
+  OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new({provider: 'google_oauth2', uid: 'devuser', info: {name: "Development"}})
 end

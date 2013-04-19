@@ -7,7 +7,7 @@ development:
   database: tinder_development
   pool: 5
   timeout: 5000
-  username: kyle
+  username: tinder
   password: 
 
 # Warning: The database defined as "test" will be erased and
@@ -18,7 +18,7 @@ test:
   database: tinder_test
   pool: 5
   timeout: 5000
-  username: kyle
+  username: tinder
   password: 
 
 # Do we need this?
