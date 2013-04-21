@@ -13,8 +13,6 @@ require 'spec_helper'
 shared_examples "instance method" do
   subject { piece }
 
-  let(:piece) { FactoryGirl.build_stubbed :piece, versions_count: 0 }
-
   it "exists" do
     should respond_to method
   end
@@ -77,6 +75,16 @@ describe Piece do
     end
   end
 
+  describe "#current_version" do
+    it_behaves_like "instance method" do
+      let(:method) { :current_version }
+    end
+
+    it "is the last item in #versions" do
+      subject.current_version.should == subject.versions.last
+    end
+  end
+
   context "with a piece" do
     before :each do
       @versions_count = 2
@@ -86,8 +94,7 @@ describe Piece do
     describe "instance methods" do
       subject { @piece }
 
-      methods = [ :current_version, :title, :content,
-                  :blurb, :short_title ]
+      methods = [ :title, :content, :blurb, :short_title ]
       methods.each do |m|
         it "responds to ##{m}" do
           should respond_to m
@@ -100,10 +107,6 @@ describe Piece do
         end
 
         subject { @piece }
-
-        it "has a #current_version is the last item in #versions" do
-          subject.current_version.should == subject.versions.last
-        end
 
         specify "#title gives the current version's title" do
           subject.title.should == subject.current_version.title
@@ -182,12 +185,6 @@ describe Piece do
 
       it "adds the new version to the versions collection" do
         @piece.versions.should include @new_version
-      end
-
-      it "sets the new version as the current version" do
-        piece = FactoryGirl.create :piece
-        new_version = FactoryGirl.create :version, piece: piece
-        piece.current_version.should == new_version
       end
     end
   end
