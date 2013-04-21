@@ -129,6 +129,28 @@ describe Piece do
     end
   end
 
+  describe "#short_title" do
+    subject { piece.short_title }
+
+    it_behaves_like "instance method" do
+      let(:method) { :short_title }
+    end
+
+    context "with a version" do
+      it "is the current version's short_title" do
+        should == piece.current_version.short_title
+      end
+    end
+
+    context "with no versions" do
+      it "is nil" do
+        piece.versions.destroy_all
+
+        should be_nil
+      end
+    end
+  end
+
   describe "#blurb" do
     subject { piece.blurb }
 
@@ -155,41 +177,6 @@ describe Piece do
     before :each do
       @versions_count = 2
       @piece = FactoryGirl.build_stubbed :piece, versions_count: @versions_count
-    end
-
-    describe "instance methods" do
-      subject { @piece }
-
-      methods = [ :short_title ]
-      methods.each do |m|
-        it "responds to ##{m}" do
-          should respond_to m
-        end
-      end
-
-      context "with a saved piece" do
-        before :each do
-          @piece = FactoryGirl.create :piece, versions_count: @versions_count 
-        end
-
-        subject { @piece }
-
-        specify "#short_title gives the current version's short title" do
-          subject.short_title == subject.current_version.short_title
-        end
-      end
-
-      context "with a piece with no versions" do
-        before :each do
-          @no_versions_piece = FactoryGirl.create :piece, versions_count: 0
-        end
-
-        subject { @no_versions_piece }
-
-        specify "#short_title is nil" do
-          subject.short_title.should be_nil
-        end
-      end
     end
 
     it "has a user" do
