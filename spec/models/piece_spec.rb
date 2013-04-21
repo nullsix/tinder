@@ -35,19 +35,18 @@ describe Piece do
     end
 
     context "with versions" do
-      it "returns the correct number of versions" do
-        versions_count = 5
-        piece = FactoryGirl.create :piece, versions_count: versions_count
+      let(:versions_count) { 5 }
+      let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
 
-        piece.versions.count.should == versions_count
+      it "returns the correct number of versions" do
+        subject.versions.count.should == versions_count
       end
     end
 
     context "with no versions" do
+      let(:piece) { FactoryGirl.create :piece, versions_count: 0 }
       it "is empty" do
-        piece = FactoryGirl.create :piece, versions_count: 0
-
-        piece.versions.should be_empty
+        subject.versions.should be_empty
       end
     end
   end
