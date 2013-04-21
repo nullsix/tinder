@@ -173,19 +173,25 @@ describe Piece do
     end
   end
 
+  describe "#user" do
+    subject { piece.user }
+
+    it "is" do
+      should be
+    end
+  end
+
+  describe "validations" do
+    it "must have a user" do
+      no_user_piece = FactoryGirl.build_stubbed :piece, user: nil
+      no_user_piece.should_not be_valid
+    end
+  end
+
   context "with a piece" do
     before :each do
       @versions_count = 2
       @piece = FactoryGirl.build_stubbed :piece, versions_count: @versions_count
-    end
-
-    it "has a user" do
-      @piece.user.should_not be_nil
-    end
-
-    it "is not valid without a user" do
-      no_user_piece = FactoryGirl.build_stubbed :piece, user: nil
-      no_user_piece.should_not be_valid
     end
 
     describe "creating a new version" do
