@@ -107,6 +107,28 @@ describe Piece do
     end
   end
 
+  describe "#content" do
+    subject { piece.content }
+
+    it_behaves_like "instance method" do
+      let(:method) { :content }
+    end
+
+    context "with a version" do
+      it "is the current version's content" do
+        should == piece.current_version.content
+      end
+    end
+
+    context "with no versions" do
+      it "is nil" do
+        piece.versions.destroy_all
+
+        should be_nil
+      end
+    end
+  end
+
   context "with a piece" do
     before :each do
       @versions_count = 2
@@ -116,7 +138,7 @@ describe Piece do
     describe "instance methods" do
       subject { @piece }
 
-      methods = [ :content, :blurb, :short_title ]
+      methods = [ :blurb, :short_title ]
       methods.each do |m|
         it "responds to ##{m}" do
           should respond_to m
@@ -129,10 +151,6 @@ describe Piece do
         end
 
         subject { @piece }
-
-        specify "#content gives the current version's content" do
-          subject.content.should == subject.current_version.content
-        end
 
         specify "#blurb gives the current version's content" do
           subject.blurb.should == subject.current_version.blurb
@@ -149,10 +167,6 @@ describe Piece do
         end
 
         subject { @no_versions_piece }
-
-        specify "#content is nil" do
-          subject.content.should be_nil
-        end
 
         specify "#blurb is nil" do
           subject.blurb.should be_nil
