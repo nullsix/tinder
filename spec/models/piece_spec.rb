@@ -51,6 +51,32 @@ describe Piece do
     end
   end
 
+  describe "#drafts" do
+    it_behaves_like "instance method" do
+      let(:method) { :drafts }
+    end
+
+    let(:versions_count) { 5 }
+    let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+    context "with no drafts" do
+      specify "#drafts is empty" do
+        subject.drafts.should be_empty
+      end
+    end
+
+    context "with drafts" do
+      specify "#drafts contains all the drafts" do
+        drafts = []
+        piece.versions.each do |v|
+          drafts << create_draft(v)
+        end
+
+        subject.drafts.should == drafts
+      end
+    end
+  end
+
   context "with a piece" do
     before :each do
       @versions_count = 2
@@ -61,7 +87,7 @@ describe Piece do
       subject { @piece }
 
       methods = [ :current_version, :title, :content,
-                  :blurb, :short_title, :drafts ]
+                  :blurb, :short_title ]
       methods.each do |m|
         it "responds to ##{m}" do
           should respond_to m
@@ -94,19 +120,6 @@ describe Piece do
         specify "#short_title gives the current version's short title" do
           subject.short_title == subject.current_version.short_title
         end
-
-        context "with a draft" do
-          before :each do
-            @version = @piece.versions.first
-            @draft = FactoryGirl.create :draft, version: @version
-          end
-
-          subject { @piece }
-
-          it "has one draft" do
-            subject.drafts == [@draft]
-          end
-        end
       end
 
       context "with a piece with no versions" do
@@ -115,10 +128,6 @@ describe Piece do
         end
 
         subject { @no_versions_piece }
-
-        specify "#drafts is empty" do
-          subject.drafts.should be_empty
-        end
 
         specify "#title is nil" do
           subject.title.should be_nil
