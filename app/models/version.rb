@@ -12,6 +12,8 @@
 #
 
 class Version < ActiveRecord::Base
+  include Previewable
+
   belongs_to :piece, inverse_of: :versions
   has_one :draft, dependent: :destroy
 
@@ -21,20 +23,10 @@ class Version < ActiveRecord::Base
   validates :piece, presence: true
 
   def blurb
-    content_length = 50
-    if content.length > content_length
-      "#{content[0..(content_length-4)]}..."
-    else
-      content
-    end
+    preview content, BLURB_LENGTH
   end
 
   def short_title
-    title_length = 30
-    if title.length > title_length
-      "#{title[0..(title_length-4)]}..."
-    else
-      title
-    end
+    preview title, SHORT_TITLE_LENGTH
   end
 end
