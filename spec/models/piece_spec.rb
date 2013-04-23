@@ -148,6 +148,18 @@ describe Piece do
     end
   end
 
+  describe "#content=" do
+    it_behaves_like "instance method" do
+      let(:method) { :content= }
+    end
+
+    it "changes the blurb" do
+      content = "a"*100
+      piece.content = content
+      piece.blurb.should == "a"*47+"..."
+    end
+  end
+
   describe "#short_title" do
     subject { piece.short_title }
 

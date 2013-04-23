@@ -11,6 +11,8 @@
 class Piece < ActiveRecord::Base
   include Previewable
 
+  attr_writer :content
+
   belongs_to :user, inverse_of: :pieces
   validates :user, presence: true
 
@@ -38,11 +40,11 @@ class Piece < ActiveRecord::Base
   end
 
   def content
-    current_version.content if !!current_version
+    @content ||= current_version.content if !current_version.nil?
   end
 
   def blurb
-    current_version.blurb if !!current_version
+    preview content, BLURB_LENGTH
   end
 
   def short_title

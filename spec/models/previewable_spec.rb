@@ -1,4 +1,10 @@
 describe Previewable do
+  describe "BLURB_LENGTH" do
+    it "is a constant" do
+      should be_const_defined :BLURB_LENGTH
+    end
+  end
+
   describe "SHORT_TITLE_LENGTH" do
     it "is a constant" do
       should be_const_defined :SHORT_TITLE_LENGTH

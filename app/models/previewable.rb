@@ -1,4 +1,5 @@
 module Previewable
+  BLURB_LENGTH = 50
   SHORT_TITLE_LENGTH = 30
 
   def preview(string, length)
