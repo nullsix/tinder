@@ -23,6 +23,8 @@ class Piece < ActiveRecord::Base
   scope :last_modified_first, order("updated_at DESC")
   default_scope last_modified_first
 
+  before_update :check_for_new_version
+
   def current_version
     versions.last
   end
@@ -50,4 +52,35 @@ class Piece < ActiveRecord::Base
   def short_title
     preview title, SHORT_TITLE_LENGTH
   end
+
+  def changed?
+    title_changed? || content_changed?
+  end
+
+  private
+    def check_for_new_version
+      if changed?
+        version = current_version.dup
+        version.title = title
+        version.content = content
+        version.number = versions.count + 1
+        version.save
+      end
+    end
+
+    def title_changed?
+      if current_version.nil?
+        title.nil?
+      else
+        title != current_version.title
+      end
+    end
+
+    def content_changed?
+      if current_version.nil?
+        content.nil?
+      else 
+        content != current_version.content
+      end
+    end
 end
