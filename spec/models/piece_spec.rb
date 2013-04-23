@@ -207,6 +207,10 @@ describe Piece do
   describe "#user" do
     subject { piece.user }
 
+    it_behaves_like "instance method" do
+      let(:method) { :user }
+    end
+
     it "is" do
       should be
     end
@@ -252,6 +256,13 @@ describe Piece do
       it "adds the new version to the versions collection" do
         @piece.versions.should include @new_version
       end
+    end
+  end
+
+  describe "validations" do
+    it "must have a user" do
+      no_user_piece = FactoryGirl.build_stubbed :piece, user: nil
+      no_user_piece.should_not be_valid
     end
   end
 
