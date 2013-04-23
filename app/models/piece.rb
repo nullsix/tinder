@@ -9,11 +9,13 @@
 #
 
 class Piece < ActiveRecord::Base
+  include Previewable
 
   belongs_to :user, inverse_of: :pieces
   validates :user, presence: true
 
-  has_many :versions, dependent: :destroy, inverse_of: :piece, order: "created_at ASC"
+  has_many :versions, dependent: :destroy, inverse_of: :piece,
+    order: "created_at ASC"
   has_many :drafts, through: :versions
 
   scope :last_modified_first, order("updated_at DESC")
@@ -24,7 +26,15 @@ class Piece < ActiveRecord::Base
   end
 
   def title
-    current_version.title if !!current_version
+    @title ||= current_version.title if !current_version.nil?
+  end
+
+  def title=(value)
+    if value.empty?
+      @title = "Untitled Piece"
+    else
+      @title = value
+    end
   end
 
   def content
@@ -36,6 +46,6 @@ class Piece < ActiveRecord::Base
   end
 
   def short_title
-    current_version.short_title if !!current_version
+    preview title, SHORT_TITLE_LENGTH
   end
 end

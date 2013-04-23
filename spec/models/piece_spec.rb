@@ -107,6 +107,25 @@ describe Piece do
     end
   end
 
+  describe "#title=" do
+    subject { piece.title }
+
+    it_behaves_like "instance method" do
+      let(:method) { :title= }
+    end
+
+    it "gets a default when empty" do
+      piece.title = ""
+      should == "Untitled Piece"
+    end
+
+    it "changes the short_title" do
+      title = "a"*100
+      piece.title = title
+      piece.short_title.should == "a"*27+"..."
+    end
+  end
+
   describe "#content" do
     subject { piece.content }
 
