@@ -123,8 +123,30 @@ describe Piece do
       let(:method) { :current_version }
     end
 
-    it "is the last item in #versions" do
-      subject.current_version.should == subject.versions.last
+    subject { piece.current_version }
+
+    context "with multiple versions" do
+      it "is the last item in #versions" do
+        should == piece.versions.last
+      end
+
+      context "after current_version is deleted" do
+        let(:piece) { FactoryGirl.create :piece, versions_count: 2 }
+
+        it "current_version is set to the next to last version" do
+          expected_current_version = piece.versions[0]
+          subject.delete
+          should == expected_current_version
+        end
+      end
+    end
+
+    context "with no versions" do
+      subject { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is nil" do
+        subject.current_version.should be_nil
+      end
     end
   end
 

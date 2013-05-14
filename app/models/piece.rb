@@ -27,7 +27,11 @@ class Piece < ActiveRecord::Base
   before_update :check_for_new_version
 
   def current_version
-    versions.last
+    if current_version_changed?
+      default_values
+    end
+
+    @current_version
   end
 
   def title
@@ -81,6 +85,28 @@ class Piece < ActiveRecord::Base
       else 
         content != current_version.content
       end
+    end
+
+    def default_values
+      if new_record?
+        @title = "Untitled Piece" if @title.nil?
+        @content = "" if @content.nil?
+
+      else
+        @current_version = versions.last
+        if @current_version.nil?
+          @title = "Untitled Piece"
+          @content = ""
+
+        else
+          @title = @current_version.title
+          @content = @current_version.content
+        end
+      end
+    end
+
+    def current_version_changed?
+      @current_version != versions.last && !versions.last.nil?
     end
 
     def create_first_version
