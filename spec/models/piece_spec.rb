@@ -44,19 +44,31 @@ describe Piece do
       let(:method) { :versions }
     end
 
-    context "with versions" do
-      let(:versions_count) { 5 }
-      let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+    subject { piece.versions }
 
-      it "returns the correct number of versions" do
-        subject.versions.count.should == versions_count
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece }
+
+      it "has no versions" do
+        should be_empty
       end
     end
 
-    context "with no versions" do
-      let(:piece) { FactoryGirl.create :piece, versions_count: 0 }
-      it "is empty" do
-        subject.versions.should be_empty
+    context "after piece is saved" do
+      let(:versions_count) { 5 }
+      let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+      it "is not empty" do
+        should_not be_empty
+      end
+
+      it "returns the correct number of versions" do
+        subject.count.should == versions_count
+      end
+
+      it "is in the right order" do
+        expected_order = piece.versions.sort_by(&:created_at)
+        should == expected_order
       end
     end
   end
