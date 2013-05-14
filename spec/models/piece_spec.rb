@@ -78,23 +78,42 @@ describe Piece do
       let(:method) { :drafts }
     end
 
-    let(:versions_count) { 5 }
-    let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+    subject { piece.drafts }
 
-    context "with no drafts" do
-      specify "#drafts is empty" do
-        subject.drafts.should be_empty
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece }
+
+      it "has no drafts" do
+        should be_empty
       end
     end
 
-    context "with drafts" do
-      specify "#drafts contains all the drafts" do
-        drafts = []
-        piece.versions.each do |v|
-          drafts << create_draft(v)
+    context "after piece is saved" do
+      let(:versions_count) { 5 }
+      let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+      context "with no drafts" do
+        it "has no drafts" do
+          should be_empty
+        end
+      end
+
+      context "with drafts" do
+        let!(:drafts) do
+            d = []
+            piece.versions.each do |v|
+              d << create_draft(v)
+            end
+            d
         end
 
-        subject.drafts.should == drafts
+        it "is not empty" do
+          should_not be_empty
+        end
+
+        it "has all the drafts" do
+          should == drafts
+        end
       end
     end
   end
