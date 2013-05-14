@@ -35,7 +35,11 @@ class Piece < ActiveRecord::Base
   end
 
   def title
-    @title ||= current_version.title if !current_version.nil?
+    if @title.nil? || current_version_changed?
+      default_values
+    end
+
+    @title
   end
 
   def title=(value)

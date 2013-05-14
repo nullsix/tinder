@@ -157,17 +157,28 @@ describe Piece do
       let(:method) { :title }
     end
 
-    context "with a version" do
-      it "is the current version's title" do
-        should == piece.current_version.title
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should == "Untitled Piece"
       end
     end
 
-    context "with no versions" do
-      it "is nil" do
-        piece.versions.destroy_all
+    context "after piece is saved" do
+      context "with a current_version" do
+        it "is the current_version's title" do
+          should == piece.current_version.title
+        end
+      end
 
-        should be_nil
+      context "with no current_version" do
+        let(:piece) { FactoryGirl.create :piece }
+
+        it "is default" do
+          piece.versions.delete_all
+          should == "Untitled Piece"
+        end
       end
     end
   end
