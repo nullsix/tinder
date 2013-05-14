@@ -23,6 +23,7 @@ class Piece < ActiveRecord::Base
   scope :last_modified_first, order("updated_at DESC")
   default_scope last_modified_first
 
+  after_save :create_first_version
   before_update :check_for_new_version
 
   def current_version
@@ -61,9 +62,7 @@ class Piece < ActiveRecord::Base
     def check_for_new_version
       if changed?
         version = current_version.dup
-        version.title = title
-        version.content = content
-        version.number = versions.count + 1
+        version = set_version version, title, content
         version.save
       end
     end
@@ -82,5 +81,18 @@ class Piece < ActiveRecord::Base
       else 
         content != current_version.content
       end
+    end
+
+    def create_first_version
+      version = versions.build
+      version = set_version version, title, content
+      version.save
+    end
+
+    def set_version(version, title, content)
+      version.title = title
+      version.content = content
+      version.number = versions.count + 1
+      version
     end
 end
