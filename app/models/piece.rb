@@ -43,7 +43,7 @@ class Piece < ActiveRecord::Base
   end
 
   def title=(value)
-    if value.empty?
+    if value.empty? #TODO: This should be blank?
       @title = "Untitled Piece"
     else
       @title = value

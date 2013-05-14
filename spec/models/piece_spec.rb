@@ -190,15 +190,36 @@ describe Piece do
       let(:method) { :title= }
     end
 
-    it "gets a default when empty" do
-      piece.title = ""
-      should == "Untitled Piece"
+    shared_examples "sets title" do
+      it "uses default when empty" do
+        piece.title = ""
+        subject.should == "Untitled Piece"
+      end
+
+      it "changes title" do
+        title = rand.to_s
+        piece.title = title
+        should == title
+      end
+
+      # Or should this be in the short_title tests?
+      it "changes short_title" do
+        title = "a"*100
+        piece.title = title
+        piece.short_title.should == "a"*27+"..."
+      end
     end
 
-    it "changes the short_title" do
-      title = "a"*100
-      piece.title = title
-      piece.short_title.should == "a"*27+"..."
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it_behaves_like "sets title"
+    end
+
+    context "after piece is saved" do
+      let(:piece) { FactoryGirl.create :piece }
+
+      it_behaves_like "sets title"
     end
   end
 
