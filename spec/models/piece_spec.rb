@@ -27,6 +27,18 @@ describe Piece do
 
   subject { piece }
 
+  describe "#user" do
+    subject { piece.user }
+
+    it_behaves_like "instance method" do
+      let(:method) { :user }
+    end
+
+    it "is" do
+      should be
+    end
+  end
+
   describe "#versions" do
     it_behaves_like "instance method" do
       let(:method) { :versions }
@@ -204,15 +216,8 @@ describe Piece do
     end
   end
 
-  describe "#user" do
-    subject { piece.user }
 
-    it_behaves_like "instance method" do
-      let(:method) { :user }
-    end
 
-    it "is" do
-      should be
     end
   end
 
