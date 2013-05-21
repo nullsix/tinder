@@ -223,6 +223,66 @@ describe Piece do
     end
   end
 
+  shared_examples "sets short_title" do
+    context "when title is changed" do
+      context "with a title more than 30 characters" do
+        it "is shortened" do
+          piece.title = "a"*50
+          should == "a"*27+"..."
+        end
+      end
+
+      context "with a title no more than 30 characters" do
+        it "is the title" do
+          piece.title = "a"*30
+          should == piece.title
+        end
+      end
+    end
+  end
+
+  describe "#short_title" do
+    subject { piece.short_title }
+
+    it_behaves_like "instance method" do
+      let(:method) { :short_title }
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should == piece.title
+      end
+
+      it_behaves_like "sets short_title"
+    end
+
+    context "after piece is saved" do
+      context "with a current_version" do
+        it "is the current_version's short_title at first" do
+          should == piece.current_version.short_title
+        end
+
+        it_behaves_like "sets short_title"
+      end
+
+      context "with no current_version" do
+        let!(:piece) do
+          p = FactoryGirl.create :piece
+          p.versions.delete_all
+          p
+        end
+
+        it "is default" do
+          should == piece.title
+        end
+
+        it_behaves_like "sets short_title"
+      end
+    end
+  end
+
   describe "#content" do
     subject { piece.content }
 

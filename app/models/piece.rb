@@ -50,16 +50,16 @@ class Piece < ActiveRecord::Base
     end
   end
 
+  def short_title
+    preview title, SHORT_TITLE_LENGTH
+  end
+
   def content
     @content ||= current_version.content if !current_version.nil?
   end
 
   def blurb
     preview content, BLURB_LENGTH
-  end
-
-  def short_title
-    preview title, SHORT_TITLE_LENGTH
   end
 
   def changed?
