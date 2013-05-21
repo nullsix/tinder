@@ -425,22 +425,22 @@ describe Piece do
 
     context "with title changed" do
       it "is true" do
-        piece.title = Time.now.to_s
+        piece.title = rand.to_s
         should be_true
       end
     end
 
     context "with content changed" do
       it "is true" do
-        piece.content = Time.now.to_s
+        piece.content = rand.to_s
         should be_true
       end
     end
 
     context "with title and content changed" do
       it "is true" do
-        piece.title = Time.now.to_s
-        piece.content = Time.now.to_s
+        piece.title = rand.to_s
+        piece.content = rand.to_s
         should be_true
       end
     end
