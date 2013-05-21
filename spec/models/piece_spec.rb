@@ -447,7 +447,65 @@ describe Piece do
     end
   end
 
-  describe "immutable versions" do
+  describe "versioning" do
+    context "with a new piece" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+      subject { piece }
+
+      specify "title is default" do
+        subject.title.should == "Untitled Piece"
+      end
+
+      it "content is empty" do
+        subject.content.should be_empty
+      end
+
+      it "can be assigned a new title" do
+        s = rand.to_s
+        piece.title = s
+        subject.title.should == s
+      end
+
+      it "can be assigned a new content" do
+        s = rand.to_s
+        piece.content = s
+        subject.content.should == s
+      end
+
+      it "has no current_version" do
+        subject.current_version.should be_nil
+      end
+
+      context "when saved" do
+        let(:title) { rand.to_s }
+
+        let(:content) { rand.to_s }
+
+        let(:piece) do
+          FactoryGirl.build :piece, versions_count: 0, title: title, content: content
+        end
+
+        it "creates a version" do
+          expect { piece.save }.to change(piece.versions, :count).by 1
+        end
+
+        specify "current_version is set" do
+          piece.save
+          piece.current_version.should be
+        end
+
+        specify "title is correct" do
+          piece.save
+          subject.title.should == title
+        end
+
+        specify "content is correct" do
+          piece.save
+          subject.content.should == content
+        end
+      end
+    end
+
     shared_examples "modifying the piece" do
       it "creates a new version" do
         expect { piece.save }.to change(piece.versions, :count).by 1
@@ -456,167 +514,175 @@ describe Piece do
       specify "new version's number is correct" do
         expected_number = piece.versions.count + 1
         piece.save
-        piece.current_version.number.should == expected_number
+        subject.current_version.number.should == expected_number
       end
 
       specify "new version is the piece's current version" do
         piece.save
-        piece.current_version.should == Version.last
+        subject.current_version.should == Version.last
       end
     end
 
-    context "when title changes" do
-      before :each do
-        @new_title = Time.now.to_s
-        @content = piece.content
-        piece.title = @new_title
+    context "with a saved piece" do
+      let(:piece) do
+        FactoryGirl.create :piece, title: rand.to_s, content: rand.to_s
       end
 
-      include_examples "modifying the piece"
+      subject { piece }
 
-      context "after the save" do
+      context "when title changes" do
         before :each do
-          piece.save
+          @new_title = rand.to_s
+          @content = piece.content
+          subject.title = @new_title
         end
 
-        it "has the new title" do
-          piece.title.should == @new_title
-        end
+        include_examples "modifying the piece"
 
-        it "has the old content" do
-          piece.content.should == @content
-        end
+        context "after the save" do
+          before :each do
+            piece.save
+          end
 
-        specify "#current_version has the new title" do
-          subject.current_version.title.should == @new_title
-        end
+          it "has the new title" do
+            subject.title.should == @new_title
+          end
 
-        specify "#current_version had the old content" do
-          subject.current_version.content.should == @content
-        end
+          it "has the old content" do
+            subject.content.should == @content
+          end
 
-        specify "new version's title is the new title" do
-          version = Version.last
-          version.title.should == @new_title
-        end
+          specify "#current_version has the new title" do
+            subject.current_version.title.should == @new_title
+          end
 
-        specify "new version's content is the old content" do
-          version = Version.last
-          version.content.should == @content
-        end
+          specify "#current_version had the old content" do
+            subject.current_version.content.should == @content
+          end
 
-        specify "#blurb is the current_version's blurb" do
-          subject.blurb.should == subject.current_version.blurb
-        end
+          specify "new version's title is the new title" do
+            version = Version.last
+            version.title.should == @new_title
+          end
 
-        specify "#short_title is the current_version's short_title" do
-          subject.short_title.should == subject.current_version.short_title
+          specify "new version's content is the old content" do
+            version = Version.last
+            version.content.should == @content
+          end
+
+          specify "#blurb is the current_version's blurb" do
+            subject.blurb.should == subject.current_version.blurb
+          end
+
+          specify "#short_title is the current_version's short_title" do
+            subject.short_title.should == subject.current_version.short_title
+          end
         end
       end
-    end
 
-    context "when content changes" do
-      before :each do
-        @new_content = Time.now.to_s
-        @title = piece.title
-        piece.content = @new_content
-      end
-
-      include_examples "modifying the piece"
-
-      context "after the save" do
+      context "when content changes" do
         before :each do
-          piece.save
+          @new_content = rand.to_s
+          @title = piece.title
+          piece.content = @new_content
         end
 
-        it "has the new content" do
-          piece.content.should == @new_content
-        end
+        include_examples "modifying the piece"
 
-        it "has the old title" do
-          piece.title.should == @title
-        end
+        context "after the save" do
+          before :each do
+            piece.save
+          end
 
-        specify "#current_version has the new content" do
-          subject.current_version.content.should == @new_content
-        end
+          it "has the new content" do
+            piece.content.should == @new_content
+          end
 
-        specify "#current_version had the old title" do
-          subject.current_version.title.should == @title
-        end
+          it "has the old title" do
+            piece.title.should == @title
+          end
 
-        specify "new version's content is the new content" do
-          version = Version.last
-          version.content.should == @new_content
-        end
+          specify "#current_version has the new content" do
+            subject.current_version.content.should == @new_content
+          end
 
-        specify "new version's title is the old title" do
-          version = Version.last
-          version.title.should == @title
-        end
+          specify "#current_version had the old title" do
+            subject.current_version.title.should == @title
+          end
 
-        specify "#blurb is the current_version's blurb" do
-          subject.blurb.should == subject.current_version.blurb
-        end
+          specify "new version's content is the new content" do
+            version = Version.last
+            version.content.should == @new_content
+          end
 
-        specify "#short_title is the current_version's short_title" do
-          subject.short_title.should == subject.current_version.short_title
+          specify "new version's title is the old title" do
+            version = Version.last
+            version.title.should == @title
+          end
+
+          specify "#blurb is the current_version's blurb" do
+            subject.blurb.should == subject.current_version.blurb
+          end
+
+          specify "#short_title is the current_version's short_title" do
+            subject.short_title.should == subject.current_version.short_title
+          end
         end
       end
-    end
 
-    context "when the title and content change" do
-      # ditto as above
-      before :each do
-        @new_title = Time.now.to_s
-        @new_content = Time.now.to_s
-
-        @title = piece.title
-        @content = piece.content
-
-        piece.title = @new_title
-        piece.content = @new_content
-      end
-
-      include_examples "modifying the piece"
-
-      context "after the save" do
+      context "when the title and content change" do
+        # ditto as above
         before :each do
-          piece.save
+          @new_title = rand.to_s
+          @new_content = rand.to_s
+
+          @title = piece.title
+          @content = piece.content
+
+          piece.title = @new_title
+          piece.content = @new_content
         end
 
-        it "has the new title" do
-          piece.title.should == @new_title
-        end
+        include_examples "modifying the piece"
 
-        it "has the new content" do
-          piece.content.should == @new_content
-        end
+        context "after the save" do
+          before :each do
+            piece.save
+          end
 
-        specify "#current_version has the new title" do
-          subject.current_version.title.should == @new_title
-        end
+          it "has the new title" do
+            piece.title.should == @new_title
+          end
 
-        specify "#current_version had the new content" do
-          subject.current_version.content.should == @new_content
-        end
+          it "has the new content" do
+            piece.content.should == @new_content
+          end
 
-        specify "new version's title is the new title" do
-          version = Version.last
-          version.title.should == @new_title
-        end
+          specify "#current_version has the new title" do
+            subject.current_version.title.should == @new_title
+          end
 
-        specify "new version's content is the old content" do
-          version = Version.last
-          version.content.should == @new_content
-        end
+          specify "#current_version had the new content" do
+            subject.current_version.content.should == @new_content
+          end
 
-        specify "#blurb is the current_version's blurb" do
-          subject.blurb.should == subject.current_version.blurb
-        end
+          specify "new version's title is the new title" do
+            version = Version.last
+            version.title.should == @new_title
+          end
 
-        specify "#short_title is the current_version's short_title" do
-          subject.short_title.should == subject.current_version.short_title
+          specify "new version's content is the old content" do
+            version = Version.last
+            version.content.should == @new_content
+          end
+
+          specify "#blurb is the current_version's blurb" do
+            subject.blurb.should == subject.current_version.blurb
+          end
+
+          specify "#short_title is the current_version's short_title" do
+            subject.short_title.should == subject.current_version.short_title
+          end
         end
       end
     end

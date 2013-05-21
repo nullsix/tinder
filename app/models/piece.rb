@@ -26,16 +26,14 @@ class Piece < ActiveRecord::Base
 
   def current_version
     if current_version_changed?
-      default_values
+      default_current_version
     end
 
     @current_version
   end
 
   def title
-    if @title.nil? || current_version_changed?
-      default_values
-    end
+    check_for_nil_field @title
 
     @title
   end
@@ -53,9 +51,7 @@ class Piece < ActiveRecord::Base
   end
 
   def content
-    if @content.nil? || current_version_changed?
-      default_values
-    end
+    check_for_nil_field @title
 
     @content
   end
@@ -81,43 +77,57 @@ class Piece < ActiveRecord::Base
 
     def title_changed?
       if current_version.nil?
-        title.nil?
+        true
       else
-        title != current_version.title
+        @title != current_version.title
       end
     end
 
     def content_changed?
       if current_version.nil?
-        content.nil?
+        true
       else 
-        content != current_version.content
+        @content != current_version.content
       end
     end
 
     def default_values
       if new_record?
-        @title = "Untitled Piece" if @title.nil?
-        @content = "" if @content.nil?
+        default_values_for_new_record
 
       else
-        @current_version = versions.last
-        if @current_version.nil?
+        if !new_record? && current_version.nil?
           @title = "Untitled Piece"
           @content = ""
 
         else
-          @title = @current_version.title
-          @content = @current_version.content
+          @title = current_version.title
+          @content = current_version.content
         end
       end
+    end
+
+    def default_values_for_new_record
+      @title = "Untitled Piece" if @title.nil?
+      @content = "" if @content.nil?
     end
 
     def current_version_changed?
       @current_version != versions.last && !versions.last.nil?
     end
 
+    def default_current_version
+      @current_version = versions.last
+    end
+
+    def check_for_nil_field(field)
+      if field.nil?
+        default_values_for_new_record
+      end
+    end
+
     def create_first_version
+      return true unless new_record? || versions.count.zero?
       version = versions.build
       version = set_version version, title, content
       version.save
