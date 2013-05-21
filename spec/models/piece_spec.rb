@@ -131,10 +131,11 @@ describe Piece do
       end
 
       context "after current_version is deleted" do
-        let(:piece) { FactoryGirl.create :piece, versions_count: 2 }
+        let(:versions_count) { 2 }
+        let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
 
         it "current_version is set to the next to last version" do
-          expected_current_version = piece.versions[0]
+          expected_current_version = piece.versions[versions_count-1]
           subject.delete
           should == expected_current_version
         end
