@@ -317,35 +317,53 @@ describe Piece do
   end
 
   describe "#content=" do
+    subject { piece.content }
+
     it_behaves_like "instance method" do
       let(:method) { :content= }
     end
 
-    it "changes the blurb" do
-      content = "a"*100
-      piece.content = content
-      piece.blurb.should == "a"*47+"..."
-    end
-  end
+    shared_examples "sets content" do
+      it "changes content" do
+        content = rand.to_s
+        piece.content = content
+        should == content
+      end
 
-  describe "#short_title" do
-    subject { piece.short_title }
-
-    it_behaves_like "instance method" do
-      let(:method) { :short_title }
-    end
-
-    context "with a version" do
-      it "is the current version's short_title" do
-        should == piece.current_version.short_title
+      it "changes blurb" do
+        content = "a"*100
+        piece.content = content
+        piece.blurb.should == "a"*47+"..."
       end
     end
 
-    context "with no versions" do
-      it "is nil" do
-        piece.versions.destroy_all
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
 
-        should be_nil
+      it_behaves_like "sets content"
+    end
+
+    context "after piece is saved" do
+      let(:piece) { FactoryGirl.create :piece }
+
+      it_behaves_like "sets content"
+    end
+  end
+
+  shared_examples "sets blurb" do
+    context "when content is changed" do
+      context "with a title more than 50 characters" do
+        it "is shortened" do
+          piece.content = "a"*100
+          should == "a"*47+"..."
+        end
+      end
+
+      context "with a content no more than 50 characters" do
+        it "is the content" do
+          piece.content = "a"*50
+          should == piece.content
+        end
       end
     end
   end

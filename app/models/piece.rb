@@ -11,8 +11,6 @@
 class Piece < ActiveRecord::Base
   include Previewable
 
-  attr_writer :content
-
   belongs_to :user, inverse_of: :pieces
   validates :user, presence: true
 
@@ -61,6 +59,8 @@ class Piece < ActiveRecord::Base
 
     @content
   end
+
+  attr_writer :content
 
   def blurb
     preview content, BLURB_LENGTH
