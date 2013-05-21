@@ -290,17 +290,28 @@ describe Piece do
       let(:method) { :content }
     end
 
-    context "with a version" do
-      it "is the current version's content" do
-        should == piece.current_version.content
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should be_empty
       end
     end
 
-    context "with no versions" do
-      it "is nil" do
-        piece.versions.destroy_all
+    context "after piece is saved" do
+      context "with a current version" do
+        it "is the current_version's content" do
+          should == piece.current_version.content
+        end
+      end
 
-        should be_nil
+      context "with no current_version" do
+        let(:piece) { FactoryGirl.create :piece }
+
+        it "is default" do
+          piece.versions.delete_all
+          should be_empty
+        end
       end
     end
   end

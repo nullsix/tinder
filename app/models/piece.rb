@@ -55,7 +55,11 @@ class Piece < ActiveRecord::Base
   end
 
   def content
-    @content ||= current_version.content if !current_version.nil?
+    if @content.nil? || current_version_changed?
+      default_values
+    end
+
+    @content
   end
 
   def blurb
