@@ -375,23 +375,38 @@ describe Piece do
       let(:method) { :blurb }
     end
 
-    context "with a version" do
-      it "is the current version's blurb" do
-        should == piece.current_version.blurb
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should be_empty
       end
+
+      it_behaves_like "sets blurb"
     end
 
-    context "with no versions" do
-      it "is nil" do
-        piece.versions.destroy_all
+    context "after piece is saved" do
+      context "with a current_version" do
+        it "is the current_version's blurb at first" do
+          should == piece.current_version.blurb
+        end
 
-        should be_nil
+        it_behaves_like "sets blurb"
       end
-    end
-  end
 
+      context "with no current_version" do
+        let!(:piece) do
+          p = FactoryGirl.create :piece
+          p.versions.delete_all
+          p
+        end
 
+        it "is default" do
+          should be_empty
+        end
 
+        it_behaves_like "sets blurb"
+      end
     end
   end
 
