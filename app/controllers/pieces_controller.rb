@@ -10,7 +10,6 @@ class PiecesController < ApplicationController
 
   def new
     @piece = Piece.new
-    @version = Version.new
   end
 
   def create

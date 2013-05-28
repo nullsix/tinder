@@ -164,10 +164,6 @@ describe PiecesController, "GET new" do
       assigns(:piece).should be_a_new_record
     end
 
-    specify "@version is a new Version" do
-      assigns(:version).should be_a_new_record
-    end
-
     it "renders the #new view" do
       should render_template :new
     end
