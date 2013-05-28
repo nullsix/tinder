@@ -67,12 +67,38 @@ class Piece < ActiveRecord::Base
   end
 
   private
+    def create_first_version
+      return true unless new_record? || versions.count.zero?
+      version = versions.build
+      version = set_version version, title, content
+      version.save
+    end
+
     def check_for_new_version
       if changed?
         version = current_version.dup
         version = set_version version, title, content
         version.save
       end
+    end
+
+    def current_version_changed?
+      @current_version != versions.last && !versions.last.nil?
+    end
+
+    def default_current_version
+      @current_version = versions.last
+    end
+
+    def check_for_nil_field(field)
+      if field.nil?
+        default_values_for_new_record
+      end
+    end
+
+    def default_values_for_new_record
+      @title = "Untitled Piece" if @title.nil?
+      @content = "" if @content.nil?
     end
 
     def title_changed?
@@ -105,32 +131,6 @@ class Piece < ActiveRecord::Base
           @content = current_version.content
         end
       end
-    end
-
-    def default_values_for_new_record
-      @title = "Untitled Piece" if @title.nil?
-      @content = "" if @content.nil?
-    end
-
-    def current_version_changed?
-      @current_version != versions.last && !versions.last.nil?
-    end
-
-    def default_current_version
-      @current_version = versions.last
-    end
-
-    def check_for_nil_field(field)
-      if field.nil?
-        default_values_for_new_record
-      end
-    end
-
-    def create_first_version
-      return true unless new_record? || versions.count.zero?
-      version = versions.build
-      version = set_version version, title, content
-      version.save
     end
 
     def set_version(version, title, content)
