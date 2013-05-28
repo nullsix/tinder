@@ -23,6 +23,7 @@ class Piece < ActiveRecord::Base
 
   after_save :create_first_version
   before_update :check_for_new_version
+  after_find :default_values_for_existing_piece
 
   def current_version
     if current_version_changed?
@@ -122,14 +123,18 @@ class Piece < ActiveRecord::Base
         default_values_for_new_record
 
       else
-        if !new_record? && current_version.nil?
-          @title = "Untitled Piece"
-          @content = ""
+        default_values_for_existing_piece
+      end
+    end
 
-        else
-          @title = current_version.title
-          @content = current_version.content
-        end
+    def default_values_for_existing_piece
+      if !new_record? && current_version.nil?
+        @title = "Untitled Piece"
+        @content = ""
+
+      else
+        @title = current_version.title
+        @content = current_version.content
       end
     end
 

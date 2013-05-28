@@ -152,6 +152,10 @@ describe Piece do
   end
 
   describe "#title" do
+    let(:piece) do
+      FactoryGirl.create :piece, title: rand.to_s, content: rand.to_s
+    end
+
     subject { piece.title }
 
     it_behaves_like "instance method" do
@@ -168,6 +172,14 @@ describe Piece do
 
     context "after piece is saved" do
       context "with a current_version" do
+        context "and retrieved from DB again" do
+          it "has the current_version's title" do
+            title = piece.current_version.title
+            piece = Piece.last
+            piece.title.should == title
+          end
+        end
+
         it "is the current_version's title" do
           should == piece.current_version.title
         end
