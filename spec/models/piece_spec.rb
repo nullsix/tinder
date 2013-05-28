@@ -701,9 +701,16 @@ describe Piece do
   end
 
   describe "validations" do
-    it "must have a user" do
-      no_user_piece = FactoryGirl.build_stubbed :piece, user: nil
-      no_user_piece.should_not be_valid
+    it "is valid with a user" do
+      user = FactoryGirl.build_stubbed :user
+      piece = FactoryGirl.build_stubbed :piece, user: user
+      piece.should be_valid
+    end
+
+    it "is invalid without a user" do
+      piece = FactoryGirl.build_stubbed :piece, user: nil
+      piece.should_not be_valid
+    end
     end
   end
 
