@@ -711,6 +711,15 @@ describe Piece do
       piece = FactoryGirl.build_stubbed :piece, user: nil
       piece.should_not be_valid
     end
+
+    it "is invalid with a title longer than 255 characters" do
+      piece = FactoryGirl.build_stubbed :piece, title: "a"*300
+      piece.should_not be_valid
+    end
+
+    it "is valid with a title less than or equal to 255 characters" do
+      piece = FactoryGirl.build_stubbed :piece, title: "a"*255
+      piece.should be_valid
     end
   end
 

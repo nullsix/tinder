@@ -14,6 +14,8 @@ class Piece < ActiveRecord::Base
   belongs_to :user, inverse_of: :pieces
   validates :user, presence: true
 
+  validates :title, length: { maximum: 255 }
+
   has_many :versions, dependent: :destroy, inverse_of: :piece,
     order: "created_at ASC"
   has_many :drafts, through: :versions
