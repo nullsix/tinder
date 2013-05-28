@@ -32,7 +32,7 @@ class Piece < ActiveRecord::Base
   end
 
   def title
-    check_for_nil_field @title
+    default_values_for_empty_piece
 
     @title
   end
@@ -51,7 +51,7 @@ class Piece < ActiveRecord::Base
   end
 
   def content
-    check_for_nil_field @title
+    default_values_for_empty_piece
 
     @content
   end
@@ -90,13 +90,7 @@ class Piece < ActiveRecord::Base
       @current_version = versions.last
     end
 
-    def check_for_nil_field(field)
-      if field.nil?
-        default_values_for_new_record
-      end
-    end
-
-    def default_values_for_new_record
+    def default_values_for_empty_piece
       @title = "Untitled Piece" if @title.nil?
       @content = "" if @content.nil?
     end
@@ -115,7 +109,7 @@ class Piece < ActiveRecord::Base
 
     def default_values
       if new_record?
-        default_values_for_new_record
+        default_values_for_empty_piece
 
       else
         default_values_for_existing_piece
