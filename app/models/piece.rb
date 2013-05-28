@@ -26,9 +26,7 @@ class Piece < ActiveRecord::Base
   after_find :default_values_for_existing_piece
 
   def current_version
-    if current_version_changed?
-      default_current_version
-    end
+    default_current_version if current_version_changed?
 
     @current_version
   end
@@ -42,6 +40,7 @@ class Piece < ActiveRecord::Base
   def title=(value)
     if value.empty? #TODO: This should be blank?
       @title = "Untitled Piece"
+
     else
       @title = value
     end
@@ -103,19 +102,15 @@ class Piece < ActiveRecord::Base
     end
 
     def title_changed?
-      if current_version.nil?
-        true
-      else
-        @title != current_version.title
-      end
+      return true if current_version.nil?
+
+      @title != current_version.title
     end
 
     def content_changed?
-      if current_version.nil?
-        true
-      else 
-        @content != current_version.content
-      end
+      return true if current_version.nil?
+
+      @content != current_version.content
     end
 
     def default_values
