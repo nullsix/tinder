@@ -204,6 +204,11 @@ describe Piece do
     end
 
     shared_examples "sets title" do
+      it "uses default when nil" do
+        piece.title = nil
+        subject.should == "Untitled Piece"
+      end
+
       it "uses default when empty" do
         piece.title = ""
         subject.should == "Untitled Piece"
@@ -341,6 +346,11 @@ describe Piece do
         content = rand.to_s
         piece.content = content
         should == content
+      end
+
+      it "defaults to empty string when nil" do
+        piece.content = nil
+        should == ""
       end
 
       it "changes blurb" do
