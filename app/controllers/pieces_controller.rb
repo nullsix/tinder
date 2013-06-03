@@ -14,10 +14,10 @@ class PiecesController < ApplicationController
 
   def create
     @piece = current_user.pieces.build
-    @version = build_version params[:version]
-    @version.number = @piece.versions.count + 1
+    @piece.title = params[:piece][:title]
+    @piece.content = params[:piece][:content]
 
-    if @piece.save # @version is saved implicitly
+    if @piece.save
       redirect_to @piece, notice: "Piece was successfully created."
     else
       render action: 'new'
@@ -25,19 +25,16 @@ class PiecesController < ApplicationController
   end
 
   def edit
-    @version = @piece.current_version
   end
 
   def update
-    @piece.title = params[:version][:title]
-    @piece.content = params[:version][:content]
+    @piece.title = params[:piece][:title]
+    @piece.content = params[:piece][:content]
 
     if @piece.changed?
       if @piece.save
-        @version = @piece.current_version
         redirect_to @piece, notice: "Piece was successfully updated."
       else
-        @version = build_version params[:version]
         render action: 'edit'
       end
     else

@@ -89,18 +89,6 @@ shared_examples "assigns @piece" do
   end
 end
 
-shared_examples "assigns @version" do
-  describe "@version" do
-    it "is a Version" do
-      assigns(:version).should be_a Version
-    end
-
-    it "belongs to the piece being created" do
-      assigns(:version).piece.should eq assigns(:piece)
-    end
-  end
-end
-
 shared_examples "creates new piece" do
   it "creates a new piece" do
     expect { @valid_create.call }.to change(Piece, :count).by 1
@@ -189,75 +177,73 @@ describe PiecesController, "POST create" do
         @piece = FactoryGirl.create :piece, user: user
       end
 
-      context "with a valid version" do
-        context "with an empty title" do
-          before :each do
-            @version_attr =
-              FactoryGirl.attributes_for :version,
-                piece_id: @piece,
-                title: ""
-            @valid_create =
-              Proc.new {
-                post :create, piece: @piece_attr, version: @version_attr
-              }
-          end
-
-          it_behaves_like "creates new piece"
-
-          it "has a default title" do
-            @valid_create.call
-
-            version = Version.last
-            version.title.should match /Untitled Piece/
-          end
-        end
-
-        context "with a non-empty title" do
-          before :each do
-            @version_attr =
-              FactoryGirl.attributes_for :version, piece_id: @piece
-            @valid_create =
-              Proc.new {
-                post :create, piece: @piece_attr, version: @version_attr
-              }
-          end
-
-          it_behaves_like "creates new piece"
-        end
-      end
-
-      context "with an invalid version" do
+      context "with an empty title" do
         before :each do
-          @invalid_version_attr =
-            FactoryGirl.attributes_for :invalid_version, piece_id: @piece
-          @invalid_create =
+          @piece_attr[:title] = ""
+          @valid_create =
             Proc.new {
-              post :create, piece: @piece_attr, version: @invalid_version_attr
+              post :create, piece: @piece_attr
             }
         end
 
-        it "does not create a new piece" do
-          expect { @invalid_create.call }.to_not change Piece, :count
+        it_behaves_like "creates new piece"
+
+        it "has a default title" do
+          @valid_create.call
+
+          piece = Piece.first
+          piece.title.should match /Untitled Piece/
+        end
+      end
+
+      context "with a non-empty title" do
+        before :each do
+          @piece_attr[:title] = "Hey there"
+          @valid_create =
+            Proc.new {
+              post :create, piece: @piece_attr
+            }
+        end
+
+        it_behaves_like "creates new piece"
+
+        it "has the right title" do
+          @valid_create.call
+          Piece.first.title.should == @piece_attr[:title]
         end
         
-        it "does not create a new version" do
-          expect { @invalid_create.call }.to_not change Version, :count
-        end
-
-        context "after the call" do
+        context "that is too long" do
           before :each do
-            @invalid_create.call
+            @invalid_piece_attr = @piece_attr
+            @invalid_piece_attr[:title] = "a"*400
+            @invalid_create =
+              Proc.new do
+                post :create, piece: @invalid_piece_attr
+              end
           end
 
-          it_behaves_like "assigns @piece"
-          it_behaves_like "assigns @version"
-
-          specify "@version has an error message" do
-            assigns(:version).errors.should_not be_empty
+          it "does not create a new piece" do
+            expect { @invalid_create.call }.to_not change Piece, :count
           end
 
-          it "renders the #new view" do
-            should render_template :new
+          it "does not create a new version" do
+            expect { @invalid_create.call }.to_not change Version, :count
+          end
+
+          context "after the call" do
+            before :each do
+              @invalid_create.call
+            end
+
+            it_behaves_like "assigns @piece"
+
+            specify "@piece has an error message" do
+              assigns(:piece).errors.should_not be_empty
+            end
+
+            it "renders the #new view" do
+              should render_template :new
+            end
           end
         end
       end
@@ -312,10 +298,6 @@ describe PiecesController, "GET edit" do
       assigns(:piece).should eq first_piece
     end
 
-    it "assigns the piece's current version to @version" do
-      assigns(:version).should eq first_piece.current_version
-    end
-
     it "renders the #edit view" do
       should render_template :edit
     end
@@ -338,25 +320,21 @@ describe PiecesController, "PUT update" do
       before :each do
         @piece_attr =
           FactoryGirl.attributes_for(
-            :piece, piece_id: first_piece, user: user
+            :piece,
+            piece_id: first_piece,
+            user: user,
+            title: first_piece.title,
+            content: first_piece.content
           )
       end
 
       context "with a valid piece" do
-        context "with an unchanged version" do
+        context "that is unchanged" do
           before :each do
-            @unchanged_version_attr = 
-              FactoryGirl.attributes_for(
-                :version,
-                piece_id: first_piece,
-                title: first_piece.current_version.title,
-                content: first_piece.current_version.content
-              )
             @unchanged_update = Proc.new {
               put :update,
-                id: first_piece.id,
-                piece: @piece_attr,
-                version: @unchanged_version_attr
+                id: first_piece,
+                piece: @piece_attr
             }
           end
 
@@ -372,20 +350,21 @@ describe PiecesController, "PUT update" do
           end
         end
 
-        context "with a changed version" do
+        context "that is changed" do
           before :each do
-            @changed_version_attr =
+            @title = rand.to_s
+            @content = rand.to_s
+            @piece_attr =
               FactoryGirl.attributes_for(
-                :version,
-                piece_id: first_piece,
-                title: "I like pie.",
-                content: "La-de-da-de-da"
+                :piece,
+                id: first_piece,
+                title: @title,
+                content: @content
               )
             @changed_update = Proc.new {
               put :update,
-                id: first_piece.id,
-                piece: @piece_attr,
-                version: @changed_version_attr
+                id: first_piece,
+                piece: @piece_attr
             }
           end
 
@@ -414,14 +393,10 @@ describe PiecesController, "PUT update" do
               assigns(:piece).should eq first_piece
             end
 
-            specify "locates the requested version" do
-              assigns(:version).should eq Version.last
-            end
-
             it "creates the version with the given attributes" do
               first_piece.reload
-              first_piece.versions.last.title.should eq "I like pie."
-              first_piece.versions.last.content.should eq "La-de-da-de-da"
+              first_piece.versions.last.title.should eq @title
+              first_piece.versions.last.content.should eq @content
             end
 
             it "redirects to the piece" do
@@ -429,22 +404,47 @@ describe PiecesController, "PUT update" do
             end
           end
         end
+      end
 
-        context "with an invalid version" do
+      context "with an invalid piece" do
+        context "having a bad id" do
           before :each do
-            @invalid_version_attr =
-              FactoryGirl.attributes_for(
-                :invalid_version,
-                piece_id: first_piece,
-                content: "La-de-da-de-da"
-              )
             @invalid_update =
-              Proc.new {
+              Proc.new do
+                put :update, id: -1
+              end
+          end
+
+          it "does not create a new version" do
+            expect{
+              @invalid_update.call
+            }.not_to change(Version, :count)
+          end
+
+          it "does not create a new version" do
+            expect{ @invalid_update.call }.not_to change Version, :count
+          end
+
+          context "after the call" do
+            before :each do
+              @invalid_update.call
+            end
+
+            it "redirects properly" do
+              should redirect_to pieces_path
+            end
+          end
+        end
+
+        context "having a title too long" do
+          before :each do
+            @piece_attr[:title] = "a"*300
+            @invalid_update =
+              Proc.new do
                 put :update,
-                  id: first_piece.id,
-                  piece: @piece_attr,
-                  version: @invalid_version_attr
-              }
+                  id: first_piece,
+                  piece: @piece_attr
+              end
           end
 
           it "does not create a new version" do
@@ -460,25 +460,15 @@ describe PiecesController, "PUT update" do
               assigns(:piece).should eq first_piece
             end
 
-            it_behaves_like "assigns @version"
-
             it "does not create a Version with the attributes" do
               piece = Piece.find assigns(:piece).id
-              piece.versions.last.content.should_not eq @invalid_version_attr[:content]
+              piece.versions.last.title.should_not eq @piece_attr[:title]
             end
 
             it "re-renders the #edit view" do
               should render_template :edit
             end
           end
-        end
-      end
-
-      context "with an invalid piece" do
-        it "does not create a new version" do
-          expect{
-            put :update, id: -1
-          }.not_to change(Version, :count)
         end
       end
     end
