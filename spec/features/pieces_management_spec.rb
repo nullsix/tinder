@@ -205,7 +205,8 @@ feature "Pieces Management", "User wants to view the history of a piece" do
       background do
         user = User.last
         @piece = create_piece user
-        @versions = create_versions @piece
+
+        @versions = @piece.versions
         create_drafts @versions
 
         visit pieces_path
@@ -247,7 +248,6 @@ feature "Pieces Management", "User wants to view the history of a piece" do
       background do
         user = create_user
         @piece = create_piece user
-        @piece.versions = create_versions @piece
       end
 
       context "with no drafts" do
@@ -283,7 +283,6 @@ feature "Pieces Management", "User wants to view the history of a piece" do
     background do
       user = create_user
       @piece = create_piece user
-      create_versions @piece
     end
 
     context "with no drafts" do

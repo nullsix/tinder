@@ -8,30 +8,17 @@ module PieceHelper
     user
   end
 
-  def create_piece(user)
+  def create_piece(user, num_versions = 3)
     piece = Piece.new
     piece.user_id = user.id
-    piece.save
-    piece
-  end
 
-  def create_version(piece, title = Time.now.to_s, content = Time.now.to_s)
-    version = Version.new
-    version.piece_id = piece.id
-    version.title = title
-    version.content = content
-    version.number = piece.versions.count + 1
-    version.save
-    version
-  end
-
-  def create_versions(piece, number = 3)
-    versions = []
-    number.times do |i|
-      versions << create_version(piece, i.to_s, i.to_s)
+    num_versions.times do
+      piece.title = rand.to_s
+      piece.content = rand.to_s
+      piece.save
     end
-    versions
   end
+
 
   def create_draft(version)
     draft = Draft.new
