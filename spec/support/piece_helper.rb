@@ -63,13 +63,13 @@ module PieceHelper
   end
 
   def verify_user_sees_piece_form
-    should have_selector "#version_title"
-    should have_selector "#version_content"
+    should have_selector "#piece_title"
+    should have_selector "#piece_content"
   end
 
   def fill_in_piece_form(title, content)
-    fill_in :version_title, with: title
-    fill_in :version_content, with: content
+    fill_in :piece_title, with: title
+    fill_in :piece_content, with: content
   end
 
   def title_or_default(title)
@@ -147,8 +147,8 @@ module PieceHelper
   def expect_edit_piece_no_change
     expect {
       expect {
-        fill_in :version_title, with: @piece.current_version.title
-        fill_in :version_content, with: @piece.current_version.content
+        fill_in :piece_title, with: @piece.title
+        fill_in :piece_content, with: @piece.content
 
         click_button "Update Piece"
       }.not_to change(Version, :count)
