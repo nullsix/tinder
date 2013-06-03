@@ -2,28 +2,26 @@
 # https://devcenter.heroku.com/articles/local-postgresql#mac-os-x
 # How to migrate to postgresql, which is helpful here
 # http://railscasts.com/episodes/342-migrating-to-postgresql
-development:
+# Keeping this file DRY
+# http://whatcodecraves.com/articles/2008/02/05/setup-rails-with-postgresql
+
+common: &common
   adapter: postgresql
-  database: tinder_development
   pool: 5
   timeout: 5000
-  username: tinder
-  password: tinder1
+
+development:
+  <<: *common
+  database: tinder_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  adapter: postgresql
+  <<: *common
   database: tinder_test
-  pool: 5
-  timeout: 5000
-  username: tinder
-  password: tinder1
 
 # Do we need this?
 production:
-  adapter: postgresql
+  <<: *common
   database: tinder_production
-  pool: 5
-  timeout: 5000

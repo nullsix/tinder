@@ -44,13 +44,8 @@ Clone the repository - git://github.com/nullsix/tinder.git
 > cd tinder
 > bundle install
 
-Create a Postgres user/role
-> psql -U postgres
-> CREATE ROLE tinder CREATEDB LOGIN ENCRYPTED PASSWORD 'tinder1';
-> \q
-
-Or you can use the following tool and set the username to 'tinder' and the password to 'tinder1':
-> createuser -P
+Create a Postgres user/role for your username
+> createuser
 
 Then create the database and load the schema:
 > rake db:create
