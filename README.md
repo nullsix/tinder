@@ -1,3 +1,5 @@
+[![Code Climate](https://codeclimate.com/github/nullsix/tinder.png)](https://codeclimate.com/github/nullsix/tinder)
+
 tinder
 ======
 
