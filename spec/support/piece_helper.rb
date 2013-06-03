@@ -17,8 +17,9 @@ module PieceHelper
       piece.content = rand.to_s
       piece.save
     end
-  end
 
+    piece
+  end
 
   def create_draft(version)
     draft = Draft.new
