@@ -10,15 +10,14 @@ class PiecesController < ApplicationController
 
   def new
     @piece = Piece.new
-    @version = Version.new
   end
 
   def create
     @piece = current_user.pieces.build
+    @piece.title = params[:piece][:title]
+    @piece.content = params[:piece][:content]
 
-    @version = build_version @piece, params[:version]
-
-    if @piece.save # @version is saved implicitly
+    if @piece.save
       redirect_to @piece, notice: "Piece was successfully created."
     else
       render action: 'new'
@@ -26,23 +25,18 @@ class PiecesController < ApplicationController
   end
 
   def edit
-    @version = @piece.current_version
   end
 
   def update
-    original_version = @piece.current_version
+    @piece.title = params[:piece][:title]
+    @piece.content = params[:piece][:content]
 
-    new_version = build_version @piece, params[:version]
-
-    if version_has_changed?(original_version, new_version)
-      @version = new_version
-
+    if @piece.changed?
       if @piece.save
         redirect_to @piece, notice: "Piece was successfully updated."
       else
         render action: 'edit'
       end
-
     else
       redirect_to @piece, notice: "Piece was already saved."
     end
@@ -75,38 +69,26 @@ class PiecesController < ApplicationController
   end
 
   private
-  def get_piece
-    @piece = current_user.pieces.find params[:id]
-  
-  # The piece either doesn't exist or doesn't belong to this user.
-  rescue ActiveRecord::RecordNotFound
-    redirect_to pieces_path
-  end
-
-  def version_has_changed?(original_version, new_version)
-    title_changed = original_version.title != new_version.title
-    content_changed = original_version.content != new_version.content
-
-    title_changed || content_changed
-  end
-
-  def title_or_default(title)
-    if title.empty?
-      "Untitled Piece"
-    else
-      title
+    def get_piece
+      @piece = current_user.pieces.find params[:id]
+    
+    # The piece either doesn't exist or doesn't belong to this user.
+    rescue ActiveRecord::RecordNotFound
+      redirect_to pieces_path
     end
-  end
 
-  def build_version(piece, hash)
-    version = piece.versions.build
-    version.title = title_or_default hash[:title]
-    version.content = hash[:content]
-    version = set_version_number version
-  end
+    def title_or_default(title)
+      if title.empty?
+        "Untitled Piece"
+      else
+        title
+      end
+    end
 
-  def set_version_number(version)
-    version.number = version.piece.versions.count + 1
-    version
-  end
+    def build_version(hash)
+      @version = @piece.versions.build
+      @version.title = title_or_default hash[:title]
+      @version.content = hash[:content]
+      @version
+    end
 end

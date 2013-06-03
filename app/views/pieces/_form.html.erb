@@ -1,10 +1,11 @@
 <%= form_for @piece, class: "span12" do |piece_form| %>
-  <% if @version.errors.any? %>
+  <% errors = @piece.errors %>
+  <% if errors.any? %>
     <div class="row">
       <div id="error_explanation" class="text-error span12">
-        <h3 class="text-error"><%= pluralize(@version.errors.count, "error") %> kept us from saving your piece.</h3>
+        <h3 class="text-error"><%= pluralize(errors.count, "error") %> kept us from saving your piece.</h3>
         <ul>
-        <% @version.errors.full_messages.each do |msg| %>
+        <% errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
         <% end %>
         </ul>
@@ -12,14 +13,12 @@
     </div>
   <% end %>
 
-  <%= fields_for :version, @version do |version_fields| %>
-    <div class="row">
-      <div class="span12">
-        <%= version_fields.text_field :title, placeholder: :title, autofocus: true %>
-        <%= version_fields.text_area :content, placeholder: :content %>
-      </div>
+  <div class="row">
+    <div class="span12">
+      <%= piece_form.text_field :title, placeholder: :title, autofocus: true %>
+      <%= piece_form.text_area :content, placeholder: :content %>
     </div>
-  <% end %>
+  </div>
 
   <div><%= piece_form.submit class: "btn btn-primary" %></div>
 <% end %>

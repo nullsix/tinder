@@ -8,7 +8,6 @@ feature "Drafts Management" do
       login_with_oauth
       user = User.last
       @piece = create_piece user
-      version = create_version @piece
     end
 
     context "while not logged in" do
@@ -36,7 +35,6 @@ feature "Drafts Management" do
         scenario "it redirects to your pieces_path" do
           otherbob = create_user "otherbob"
           otherpiece = create_piece(otherbob)
-          otherversion = create_version(otherpiece)
           @piece = otherpiece
           visit piece_path @piece
 
@@ -49,17 +47,15 @@ feature "Drafts Management" do
   context "viewing a draft" do
     background do
       login_with_oauth
-      user = User.last
-      @piece = create_piece user
-      version = create_version @piece
-      @draft = create_draft version
+      @user = User.last
+      @piece = create_piece @user, 1
+      @draft = create_draft @piece.versions.last
     end
 
     context "while not logged in" do
       background do
         logout
-        visit piece_draft_path piece_id: @piece,
-          id: @draft.number
+        visit piece_draft_path piece_id: @piece, id: @draft.number
       end
 
       it_behaves_like "no piece bar"
@@ -79,9 +75,8 @@ feature "Drafts Management" do
 
         context "with three versions" do
           background do
-            v2 = create_version @piece
-            v3 = create_version @piece
-            @draft = create_draft v3
+            @piece = create_piece @user
+            @draft = create_draft @piece.versions.last
             visit piece_draft_path piece_id: @piece,
               id: @draft.number
           end
@@ -94,8 +89,7 @@ feature "Drafts Management" do
         background do
           nonowner = create_user "nonowner"
           @piece = create_piece nonowner
-          version = create_version @piece
-          @draft = create_draft version
+          @draft = create_draft @piece.versions.last
           visit piece_draft_path piece_id: @piece,
             id: @draft.number
         end

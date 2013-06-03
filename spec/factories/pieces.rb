@@ -7,11 +7,22 @@ FactoryGirl.define do
     user { FactoryGirl.build_stubbed :user }
 
     before :stub do |piece, evaluator|
-      FactoryGirl.stub_list :version, evaluator.versions_count, piece: piece
+      if !evaluator.versions_count.zero?
+        FactoryGirl.stub_list :version, evaluator.versions_count, piece: piece
+      end
     end
 
-    before :build, :create do |piece, evaluator|
-      FactoryGirl.create_list :version, evaluator.versions_count, piece: piece
+    after :create do |piece, evaluator|
+      if evaluator.versions_count.zero?
+        piece.versions.delete_all
+      else
+        FactoryGirl.create_list :version,
+          evaluator.versions_count-1, piece: piece
+      end
+    end
+
+    before :build do |piece, evaluator|
+      FactoryGirl.build_list :version, evaluator.versions_count, piece: piece
     end
 
   end

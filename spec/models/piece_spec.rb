@@ -10,148 +10,726 @@
 
 require 'spec_helper'
 
+shared_examples "instance method" do
+  subject { piece }
+
+  it "exists" do
+    should respond_to method
+  end
+end
+
 describe Piece do
   it "has a valid factory" do
     FactoryGirl.build_stubbed(:piece).should be_valid
   end
-  
-  context "with a piece" do
-    before :each do
-      @versions_count = 2
-      @piece = FactoryGirl.build_stubbed :piece, versions_count: @versions_count
+
+  let(:piece) { FactoryGirl.create :piece }
+
+  subject { piece }
+
+  describe "#user" do
+    subject { piece.user }
+
+    it_behaves_like "instance method" do
+      let(:method) { :user }
     end
 
-    describe "instance methods" do
-      subject { @piece }
+    it "is" do
+      should be
+    end
+  end
 
-      methods = [ :versions, :current_version, :title, :content,
-                  :blurb, :short_title, :drafts ]
-      methods.each do |m|
-        it "responds to ##{m}" do
-          should respond_to m
+  describe "#versions" do
+    it_behaves_like "instance method" do
+      let(:method) { :versions }
+    end
+
+    subject { piece.versions }
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece }
+
+      it "has no versions" do
+        should be_empty
+      end
+    end
+
+    context "after piece is saved" do
+      let(:versions_count) { 5 }
+      let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+      it "is not empty" do
+        should_not be_empty
+      end
+
+      it "returns the correct number of versions" do
+        subject.count.should == versions_count
+      end
+
+      it "is in the right order" do
+        expected_order = piece.versions.sort_by(&:created_at)
+        should == expected_order
+      end
+    end
+  end
+
+  describe "#drafts" do
+    it_behaves_like "instance method" do
+      let(:method) { :drafts }
+    end
+
+    subject { piece.drafts }
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece }
+
+      it "has no drafts" do
+        should be_empty
+      end
+    end
+
+    context "after piece is saved" do
+      let(:versions_count) { 5 }
+      let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+      context "with no drafts" do
+        it "has no drafts" do
+          should be_empty
         end
       end
 
-      context "with a saved piece" do
+      context "with drafts" do
+        let!(:drafts) do
+            d = []
+            piece.versions.each do |v|
+              d << create_draft(v)
+            end
+            d
+        end
+
+        it "is not empty" do
+          should_not be_empty
+        end
+
+        it "has all the drafts" do
+          should == drafts
+        end
+      end
+    end
+  end
+
+  describe "#current_version" do
+    it_behaves_like "instance method" do
+      let(:method) { :current_version }
+    end
+
+    subject { piece.current_version }
+
+    context "with multiple versions" do
+      it "is the last item in #versions" do
+        should == piece.versions.last
+      end
+
+      context "after current_version is deleted" do
+        let(:versions_count) { 2 }
+        let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+        it "current_version is set to the next to last version" do
+          expected_current_version = piece.versions[versions_count-1]
+          subject.delete
+          should == expected_current_version
+        end
+      end
+    end
+
+    context "with no versions" do
+      subject { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is nil" do
+        subject.current_version.should be_nil
+      end
+    end
+  end
+
+  describe "#title" do
+    let(:piece) do
+      FactoryGirl.create :piece, title: rand.to_s, content: rand.to_s
+    end
+
+    subject { piece.title }
+
+    it_behaves_like "instance method" do
+      let(:method) { :title }
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should == "Untitled Piece"
+      end
+    end
+
+    context "after piece is saved" do
+      context "with a current_version" do
+        context "and retrieved from DB again" do
+          it "has the current_version's title" do
+            title = piece.current_version.title
+            piece = Piece.last
+            piece.title.should == title
+          end
+        end
+
+        it "is the current_version's title" do
+          should == piece.current_version.title
+        end
+      end
+
+      context "with no current_version" do
+        let(:piece) { FactoryGirl.create :piece }
+
+        it "is default" do
+          piece.versions.delete_all
+          should == "Untitled Piece"
+        end
+      end
+    end
+  end
+
+  describe "#title=" do
+    subject { piece.title }
+
+    it_behaves_like "instance method" do
+      let(:method) { :title= }
+    end
+
+    shared_examples "sets title" do
+      it "uses default when nil" do
+        piece.title = nil
+        subject.should == "Untitled Piece"
+      end
+
+      it "uses default when empty" do
+        piece.title = ""
+        subject.should == "Untitled Piece"
+      end
+
+      it "changes title" do
+        title = rand.to_s
+        piece.title = title
+        should == title
+      end
+
+      # Or should this be in the short_title tests?
+      it "changes short_title" do
+        title = "a"*100
+        piece.title = title
+        piece.short_title.should == "a"*27+"..."
+      end
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it_behaves_like "sets title"
+    end
+
+    context "after piece is saved" do
+      let(:piece) { FactoryGirl.create :piece }
+
+      it_behaves_like "sets title"
+    end
+  end
+
+  shared_examples "sets short_title" do
+    context "when title is changed" do
+      context "with a title more than 30 characters" do
+        it "is shortened" do
+          piece.title = "a"*50
+          should == "a"*27+"..."
+        end
+      end
+
+      context "with a title no more than 30 characters" do
+        it "is the title" do
+          piece.title = "a"*30
+          should == piece.title
+        end
+      end
+    end
+  end
+
+  describe "#short_title" do
+    subject { piece.short_title }
+
+    it_behaves_like "instance method" do
+      let(:method) { :short_title }
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should == piece.title
+      end
+
+      it_behaves_like "sets short_title"
+    end
+
+    context "after piece is saved" do
+      context "with a current_version" do
+        it "is the current_version's short_title at first" do
+          should == piece.current_version.short_title
+        end
+
+        it_behaves_like "sets short_title"
+      end
+
+      context "with no current_version" do
+        let!(:piece) do
+          p = FactoryGirl.create :piece
+          p.versions.delete_all
+          p
+        end
+
+        it "is default" do
+          should == piece.title
+        end
+
+        it_behaves_like "sets short_title"
+      end
+    end
+  end
+
+  describe "#content" do
+    subject { piece.content }
+
+    it_behaves_like "instance method" do
+      let(:method) { :content }
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should be_empty
+      end
+    end
+
+    context "after piece is saved" do
+      context "with a current version" do
+        it "is the current_version's content" do
+          should == piece.current_version.content
+        end
+      end
+
+      context "with no current_version" do
+        let(:piece) { FactoryGirl.create :piece }
+
+        it "is default" do
+          piece.versions.delete_all
+          should be_empty
+        end
+      end
+    end
+  end
+
+  describe "#content=" do
+    subject { piece.content }
+
+    it_behaves_like "instance method" do
+      let(:method) { :content= }
+    end
+
+    shared_examples "sets content" do
+      it "changes content" do
+        content = rand.to_s
+        piece.content = content
+        should == content
+      end
+
+      it "defaults to empty string when nil" do
+        piece.content = nil
+        should == ""
+      end
+
+      it "changes blurb" do
+        content = "a"*100
+        piece.content = content
+        piece.blurb.should == "a"*47+"..."
+      end
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it_behaves_like "sets content"
+    end
+
+    context "after piece is saved" do
+      let(:piece) { FactoryGirl.create :piece }
+
+      it_behaves_like "sets content"
+    end
+  end
+
+  shared_examples "sets blurb" do
+    context "when content is changed" do
+      context "with a title more than 50 characters" do
+        it "is shortened" do
+          piece.content = "a"*100
+          should == "a"*47+"..."
+        end
+      end
+
+      context "with a content no more than 50 characters" do
+        it "is the content" do
+          piece.content = "a"*50
+          should == piece.content
+        end
+      end
+    end
+  end
+
+  describe "#blurb" do
+    subject { piece.blurb }
+
+    it_behaves_like "instance method" do
+      let(:method) { :blurb }
+    end
+
+    context "before piece is saved" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+
+      it "is default" do
+        should be_empty
+      end
+
+      it_behaves_like "sets blurb"
+    end
+
+    context "after piece is saved" do
+      context "with a current_version" do
+        it "is the current_version's blurb at first" do
+          should == piece.current_version.blurb
+        end
+
+        it_behaves_like "sets blurb"
+      end
+
+      context "with no current_version" do
+        let!(:piece) do
+          p = FactoryGirl.create :piece
+          p.versions.delete_all
+          p
+        end
+
+        it "is default" do
+          should be_empty
+        end
+
+        it_behaves_like "sets blurb"
+      end
+    end
+  end
+
+  describe "#changed?" do
+    subject { piece.changed? }
+    
+    it_behaves_like "instance method" do
+      let(:method) { :changed? }
+    end
+
+    context "with no changes" do
+      it "is false" do
+        should be_false
+      end
+    end
+
+    context "with title changed" do
+      it "is true" do
+        piece.title = rand.to_s
+        should be_true
+      end
+    end
+
+    context "with content changed" do
+      it "is true" do
+        piece.content = rand.to_s
+        should be_true
+      end
+    end
+
+    context "with title and content changed" do
+      it "is true" do
+        piece.title = rand.to_s
+        piece.content = rand.to_s
+        should be_true
+      end
+    end
+  end
+
+  describe "versioning" do
+    context "with a new piece" do
+      let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
+      subject { piece }
+
+      specify "title is default" do
+        subject.title.should == "Untitled Piece"
+      end
+
+      it "content is empty" do
+        subject.content.should be_empty
+      end
+
+      it "can be assigned a new title" do
+        s = rand.to_s
+        piece.title = s
+        subject.title.should == s
+      end
+
+      it "can be assigned a new content" do
+        s = rand.to_s
+        piece.content = s
+        subject.content.should == s
+      end
+
+      it "has no current_version" do
+        subject.current_version.should be_nil
+      end
+
+      context "when saved" do
+        let(:title) { rand.to_s }
+
+        let(:content) { rand.to_s }
+
+        let(:piece) do
+          FactoryGirl.build :piece, versions_count: 0, title: title, content: content
+        end
+
+        it "creates a version" do
+          expect { piece.save }.to change(piece.versions, :count).by 1
+        end
+
+        specify "current_version is set" do
+          piece.save
+          piece.current_version.should be
+        end
+
+        specify "title is correct" do
+          piece.save
+          subject.title.should == title
+        end
+
+        specify "content is correct" do
+          piece.save
+          subject.content.should == content
+        end
+      end
+    end
+
+    shared_examples "modifying the piece" do
+      it "creates a new version" do
+        expect { piece.save }.to change(piece.versions, :count).by 1
+      end
+
+      specify "new version's number is correct" do
+        expected_number = piece.versions.count + 1
+        piece.save
+        subject.current_version.number.should == expected_number
+      end
+
+      specify "new version is the piece's current version" do
+        piece.save
+        subject.current_version.should == Version.last
+      end
+    end
+
+    context "with a saved piece" do
+      let(:piece) do
+        FactoryGirl.create :piece, title: rand.to_s, content: rand.to_s
+      end
+
+      subject { piece }
+
+      context "when title changes" do
         before :each do
-          @piece = FactoryGirl.create :piece, versions_count: @versions_count 
+          @new_title = rand.to_s
+          @content = piece.content
+          subject.title = @new_title
         end
 
-        subject { @piece }
+        include_examples "modifying the piece"
 
-        it "has the correct number of versions" do
-          subject.versions.length.should == @versions_count
-        end
-
-        it "has a #current_version is the last item in #versions" do
-          subject.current_version.should == subject.versions.last
-        end
-
-        specify "#title gives the current version's title" do
-          subject.title.should == subject.current_version.title
-        end
-
-        specify "#content gives the current version's content" do
-          subject.content.should == subject.current_version.content
-        end
-
-        specify "#blurb gives the current version's content" do
-          subject.blurb.should == subject.current_version.blurb
-        end
-
-        specify "#short_title gives the current version's short title" do
-          subject.short_title == subject.current_version.short_title
-        end
-
-        context "with a draft" do
+        context "after the save" do
           before :each do
-            @version = @piece.versions.first
-            @draft = FactoryGirl.create :draft, version: @version
+            piece.save
           end
 
-          subject { @piece }
+          it "has the new title" do
+            subject.title.should == @new_title
+          end
 
-          it "has one draft" do
-            subject.drafts == [@draft]
+          it "has the old content" do
+            subject.content.should == @content
+          end
+
+          specify "#current_version has the new title" do
+            subject.current_version.title.should == @new_title
+          end
+
+          specify "#current_version had the old content" do
+            subject.current_version.content.should == @content
+          end
+
+          specify "new version's title is the new title" do
+            version = Version.last
+            version.title.should == @new_title
+          end
+
+          specify "new version's content is the old content" do
+            version = Version.last
+            version.content.should == @content
+          end
+
+          specify "#blurb is the current_version's blurb" do
+            subject.blurb.should == subject.current_version.blurb
+          end
+
+          specify "#short_title is the current_version's short_title" do
+            subject.short_title.should == subject.current_version.short_title
           end
         end
       end
 
-      context "with a piece with no versions" do
+      context "when content changes" do
         before :each do
-          @no_versions_piece = FactoryGirl.create :piece, versions_count: 0
+          @new_content = rand.to_s
+          @title = piece.title
+          piece.content = @new_content
         end
 
-        subject { @no_versions_piece }
+        include_examples "modifying the piece"
 
-        specify "#versions is empty" do
-          subject.versions.should be_empty
+        context "after the save" do
+          before :each do
+            piece.save
+          end
+
+          it "has the new content" do
+            piece.content.should == @new_content
+          end
+
+          it "has the old title" do
+            piece.title.should == @title
+          end
+
+          specify "#current_version has the new content" do
+            subject.current_version.content.should == @new_content
+          end
+
+          specify "#current_version had the old title" do
+            subject.current_version.title.should == @title
+          end
+
+          specify "new version's content is the new content" do
+            version = Version.last
+            version.content.should == @new_content
+          end
+
+          specify "new version's title is the old title" do
+            version = Version.last
+            version.title.should == @title
+          end
+
+          specify "#blurb is the current_version's blurb" do
+            subject.blurb.should == subject.current_version.blurb
+          end
+
+          specify "#short_title is the current_version's short_title" do
+            subject.short_title.should == subject.current_version.short_title
+          end
+        end
+      end
+
+      context "when the title and content change" do
+        # ditto as above
+        before :each do
+          @new_title = rand.to_s
+          @new_content = rand.to_s
+
+          @title = piece.title
+          @content = piece.content
+
+          piece.title = @new_title
+          piece.content = @new_content
         end
 
-        specify "#drafts is empty" do
-          subject.drafts.should be_empty
-        end
+        include_examples "modifying the piece"
 
-        specify "#title is nil" do
-          subject.title.should be_nil
-        end
+        context "after the save" do
+          before :each do
+            piece.save
+          end
 
-        specify "#content is nil" do
-          subject.content.should be_nil
-        end
+          it "has the new title" do
+            piece.title.should == @new_title
+          end
 
-        specify "#blurb is nil" do
-          subject.blurb.should be_nil
-        end
+          it "has the new content" do
+            piece.content.should == @new_content
+          end
 
-        specify "#short_title is nil" do
-          subject.short_title.should be_nil
+          specify "#current_version has the new title" do
+            subject.current_version.title.should == @new_title
+          end
+
+          specify "#current_version had the new content" do
+            subject.current_version.content.should == @new_content
+          end
+
+          specify "new version's title is the new title" do
+            version = Version.last
+            version.title.should == @new_title
+          end
+
+          specify "new version's content is the old content" do
+            version = Version.last
+            version.content.should == @new_content
+          end
+
+          specify "#blurb is the current_version's blurb" do
+            subject.blurb.should == subject.current_version.blurb
+          end
+
+          specify "#short_title is the current_version's short_title" do
+            subject.short_title.should == subject.current_version.short_title
+          end
         end
       end
     end
+  end
 
-    it "has a user" do
-      @piece.user.should_not be_nil
+  describe "validations" do
+    it "is valid with a user" do
+      user = FactoryGirl.build_stubbed :user
+      piece = FactoryGirl.build_stubbed :piece, user: user
+      piece.should be_valid
     end
 
-    it "is not valid without a user" do
-      no_user_piece = FactoryGirl.build_stubbed :piece, user: nil
-      no_user_piece.should_not be_valid
+    it "is invalid without a user" do
+      piece = FactoryGirl.build_stubbed :piece, user: nil
+      piece.should_not be_valid
     end
 
-    describe "creating a new version" do
-      it "increases the size of the versions collection by 1" do
-        piece = FactoryGirl.create :piece
-        expect do
-          FactoryGirl.create :version, piece: piece
-          piece.reload
-        end.to change{ piece.versions.length }.by 1
-      end
+    it "is invalid with a title longer than 255 characters" do
+      piece = FactoryGirl.build_stubbed :piece, title: "a"*300
+      piece.should_not be_valid
     end
 
-    describe "a new version" do
-      before :each do
-        @piece = FactoryGirl.create :piece
-        @new_version = FactoryGirl.create :version, piece: @piece
-      end
-
-      it "saves the new version" do
-        @new_version.should_not be_a_new_record
-      end
-
-      it "has piece as its piece" do
-        @new_version.piece.should == @piece
-      end
-
-      it "adds the new version to the versions collection" do
-        @piece.versions.should include @new_version
-      end
-
-      it "sets the new version as the current version" do
-        piece = FactoryGirl.create :piece
-        new_version = FactoryGirl.create :version, piece: piece
-        piece.current_version.should == new_version
-      end
+    it "is valid with a title less than or equal to 255 characters" do
+      piece = FactoryGirl.build_stubbed :piece, title: "a"*255
+      piece.should be_valid
     end
   end
 

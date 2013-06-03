@@ -93,8 +93,7 @@ describe DraftsController, "GET index" do
   before :each do
     user = create_user
     @piece = create_piece user
-    @version = create_version @piece
-    @draft = create_draft @version
+    @draft = create_draft @piece.versions.last
     get :index, piece_id: @piece.id, id: @draft.number
   end
 

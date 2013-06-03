@@ -2,12 +2,14 @@ feature "Versions Management" do
   before :each do
     login_with_oauth
 
-    @piece = FactoryGirl.create :piece, user_id: User.last.id, versions_count: 0
-
-    @versions = []
+    @piece = FactoryGirl.build :piece, user_id: User.last.id
     5.times do |i|
-      @versions << FactoryGirl.create(:version, piece_id: @piece.id, title: i.to_s, content: i.to_s, number: (i+1).to_s)
+      @piece.title = i.to_s
+      @piece.content = i.to_s
+      @piece.save
     end
+
+    @versions = @piece.versions
   end
 
   subject { page }
