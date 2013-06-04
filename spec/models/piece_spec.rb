@@ -552,6 +552,14 @@ describe Piece do
 
       subject { piece }
 
+      shared_examples "piece updated_at changed" do
+        it "changes #updated_at" do
+          original_time = piece.updated_at
+          piece.save
+          piece.updated_at.should_not == original_time
+        end
+      end
+
       context "when title changes" do
         before :each do
           @new_title = rand.to_s
@@ -560,6 +568,8 @@ describe Piece do
         end
 
         include_examples "modifying the piece"
+
+        include_examples "piece updated_at changed"
 
         context "after the save" do
           before :each do
@@ -610,6 +620,8 @@ describe Piece do
         end
 
         include_examples "modifying the piece"
+
+        include_examples "piece updated_at changed"
 
         context "after the save" do
           before :each do
@@ -666,6 +678,8 @@ describe Piece do
         end
 
         include_examples "modifying the piece"
+
+        include_examples "piece updated_at changed"
 
         context "after the save" do
           before :each do

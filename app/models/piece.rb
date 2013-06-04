@@ -81,6 +81,7 @@ class Piece < ActiveRecord::Base
         version = current_version.dup
         version = set_version version, title, content
         version.save
+        self.touch
       end
     end
 
