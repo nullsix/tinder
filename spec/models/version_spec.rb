@@ -13,47 +13,107 @@
 
 require 'spec_helper'
 
+shared_examples "is a string" do
+  it { should be_a String }
+end
+
 describe Version do
 
   it "has a valid factory" do
     FactoryGirl.build_stubbed(:version).should be_valid
   end
-  
-  before :each do
-    @version = FactoryGirl.build_stubbed :version
+
+  let(:piece) { FactoryGirl.create :piece }
+  let(:version) { FactoryGirl.create :version, piece: piece }
+
+  subject { version }
+
+  describe "#piece" do
+    subject { version.piece }
+
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :piece }
+    end
+
+    it { should be_a Piece }
   end
 
-  subject { @version }
+  describe "#draft" do
+    subject { version.draft }
 
-  describe "instance methods" do
-    [ :title, :content, :piece, :blurb,
-      :short_title, :number, :draft ].each do |m|
-      it { should respond_to m }
-    end
-
-    [ :title, :content, :blurb, :short_title ].each do |m|
-      describe "##{m}" do
-        subject { @version.send m }
-
-        it { should be_a String }
-      end
-    end
-
-    describe "#piece" do
-      subject { @version.piece }
-      it { should be_a Piece }
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :draft }
     end
 
     context "with a draft" do
-      describe "#draft" do
-        it "is a Draft" do
-          draft = Draft.new
-          draft.version_id = @version.id
-          draft.number = 1
-          draft.save
-          @version.draft.should == draft
-        end
+      it "is a draft" do
+        draft = Draft.new
+        draft.version = version
+        draft.number = 1
+        draft.save
+        version.draft.should == draft
       end
+    end
+
+    context "with no draft" do
+      it "is nil" do
+        version.draft.should be_nil
+      end
+    end
+  end
+
+  describe "#title" do
+    subject { version.title}
+
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :title }
+    end
+
+    it { should be_a String }
+  end
+
+  describe "#short_title" do
+    subject { version.short_title}
+
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :short_title }
+    end
+
+    it { should be_a String }
+  end
+
+  describe "#content" do
+    subject { version.content}
+
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :content }
+    end
+
+    it { should be_a String }
+  end
+
+  describe "#blurb" do
+    subject { version.blurb}
+
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :blurb }
+    end
+
+    it { should be_a String }
+  end
+
+  describe "#number" do
+    subject { version.number}
+
+    it_behaves_like "instance method" do
+      let(:instance) { version }
+      let(:method) { :number }
     end
   end
 
