@@ -18,17 +18,36 @@ describe User do
     FactoryGirl.build_stubbed(:user).should be_valid
   end
 
-  describe "instance methods" do
-    before :each do
-      @user = build_stubbed :user
+  let(:user) { FactoryGirl.build_stubbed :user }
+
+  subject { user }
+
+  describe "#name" do
+    it_behaves_like "instance method" do
+      let(:instance) { user }
+      let(:method) { :name }
     end
+  end
 
-    subject { @user }
+  describe "#pieces" do
+    it_behaves_like "instance method" do
+      let(:instance) { user }
+      let(:method) { :pieces }
+    end
+  end
 
-    it { should respond_to :name }
-    it { should respond_to :pieces }
-    it { should respond_to :provider }
-    it { should respond_to :uid }
+  describe "#provider" do
+    it_behaves_like "instance method" do
+      let(:instance) { user }
+      let(:method) { :provider }
+    end
+  end
+
+  describe "#uid" do
+    it_behaves_like "instance method" do
+      let(:instance) { user }
+      let(:method) { :uid }
+    end
   end
 
   describe "::create_with_omniauth" do

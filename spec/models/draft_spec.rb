@@ -15,29 +15,41 @@ describe Draft do
   it "has a valid factory" do
     FactoryGirl.build_stubbed(:draft).should be_valid
   end
-  
-  describe "instance methods" do 
-    methods = [ :version, :piece, :number ]
-    methods.each do |m|
-      it "responds to #{m}" do
-        should respond_to m
-      end
+
+  let(:draft) { FactoryGirl.build_stubbed :draft }
+
+  subject { draft }
+
+  describe "#version" do
+    it_behaves_like "instance method" do
+      let(:instance) { draft }
+      let(:method) { :version }
     end
-    
-    context "with a draft" do
-      subject { FactoryGirl.build_stubbed :draft }
 
-      specify do
-        subject.version.should be_a Version
-      end
+    specify do
+      subject.version.should be_a Version
+    end
+  end
 
-      specify do
-        subject.number.should be_an Integer
-      end
+  describe "#number" do
+    it_behaves_like "instance method" do
+      let(:instance) { draft }
+      let(:method) { :number }
+    end
 
-      specify do
-        subject.piece.should be_a Piece
-      end
+    specify do
+      subject.number.should be_an Integer
+    end
+  end
+
+  describe "#piece" do
+    it_behaves_like "instance method" do
+      let(:instance) { draft }
+      let(:method) { :piece }
+    end
+
+    specify do
+      subject.piece.should be_a Piece
     end
   end
 end

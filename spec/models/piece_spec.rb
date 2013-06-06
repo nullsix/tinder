@@ -10,14 +10,6 @@
 
 require 'spec_helper'
 
-shared_examples "instance method" do
-  subject { piece }
-
-  it "exists" do
-    should respond_to method
-  end
-end
-
 describe Piece do
   it "has a valid factory" do
     FactoryGirl.build_stubbed(:piece).should be_valid
@@ -31,6 +23,7 @@ describe Piece do
     subject { piece.user }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :user }
     end
 
@@ -41,6 +34,7 @@ describe Piece do
 
   describe "#versions" do
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :versions }
     end
 
@@ -75,6 +69,7 @@ describe Piece do
 
   describe "#drafts" do
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :drafts }
     end
 
@@ -120,6 +115,7 @@ describe Piece do
 
   describe "#current_version" do
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :current_version }
     end
 
@@ -159,6 +155,7 @@ describe Piece do
     subject { piece.title }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :title }
     end
 
@@ -200,6 +197,7 @@ describe Piece do
     subject { piece.title }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :title= }
     end
 
@@ -263,6 +261,7 @@ describe Piece do
     subject { piece.short_title }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :short_title }
     end
 
@@ -305,6 +304,7 @@ describe Piece do
     subject { piece.content }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :content }
     end
 
@@ -338,6 +338,7 @@ describe Piece do
     subject { piece.content }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :content= }
     end
 
@@ -395,6 +396,7 @@ describe Piece do
     subject { piece.blurb }
 
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :blurb }
     end
 
@@ -437,6 +439,7 @@ describe Piece do
     subject { piece.changed? }
     
     it_behaves_like "instance method" do
+      let(:instance) { piece }
       let(:method) { :changed? }
     end
 
