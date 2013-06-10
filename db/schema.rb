@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130321133545) do
+ActiveRecord::Schema.define(:version => 20130610144228) do
 
   create_table "drafts", :force => true do |t|
     t.integer  "number"
@@ -19,6 +19,8 @@ ActiveRecord::Schema.define(:version => 20130321133545) do
     t.datetime "updated_at", :null => false
     t.integer  "version_id"
   end
+
+  add_index "drafts", ["number"], :name => "index_drafts_on_number"
 
   create_table "pieces", :force => true do |t|
     t.datetime "created_at", :null => false
@@ -42,5 +44,7 @@ ActiveRecord::Schema.define(:version => 20130321133545) do
     t.integer  "piece_id"
     t.integer  "number"
   end
+
+  add_index "versions", ["number"], :name => "index_versions_on_number"
 
 end
