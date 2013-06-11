@@ -28,9 +28,7 @@ class Piece < ActiveRecord::Base
   after_find :default_values_for_existing_piece
 
   def current_version
-    default_current_version if current_version_changed?
-
-    @current_version
+    versions.last
   end
 
   def title
@@ -83,10 +81,6 @@ class Piece < ActiveRecord::Base
         version.save
         self.touch
       end
-    end
-
-    def current_version_changed?
-      @current_version != versions.last && !versions.last.nil?
     end
 
     def default_current_version
