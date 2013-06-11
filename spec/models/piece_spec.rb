@@ -537,7 +537,7 @@ describe Piece do
       end
 
       specify "new version's number is correct" do
-        expected_number = piece.versions.count + 1
+        expected_number = piece.versions.last.number + 1
         piece.save
         subject.current_version.number.should == expected_number
       end
@@ -560,6 +560,20 @@ describe Piece do
           original_time = piece.updated_at
           piece.save
           piece.updated_at.should_not == original_time
+        end
+      end
+
+      context "with the first version deleted" do
+        specify "new version has the right number" do
+          piece.save
+          piece.title = rand.to_s
+          piece.save
+          piece.versions.first.delete
+          piece.title = rand.to_s
+          piece.save
+          expected_number = 3
+
+          piece.current_version.number.should == expected_number
         end
       end
 

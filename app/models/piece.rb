@@ -70,14 +70,18 @@ class Piece < ActiveRecord::Base
     def create_first_version
       return true unless new_record? || versions.count.zero?
       version = versions.build
-      version = set_version version, title, content
+      version.title = title
+      version.content = content
+      version.number = 1
       version.save
     end
 
     def check_for_new_version
       if changed?
         version = current_version.dup
-        version = set_version version, title, content
+        version.title = title
+        version.content = content
+        version.number = current_version.number + 1
         version.save
         self.touch
       end
@@ -122,12 +126,5 @@ class Piece < ActiveRecord::Base
         @title = current_version.title
         @content = current_version.content
       end
-    end
-
-    def set_version(version, title, content)
-      version.title = title
-      version.content = content
-      version.number = versions.count + 1
-      version
     end
 end
