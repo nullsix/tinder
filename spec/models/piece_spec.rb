@@ -472,6 +472,43 @@ describe Piece do
     end
   end
 
+  describe "#create_draft" do
+    let(:versions_count) { 5 }
+    let(:piece) { FactoryGirl.create :piece, versions_count: versions_count }
+
+    it "creates a draft" do
+      piece.create_draft
+      piece.drafts.should_not be_empty
+    end
+
+    specify "draft.number is correct" do
+      # the number is not based on the collection size
+      piece.versions[1..versions_count-1].each do |v|
+        piece.create_draft v
+      end
+    
+      piece.create_draft
+      piece.drafts.last.number.should == versions_count
+    end
+
+    it "defaults to current_version" do
+      piece.create_draft
+      piece.drafts.first.version.should == piece.current_version
+    end
+
+    it "doesn't create a duplicate draft" do
+      piece.create_draft
+      piece.create_draft
+      piece.drafts.count.should_not > 1
+    end
+
+    it "allows you to specify a version" do
+      version = piece.versions.first
+      piece.create_draft version
+      piece.drafts.first.version.should == version
+    end
+  end
+
   describe "versioning" do
     context "with a new piece" do
       let(:piece) { FactoryGirl.build :piece, versions_count: 0 }
@@ -537,7 +574,7 @@ describe Piece do
       end
 
       specify "new version's number is correct" do
-        expected_number = piece.versions.count + 1
+        expected_number = piece.versions.last.number + 1
         piece.save
         subject.current_version.number.should == expected_number
       end
@@ -560,6 +597,20 @@ describe Piece do
           original_time = piece.updated_at
           piece.save
           piece.updated_at.should_not == original_time
+        end
+      end
+
+      context "with the first version deleted" do
+        specify "new version has the right number" do
+          piece.save
+          piece.title = rand.to_s
+          piece.save
+          piece.versions.first.delete
+          piece.title = rand.to_s
+          piece.save
+          expected_number = 3
+
+          piece.current_version.number.should == expected_number
         end
       end
 

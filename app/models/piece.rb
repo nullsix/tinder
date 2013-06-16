@@ -28,9 +28,7 @@ class Piece < ActiveRecord::Base
   after_find :default_values_for_existing_piece
 
   def current_version
-    default_current_version if current_version_changed?
-
-    @current_version
+    versions.last
   end
 
   def title
@@ -67,26 +65,41 @@ class Piece < ActiveRecord::Base
   def changed?
     title_changed? || content_changed?
   end
+  
+  def create_draft(version = current_version)
+    return false if version.draft
+
+    draft = Draft.new
+    draft.version = version
+
+    if drafts.empty?
+      draft.number = 1
+    else
+      draft.number = drafts.last.number + 1
+    end
+
+    return draft.save
+  end
 
   private
     def create_first_version
       return true unless new_record? || versions.count.zero?
       version = versions.build
-      version = set_version version, title, content
+      version.title = title
+      version.content = content
+      version.number = 1
       version.save
     end
 
     def check_for_new_version
       if changed?
         version = current_version.dup
-        version = set_version version, title, content
+        version.title = title
+        version.content = content
+        version.number = current_version.number + 1
         version.save
         self.touch
       end
-    end
-
-    def current_version_changed?
-      @current_version != versions.last && !versions.last.nil?
     end
 
     def default_current_version
@@ -128,12 +141,5 @@ class Piece < ActiveRecord::Base
         @title = current_version.title
         @content = current_version.content
       end
-    end
-
-    def set_version(version, title, content)
-      version.title = title
-      version.content = content
-      version.number = versions.count + 1
-      version
     end
 end
