@@ -65,6 +65,21 @@ class Piece < ActiveRecord::Base
   def changed?
     title_changed? || content_changed?
   end
+  
+  def create_draft(version = current_version)
+    return false if version.draft
+
+    draft = Draft.new
+    draft.version = version
+
+    if drafts.empty?
+      draft.number = 1
+    else
+      draft.number = drafts.last.number + 1
+    end
+
+    return draft.save
+  end
 
   private
     def create_first_version
