@@ -2,6 +2,7 @@ require 'rubygems'
 require 'spork'
 require 'database_cleaner'
 require 'coveralls'
+Coveralls.wear! 'rails'
 #uncomment the following line to use spork with the debugger
 #require 'spork/ext/ruby-debug'
 
@@ -105,5 +106,4 @@ end
 
 Spork.each_run do
   # This code will be run each time you run your specs.
-  Coveralls.wear! 'rails'
 end
