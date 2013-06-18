@@ -55,6 +55,8 @@ group :test do
   gem 'rb-notifu',  '~> 0.0.4', require: false
 end
 
+gem 'coveralls', require: false
+
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
