@@ -1,4 +1,5 @@
 [![Code Climate](https://codeclimate.com/github/nullsix/tinder.png)](https://codeclimate.com/github/nullsix/tinder)
+[![Build Status](https://travis-ci.org/nullsix/tinder.png?branch=master)](https://travis-ci.org/nullsix/tinder)
 
 tinder
 ======
