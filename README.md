@@ -1,4 +1,5 @@
 [![Code Climate](https://codeclimate.com/github/nullsix/tinder.png)](https://codeclimate.com/github/nullsix/tinder)
+[![Coverage Status](https://coveralls.io/repos/nullsix/tinder/badge.png?branch=add-coveralls)](https://coveralls.io/r/nullsix/tinder?branch=add-coveralls)
 
 tinder
 ======
