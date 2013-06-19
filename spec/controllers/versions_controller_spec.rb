@@ -24,6 +24,34 @@ describe VersionsController do
     end
   end
 
+  context "with a non-existent piece" do
+    before :each do
+      session[:user_id] = @user.id
+      @piece.id = -1
+    end
+
+    describe "GET index" do
+      subject { get :index, piece_id: @piece.id }
+      it { should redirect_to pieces_path }
+    end
+
+    describe "GET show" do
+      subject { get :show, piece_id: @piece.id, id: -1 }
+      it { should redirect_to pieces_path }
+    end
+  end
+
+  context "with a non-existent version" do
+    before :each do
+      session[:user_id] = @user.id
+
+      describe "GET show" do
+        subject { get :show, piece_id: @piece.id, id: -1 }
+        it { should redirect_to pieces_path }
+      end
+    end
+  end
+
   context "with a logged in user" do
     before :each do
       session[:user_id] = @user.id
