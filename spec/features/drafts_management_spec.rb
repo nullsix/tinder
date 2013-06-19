@@ -1,3 +1,5 @@
+require './spec/support/piece_helper'
+
 feature "Drafts Management" do
   include PieceHelper
 
