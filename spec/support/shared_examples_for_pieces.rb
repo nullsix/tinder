@@ -1,3 +1,4 @@
+require './spec/support/piece_helper'
 include PieceHelper
 
 shared_examples "a user seeing a new piece form" do

@@ -102,10 +102,6 @@ class Piece < ActiveRecord::Base
       end
     end
 
-    def default_current_version
-      @current_version = versions.last
-    end
-
     def default_values_for_empty_piece
       @title = "Untitled Piece" if @title.nil?
       @content = "" if @content.nil?

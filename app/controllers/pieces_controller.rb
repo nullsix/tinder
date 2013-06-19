@@ -76,19 +76,4 @@ class PiecesController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       redirect_to pieces_path
     end
-
-    def title_or_default(title)
-      if title.empty?
-        "Untitled Piece"
-      else
-        title
-      end
-    end
-
-    def build_version(hash)
-      @version = @piece.versions.build
-      @version.title = title_or_default hash[:title]
-      @version.content = hash[:content]
-      @version
-    end
 end
