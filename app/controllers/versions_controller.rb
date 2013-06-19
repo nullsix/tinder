@@ -8,6 +8,9 @@ class VersionsController < ApplicationController
 
   def show
     @version = @piece.versions.find_by_number params[:id]
+
+  rescue ActiveRecord::RecordNotFound
+    redirect_to pieces_path
   end
 
   private
