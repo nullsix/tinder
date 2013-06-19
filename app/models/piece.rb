@@ -119,15 +119,6 @@ class Piece < ActiveRecord::Base
       @content != current_version.content
     end
 
-    def default_values
-      if new_record?
-        default_values_for_empty_piece
-
-      else
-        default_values_for_existing_piece
-      end
-    end
-
     def default_values_for_existing_piece
       if !new_record? && current_version.nil?
         @title = "Untitled Piece"
