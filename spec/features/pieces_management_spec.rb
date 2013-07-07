@@ -9,12 +9,6 @@ end
 feature "Pieces Management", "User wants to create a new piece" do
   include_context "common"
 
-  context "from the root path" do
-    background { visit root_path }
-
-    it_behaves_like "a user creating a piece"
-  end
-
   context "from a page with a piece bar" do
     background do
       visit pieces_path
