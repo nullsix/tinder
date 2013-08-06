@@ -1,0 +1,15 @@
+!!! 5
+%html{ lang: :en }
+  %head
+    = render 'layouts/title'
+    = stylesheet_link_tag "application", media: :all
+    %meta{ name: :viewport, content: "width=device-width, initial-scale=1.0" }
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+    = render 'layouts/shim'
+%body
+  .container
+    = render 'layouts/header'
+    = render 'layouts/flashes'
+    = yield
+    = render 'layouts/footer'
