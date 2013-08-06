@@ -34,6 +34,7 @@ group :assets do
 end
 
 gem 'jquery-rails', '~> 2.1.4'
+gem 'haml', '~> 3.1.8'
 
 group :test do
   gem 'faker',            '~> 1.1.2'
