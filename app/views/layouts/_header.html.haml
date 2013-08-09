@@ -1,0 +1,15 @@
+%header.row
+  %h1.pull-left
+    = link_to 'tinder', root_path
+    %small fuel your creativity
+
+  - if current_user
+    .navbar.pull-right
+      .navbar-inner
+        %ul.nav
+          %li= link_to current_user.name, "/profile", class: :brand
+          %li.divider-vertical
+          %li= link_to "Pieces", pieces_path
+          %li.divider-vertical
+          %li= link_to "Sign Out", signout_path
+
