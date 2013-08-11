@@ -1,0 +1,23 @@
+- title = 'your pieces'
+- provide :title, title
+
+- piece_bar = render partial: "pieces/piece_bar", locals: { current_page: :pieces }
+
+= piece_bar
+.row
+  .span12
+    - if @pieces.empty?
+      %p You have no pieces.
+
+    - else
+      %table.table.table-striped.table-condensed
+        - @pieces.each do |piece|
+          %tr.piece-row
+            %td.piece-version.span8
+              %h3.piece-title= link_to piece.title, piece
+              %p.piece-blurb.muted= piece.blurb
+              - last_modified = "Last modified #{time_ago_in_words(piece.current_version.updated_at)} ago"
+              %small.piece-last-modified.muted.small= last_modified
+            %td.piece-links.span2
+              = render partial: "pieces/piece_links", locals: { piece: piece }
+= piece_bar
