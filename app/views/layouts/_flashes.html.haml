@@ -1,0 +1,17 @@
+- if !flash.empty?
+  .row
+    - if flash[:notice]
+      .alert.alert-success.span12
+        %strong= flash[:notice]
+
+    - if flash[:warning]
+      .alert.alert-warning.span12
+        %strong= flash[:warning]
+
+    - if flash[:alert]
+      .alert.alert-error.span12
+        %strong= flash[:alert]
+
+    - if flash[:info]
+      .alert.alert-info.span12
+        %strong= flash[:info]

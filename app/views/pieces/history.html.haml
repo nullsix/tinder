@@ -1,0 +1,40 @@
+- provide(:title) { 'piece history' }
+
+- if @versions.empty?
+  .row
+    .span12
+      %p This piece has no history you can view.
+
+- else
+  - piece_bar = ""
+  - if owner_is_logged_in? @piece.user
+    - piece_bar = render partial: "pieces/piece_bar",
+        locals: { current_page: :history, piece: @piece }
+
+  = piece_bar
+
+  .row
+    .span12
+      %table.history.table.table-striped
+        - @versions.each do |version|
+          %tr.history-row
+            %td
+              - if version.draft.nil?
+                %p.version-title
+                  = link_to version.title,
+                      piece_version_path(piece_id: @piece.id,
+                                         id: version.number)
+                  %small.number.muted (version ##{version.number})
+                - last_modified = "Last modified #{time_ago_in_words(version.updated_at)} ago"
+
+              -else
+                %p.draft-title
+                  = link_to version.title,
+                      piece_draft_path(piece_id: @piece.id,
+                                       id: version.draft.number)
+                  %small.number.muted (draft ##{version.draft.number})
+                - last_modified = "Last modified #{time_ago_in_words(version.draft.updated_at)} ago"
+
+              %small.last-modified.muted= last_modified
+
+  = piece_bar

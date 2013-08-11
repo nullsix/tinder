@@ -1,0 +1,3 @@
+%li
+  - history_class = current_page == :history ? "btn" : "btn btn-link"
+  = link_to "history", history_piece_path(piece.id), class: history_class

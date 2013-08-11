@@ -1,0 +1,11 @@
+%li
+  - pieces_class = current_page == :pieces ? "btn" : "btn btn-link"
+  .btn-group
+    = link_to "<i class=\"icon-pencil\"></i>".html_safe, new_piece_path,
+        class: "btn btn-primary create-piece",
+        title: "create a new piece"
+    = link_to "your pieces", pieces_path,
+        class: pieces_class,
+        title: "view all your pieces in a list"
+  - unless current_page == :pieces
+    %span.divider /
