@@ -1,56 +1,56 @@
 source 'https://rubygems.org'
+
 ruby '2.0.0'
 
-gem 'rails', '~> 3.2.13'
+gem 'rails', '~> 3.2.14'
 
+# Process management
 gem 'foreman', '~> 0.63.0'
 
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
-
+# Database
 gem 'pg', '~> 0.14.1'
 
+# Authentication
 gem 'omniauth',               '~> 1.1.1'
-gem 'omniauth-google-oauth2', '~> 0.1.13'
+gem 'omniauth-google-oauth2', '~> 0.1.19'
 
 group :development, :test do
-  gem 'rspec-rails',      '~> 2.13.0'
-  gem 'taps',             '~> 0.3.24'
-  gem 'guard-rspec',      '~> 2.5.0'
-  gem 'guard-livereload', '~> 1.1.3'
-  gem 'rack-livereload',  '~> 0.3.11'
-  gem 'yajl-ruby',        '~> 1.1.0'
-  gem 'factory_girl_rails', '~> 4.2.0'
-  gem 'annotate', '~> 2.5.0'
+  gem 'rspec-rails',        '~> 2.13.2' # Rspec in Rails
+  gem 'taps',               '~> 0.3.24' # Database import/export for local/remote servers
+  gem 'guard-rspec',        '~> 2.5.4'  # Automatically run tests when they change
+  gem 'guard-livereload',   '~> 1.1.3'  # Reload browsers when views change
+  gem 'rack-livereload',    '~> 0.3.15' # Makes using guard-livereload easy
+  gem 'yajl-ruby',          '~> 1.1.0'  # JSON parser
+  gem 'factory_girl_rails', '~> 4.2.0'  # For creating test data
+  gem 'annotate',           '~> 2.5.0'  # Annodate the models
 end
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem 'therubyracer',            '~> 0.11.4', :platforms => :ruby
-  gem 'uglifier',                '~> 1.3.0'
-  gem 'sass-rails',              '~> 3.2.6'
-  gem 'bootstrap-sass',          '~> 2.3.0.1'
-  gem 'font-awesome-sass-rails', '~> 3.0.2.2'
-  gem 'coffee-rails',            '~> 3.2.2'
+  gem 'therubyracer',            '~> 0.11.4', :platforms => :ruby # Use V8 JS interpreter in Ruby
+  gem 'uglifier',                '~> 1.3.0'   # Javascript compressor
+  gem 'sass-rails',              '~> 3.2.6'   # Use SASS with rails 
+  gem 'bootstrap-sass',          '~> 2.3.0.1' # Use bootstrap with SASS
+  gem 'font-awesome-sass-rails', '~> 3.0.2.2' # Use fontawesome
+  gem 'coffee-rails',            '~> 3.2.2'   # Use coffeescript in rails
 end
 
-gem 'jquery-rails', '~> 2.1.4'
-gem 'haml', '~> 3.1.8'
+gem 'jquery-rails', '~> 2.1.4' # Use jquery in rails
+gem 'haml',         '~> 3.1.8' # Easier templating than ERB
 
 group :test do
-  gem 'faker',            '~> 1.1.2'
-  gem 'capybara',         '~> 2.0.2'
-  gem 'database_cleaner', '~> 0.9.1'
-  gem 'spork',            '~> 0.9.2'
-  gem 'guard-spork',      '~> 1.5.0'
-  gem 'launchy',          '~> 2.2.0'
-
+  gem 'faker',            '~> 1.1.2' # Fake test data
+  gem 'capybara',         '~> 2.0.2' # Integration specs
+  gem 'database_cleaner', '~> 0.9.1' # Clean database between tests
+  gem 'spork',            '~> 0.9.2' # Keep rails loaded for specs
+  gem 'guard-spork',      '~> 1.5.1' # Manage spork in guard
+ 
   # For watching the file system and notifications on...
   #   linux
-  gem 'rb-inotify', '~> 0.9.0', require: false
-  gem 'libnotify',  '~> 0.8.0', require: false
+  gem 'rb-inotify', '~> 0.9.1', require: false
+  gem 'libnotify',  '~> 0.8.1', require: false
   #   os x
   gem 'rb-fsevent', '~> 0.9.3', require: false
   gem 'growl',      '~> 1.0.3', require: false
@@ -59,19 +59,5 @@ group :test do
   gem 'rb-notifu',  '~> 0.0.4', require: false
 end
 
-gem 'coveralls', require: false
+gem 'coveralls', require: false # Code coverage
 
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# Use unicorn as the app server
-# gem 'unicorn'
-
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'debugger'
