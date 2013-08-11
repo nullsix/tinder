@@ -1,0 +1,9 @@
+- provide :title, @piece.current_version.title
+- piece_bar = render partial: "pieces/piece_bar",
+    locals: { current_page: :piece, piece: @piece }
+
+= piece_bar
+.row
+  .span12
+    = render partial: 'versions/version', locals: { version: @piece.current_version }
+= piece_bar
