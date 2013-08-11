@@ -1,0 +1,10 @@
+.row.piece-bar
+  .span12
+    %ul.breadcrumb
+      - page = { current_page: current_page }
+      = render partial: "pieces/piece_bar/pieces", locals: page
+
+      - unless current_page == :pieces
+        - page_and_piece = page.merge(piece: piece)
+        = render partial: "pieces/piece_bar/piece", locals: page_and_piece
+        = render partial: "pieces/piece_bar/history", locals: page_and_piece
