@@ -1,0 +1,16 @@
+= form_for @piece, class: "span12" do |piece_form|
+  - errors = @piece.errors
+  - if errors.any?
+    .row
+      #error_explanation.text-error.span12
+        %h3.text-error #{pluralize(errors.count, "error")} kept us from saving your piece.
+        %ul
+          - errors.full_messages.each do |msg|
+            %li= msg
+
+  .row
+    .span12
+      = piece_form.text_field :title, placeholder: :title, autofocus: true
+      = piece_form.text_area :content, placeholder: :content
+
+  %div= piece_form.submit class: "btn btn-primary"
