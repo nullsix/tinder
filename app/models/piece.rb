@@ -16,12 +16,12 @@ class Piece < ActiveRecord::Base
 
   validates :title, length: { maximum: 255 }
 
-  has_many :versions, dependent: :destroy, inverse_of: :piece,
-    order: "created_at ASC"
+  has_many :versions, -> { order(created_at: :asc) },
+    dependent: :destroy, inverse_of: :piece
   has_many :drafts, through: :versions
 
-  scope :last_modified_first, order("updated_at DESC")
-  default_scope last_modified_first
+  scope :last_modified_first, -> { order("updated_at DESC") }
+  default_scope { last_modified_first }
 
   after_save :create_first_version
   before_update :check_for_new_version
