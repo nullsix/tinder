@@ -71,7 +71,7 @@ class PiecesController < ApplicationController
   private
     def get_piece
       @piece = current_user.pieces.find params[:id]
-    
+
     # The piece either doesn't exist or doesn't belong to this user.
     rescue ActiveRecord::RecordNotFound
       redirect_to pieces_path
