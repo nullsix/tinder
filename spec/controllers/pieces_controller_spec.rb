@@ -554,22 +554,22 @@ describe PiecesController, "GET history" do
       context "with a non-existent piece" do
         it "redirects to root" do
           get :history, id: -1
-          
+
           should redirect_to pieces_path
         end
       end
 
       context "with an existing piece" do
+        let(:versions) { piece.versions}
+
         before :each do
-          @versions = piece.versions
-          create_drafts @versions
-          @versions.reverse!
+          create_drafts versions
 
           get :history, id: piece.id
         end
 
         specify "@versions contains all the user's versions" do
-          assigns(:versions).should == @versions
+          assigns(:versions).should == versions.reverse
         end
 
         specify "@piece is the right piece" do
