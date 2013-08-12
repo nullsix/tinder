@@ -192,7 +192,7 @@ describe PiecesController, "POST create" do
           @valid_create.call
 
           piece = Piece.first
-          piece.title.should match /Untitled Piece/
+          piece.title.should match(/Untitled Piece/)
         end
       end
 
@@ -211,7 +211,7 @@ describe PiecesController, "POST create" do
           @valid_create.call
           Piece.first.title.should == @piece_attr[:title]
         end
-        
+
         context "that is too long" do
           before :each do
             @invalid_piece_attr = @piece_attr
@@ -493,12 +493,12 @@ describe PiecesController, "DELETE destroy" do
       end
 
       it "deletes the piece" do
-        expect{ @valid_destroy.call }.to change(Piece, :count).by -1
+        expect{ @valid_destroy.call }.to change(Piece, :count).by(-1)
       end
 
       it "deletes the associated versions" do
         expect { @valid_destroy.call }.to change(Version, :count).
-          by -1*first_piece.versions.length
+          by(-1*first_piece.versions.length)
       end
 
       it "redirects to the pieces#index" do
@@ -541,7 +541,7 @@ describe PiecesController, "GET history" do
     context "with a non-existent piece" do
       it "redirects to root" do
         get :history, id: -1
-        
+
         should redirect_to root_path
       end
     end
@@ -554,22 +554,22 @@ describe PiecesController, "GET history" do
       context "with a non-existent piece" do
         it "redirects to root" do
           get :history, id: -1
-          
+
           should redirect_to pieces_path
         end
       end
 
       context "with an existing piece" do
+        let(:versions) { piece.versions}
+
         before :each do
-          @versions = piece.versions
-          create_drafts @versions
-          @versions.reverse!
+          create_drafts versions
 
           get :history, id: piece.id
         end
 
         specify "@versions contains all the user's versions" do
-          assigns(:versions).should == @versions
+          assigns(:versions).should == versions.reverse
         end
 
         specify "@piece is the right piece" do
@@ -584,11 +584,11 @@ describe PiecesController, "GET history" do
 
     context "who isn't the owner" do
       include_context "is not owner"
-      
+
       context "with a non-existent piece" do
         it "redirects to root" do
           get :history, id: -1
-          
+
           should redirect_to pieces_path
         end
       end
