@@ -1,9 +1,9 @@
 Tinder::Application.routes.draw do
   root to: "pages#index"
 
-  match "/auth/:provider/callback" => "sessions#create"
+  get "/auth/:provider/callback" => "sessions#create"
 
-  match "/signout" => "sessions#destroy", :as => :signout
+  get "/signout" => "sessions#destroy", :as => :signout
 
   resources :users
 
