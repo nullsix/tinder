@@ -192,7 +192,7 @@ describe PiecesController, "POST create" do
           @valid_create.call
 
           piece = Piece.first
-          piece.title.should match /Untitled Piece/
+          piece.title.should match(/Untitled Piece/)
         end
       end
 
@@ -493,12 +493,12 @@ describe PiecesController, "DELETE destroy" do
       end
 
       it "deletes the piece" do
-        expect{ @valid_destroy.call }.to change(Piece, :count).by -1
+        expect{ @valid_destroy.call }.to change(Piece, :count).by(-1)
       end
 
       it "deletes the associated versions" do
         expect { @valid_destroy.call }.to change(Version, :count).
-          by -1*first_piece.versions.length
+          by(-1*first_piece.versions.length)
       end
 
       it "redirects to the pieces#index" do
