@@ -211,7 +211,7 @@ describe PiecesController, "POST create" do
           @valid_create.call
           Piece.first.title.should == @piece_attr[:title]
         end
-        
+
         context "that is too long" do
           before :each do
             @invalid_piece_attr = @piece_attr
@@ -541,7 +541,7 @@ describe PiecesController, "GET history" do
     context "with a non-existent piece" do
       it "redirects to root" do
         get :history, id: -1
-        
+
         should redirect_to root_path
       end
     end
@@ -584,11 +584,11 @@ describe PiecesController, "GET history" do
 
     context "who isn't the owner" do
       include_context "is not owner"
-      
+
       context "with a non-existent piece" do
         it "redirects to root" do
           get :history, id: -1
-          
+
           should redirect_to pieces_path
         end
       end
