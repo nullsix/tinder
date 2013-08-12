@@ -96,6 +96,13 @@ Spork.prefork do
     config.include FeatureSpecHelper, type: :feature
   end
 
+  Capybara.configure do |config|
+    config.match = :one
+    config.exact_options = true
+    config.ignore_hidden_elements = true
+    config.visible_text_only = true
+  end
+
   OmniAuth.config.test_mode = true
   OmniAuth.config.add_mock(:google_oauth2, {
     uid: "12345",
