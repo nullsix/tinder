@@ -15,7 +15,7 @@ class DraftsController < ApplicationController
   end
 
   def show
-    @draft = @piece.drafts.find_by_number params[:id]
+    @draft = @piece.drafts.find_by number: params[:id]
 
     unless @draft
       redirect_to piece_path params[:piece_id]

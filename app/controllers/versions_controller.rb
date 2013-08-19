@@ -7,7 +7,7 @@ class VersionsController < ApplicationController
   end
 
   def show
-    @version = @piece.versions.find_by_number params[:id]
+    @version = @piece.versions.find_by number: params[:id]
   end
 
   private
