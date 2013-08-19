@@ -65,7 +65,7 @@ class Piece < ActiveRecord::Base
   def changed?
     title_changed? || content_changed?
   end
-  
+
   def create_draft(version = current_version)
     return false if version.draft
 

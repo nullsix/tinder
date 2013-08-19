@@ -11,7 +11,6 @@
 
 class Draft < ActiveRecord::Base
   belongs_to :version
-  attr_accessible :number
 
   def piece
     version.piece

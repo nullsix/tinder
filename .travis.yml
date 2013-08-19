@@ -1,6 +1,9 @@
 language: ruby
 rvm:
-  - 2.0.0
+- 2.0.0
 before_script:
-  - psql -c 'create database tinder_test;' -U postgres
-  - rake db:migrate
+- psql -c 'create database tinder_test;' -U postgres
+- rake db:migrate
+env:
+  matrix:
+    secure: XCqK+WRk7e3sFdR0g3ogCzSYY+Z4Xlmn2TZwAdHjUWbD1Zdfx6c1RmrbqgA9vvQhe31QxPE4zO0eqXVFhV7UpjxeZnt07tHIINh9bstbzKoSzy1dcDqSZTCqlGoNPemYcjpPl9S34ZHYrSP3qXRB4LLCPK8Kt9EtfEPahKg1JPs=

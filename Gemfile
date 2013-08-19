@@ -12,27 +12,23 @@ gem 'pg', '~> 0.16.0'
 
 # Authentication
 gem 'omniauth',               '~> 1.1.1'
-gem 'omniauth-google-oauth2', '~> 0.2.0'
-
-# Gems added during the upgrade process
-gem 'protected_attributes'
-gem 'rails-observers'
-gem 'actionpack-page_caching'
-gem 'actionpack-action_caching'
+gem 'omniauth-google-oauth2', '~> 0.2.1'
 
 group :development, :test do
-  gem 'rspec-rails',        '~> 2.14.0' # Rspec in Rails
-  gem 'taps',               '~> 0.3.24' # Database import/export for local/remote servers
+  gem 'rspec-rails',        '~> 2.14.0'   # Rspec in Rails
+  gem 'taps',               '~> 0.3.24'   # Database import/export for local/remote servers
   gem 'guard',              '~> 1.8.2'
-  gem 'guard-rspec',        '~> 3.0.2'  # Automatically run tests when they change
-  gem 'guard-livereload',   '~> 1.4.0'  # Reload browsers when views change
-  gem 'rack-livereload',    '~> 0.3.15' # Makes using guard-livereload easy
-  gem 'yajl-ruby',          '~> 1.1.0'  # JSON parser
-  gem 'factory_girl_rails', '~> 4.2.0'  # For creating test data
-  gem 'annotate',           '~> 2.5.0'  # Annodate the models
+  gem 'guard-rspec',        '~> 3.0.2'    # Automatically run tests when they change
+  gem 'guard-livereload',   '~> 1.4.0'    # Reload browsers when views change
+  gem 'rack-livereload',    '~> 0.3.15'   # Makes using guard-livereload easy
+  gem 'yajl-ruby',          '~> 1.1.0'    # JSON parser
+  gem 'factory_girl_rails', '~> 4.2.0'    # For creating test data
+  gem 'annotate',           '~> 2.5.0'    # Annodate the models
+  gem 'pry',                '~> 0.9.12.2' # irb replacement
+  gem 'awesome_print',      '~> 1.1.0'    # Better print statements for objects
 end
 
-# # Assets
+# Assets
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'therubyracer',            '~> 0.11.4', :platforms => :ruby # Use V8 JS interpreter in Ruby
 gem 'uglifier',                '~> 2.1.2'   # Javascript compressor
@@ -48,7 +44,7 @@ group :test do
   gem 'faker',            '~> 1.2.0' # Fake test data
   gem 'capybara',         '~> 2.1.0' # Integration specs
   gem 'database_cleaner', '~> 1.1.1' # Clean database between tests
-  gem 'spork',            '~> 0.9.2' # Keep rails loaded for specs
+  gem 'spork-rails',      github: 'sporkrb/spork-rails' # Keep rails loaded for specs
   gem 'guard-spork',      '~> 1.5.1' # Manage spork in guard
 
   # For watching the file system and notifications on...
@@ -65,6 +61,7 @@ end
 
 gem 'coveralls', require: false # Code coverage
 
-# Heroku
-gem 'rails_12factor', '~> 0.0.2' # Get Rails 4 working on Heroku
+group :production do
+  gem 'rails_12factor', '~> 0.0.2' # Get Rails 4 working on Heroku
+end
 
