@@ -61,6 +61,7 @@ end
 
 gem 'coveralls', require: false # Code coverage
 
-# Heroku
-gem 'rails_12factor', '~> 0.0.2' # Get Rails 4 working on Heroku
+group :production do
+  gem 'rails_12factor', '~> 0.0.2' # Get Rails 4 working on Heroku
+end
 
