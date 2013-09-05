@@ -18,6 +18,7 @@ group :development, :test do
   gem 'rspec-rails',        '~> 2.14.0'   # Rspec in Rails
   gem 'taps',               '~> 0.3.24'   # Database import/export for local/remote servers
   gem 'guard',              '~> 1.8.2'
+  gem 'guard-bundler',      '~> 1.0.0'
   gem 'guard-rspec',        '~> 3.0.2'    # Automatically run tests when they change
   gem 'guard-livereload',   '~> 1.4.0'    # Reload browsers when views change
   gem 'rack-livereload',    '~> 0.3.15'   # Makes using guard-livereload easy
