@@ -20,7 +20,7 @@ guard 'spork', :cucumber_env => { 'RAILS_ENV' => 'test' }, :rspec_env => { 'RAIL
   watch(%r{^spec/factories/.+\.rb}) { :rspec }
 end
 
-guard 'rspec', all_after_pass: false, cli: '--drb' do
+guard 'rspec', all_after_pass: false, cli: '--drb --format progress' do
 
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
