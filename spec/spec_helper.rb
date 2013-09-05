@@ -1,8 +1,4 @@
-require 'rubygems'
 require 'spork'
-require 'database_cleaner'
-require 'coveralls'
-Coveralls.wear! 'rails'
 #uncomment the following line to use spork with the debugger
 #require 'spork/ext/ruby-debug'
 
@@ -42,10 +38,14 @@ Spork.prefork do
   # This file is copied to spec/ when you run 'rails generate rspec:install'
   ENV["RAILS_ENV"] ||= 'test'
   require File.expand_path("../../config/environment", __FILE__)
+  require 'rubygems'
   require 'rspec/rails'
   require 'rspec/autorun'
   require 'capybara/rspec'
   require 'capybara/rails'
+  require 'database_cleaner'
+  require 'coveralls'
+  Coveralls.wear! 'rails'
 
   # Requires supporting ruby files with custom matchers and macros, etc,
   # in spec/support/ and its subdirectories.
